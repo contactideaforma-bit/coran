@@ -9,6 +9,9 @@ export interface Segment {
 
 export interface Word {
   segments: Segment[];
+  /** Numéro du fichier audio mot à mot (les signes de pause ۖ ۗ ۞ comptent
+   *  dans la numérotation officielle, d'où ce champ dédié). */
+  audio: number;
 }
 
 export interface Verse {
@@ -64,22 +67,36 @@ function parserTajweed(html: string): Segment[] {
   return segments;
 }
 
+/** Signes seuls (pauses ۖ ۗ ۚ, hizb ۞, sajda ۩) : affichés avec le mot
+ *  précédent chez Quran.com, ils comptent néanmoins dans la numérotation
+ *  des fichiers audio mot à mot. */
+const SIGNE_SEUL = /^[ۖ-۞۩]+$/;
+
 /** Découpe les segments en mots (les espaces marquent les frontières,
  *  y compris à l'intérieur d'un segment coloré, ex. ikhfa entre deux mots). */
 function segmentsEnMots(segments: Segment[]): Word[] {
   const mots: Word[] = [];
   let courant: Segment[] = [];
+  let numToken = 0;
+
+  const fermerToken = () => {
+    if (!courant.length) return;
+    numToken += 1;
+    const texte = courant.map((s) => s.t).join("");
+    if (!SIGNE_SEUL.test(texte)) {
+      mots.push({ segments: courant, audio: numToken });
+    }
+    courant = [];
+  };
+
   for (const s of segments) {
     const parties = s.t.split(/\s+/);
     parties.forEach((p, i) => {
-      if (i > 0 && courant.length) {
-        mots.push({ segments: courant });
-        courant = [];
-      }
+      if (i > 0) fermerToken();
       if (p) courant.push({ t: p, r: s.r });
     });
   }
-  if (courant.length) mots.push({ segments: courant });
+  fermerToken();
   return mots;
 }
 
@@ -124,3 +141,40 @@ export async function chargerSourate(n: number): Promise<SourateData> {
 }
 
 export const BASMALA = "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ";
+
+/* ===== Traduction française mot à mot =====
+ * Source : QuranWBW (Dr. Usama Nonnenmacher), fichier statique couvrant
+ * tout le Coran, structure { sourate: { verset: [[mots…]] } }.
+ */
+const MOTS_FR_URL =
+  "https://static.quranwbw.com/data/v4/words-data/translations/11.json?version=1";
+
+type MotsFr = Record<string, Record<string, string[][]>>;
+
+let motsFrData: MotsFr | null = null;
+let motsFrPromesse: Promise<MotsFr> | null = null;
+
+export async function chargerMotsFr(): Promise<MotsFr> {
+  if (motsFrData) return motsFrData;
+  if (!motsFrPromesse) {
+    motsFrPromesse = fetch(MOTS_FR_URL)
+      .then((r) => {
+        if (!r.ok) throw new Error("mots-fr indisponibles");
+        return r.json();
+      })
+      .then((d: MotsFr) => {
+        motsFrData = d;
+        return d;
+      })
+      .catch((e) => {
+        motsFrPromesse = null;
+        throw e;
+      });
+  }
+  return motsFrPromesse;
+}
+
+/** Traduction française du mot `w` (index d'affichage, base 0). */
+export function motFr(sourate: number, verset: number, w: number): string | null {
+  return motsFrData?.[String(sourate)]?.[String(verset)]?.[0]?.[w] ?? null;
+}

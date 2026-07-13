@@ -4,7 +4,9 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import {
   BASMALA,
+  chargerMotsFr,
   chargerSourate,
+  motFr,
   type SourateData,
   type Word,
 } from "@/lib/coran";
@@ -42,8 +44,16 @@ export default function Lecteur({ n }: { n: number }) {
   const [regleActive, setRegleActive] = useState<TajwidRule | null>(null);
   const [lecture, setLecture] = useState<Lecture>(null);
   const [motActif, setMotActif] = useState<MotActif | null>(null);
+  const [motsFrPrets, setMotsFrPrets] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const dataRef = useRef<SourateData | null>(null);
+
+  // Précharger les traductions mot à mot françaises (en arrière-plan)
+  useEffect(() => {
+    chargerMotsFr()
+      .then(() => setMotsFrPrets(true))
+      .catch(() => {});
+  }, []);
 
   const meta = SOURATES.find((s) => s.n === n)!;
   const police = prefs.police;
@@ -120,7 +130,7 @@ export default function Lecteur({ n }: { n: number }) {
   };
 
   const clicMot = (v: number, w: number, word: Word) => {
-    jouer(urlMot(n, v, w + 1), { type: "mot", v, w });
+    jouer(urlMot(n, v, word.audio), { type: "mot", v, w });
     setMotActif({ v, w, word });
   };
 
@@ -481,22 +491,41 @@ export default function Lecteur({ n }: { n: number }) {
           <div className="card pop flex w-full max-w-3xl items-center gap-3 rounded-2xl px-4 py-3 shadow-soft">
             <button
               onClick={() => clicMot(motActif.v, motActif.w, motActif.word)}
-              className="rounded-full px-3 py-2 text-lg text-white transition active:scale-95"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition active:scale-95"
               style={{ backgroundColor: "var(--accent)" }}
               aria-label="Réécouter le mot"
             >
-              🔊
+              <svg
+                viewBox="0 0 24 24"
+                width="22"
+                height="22"
+                fill="#fff"
+                aria-hidden="true"
+              >
+                <path d="M3 9v6h4l5 5V4L7 9H3z" />
+                <path d="M16.5 12a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4z" />
+                <path d="M14 3.8v2.1a6.5 6.5 0 0 1 0 12.2v2.1a8.5 8.5 0 0 0 0-16.4z" />
+              </svg>
             </button>
-            <span className={`arabic text-2xl ${police}`} dir="rtl">
-              {motActif.word.segments.map((s, si) =>
-                s.r ? (
-                  <span key={si} style={{ color: couleur(RULE_BY_ID[s.r]) }}>
-                    {s.t}
-                  </span>
-                ) : (
-                  <span key={si}>{s.t}</span>
-                )
-              )}
+            <span className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-0.5">
+              <span className={`arabic text-2xl ${police}`} dir="rtl">
+                {motActif.word.segments.map((s, si) =>
+                  s.r ? (
+                    <span key={si} style={{ color: couleur(RULE_BY_ID[s.r]) }}>
+                      {s.t}
+                    </span>
+                  ) : (
+                    <span key={si}>{s.t}</span>
+                  )
+                )}
+              </span>
+              <span
+                className="text-sm font-medium"
+                style={{ color: "var(--muted)" }}
+              >
+                {motFr(n, motActif.v, motActif.w) ??
+                  (motsFrPrets ? "" : "traduction…")}
+              </span>
             </span>
             <span className="flex flex-1 flex-wrap justify-end gap-1.5">
               {reglesDuMot(motActif.word).length === 0 ? (
@@ -508,9 +537,13 @@ export default function Lecteur({ n }: { n: number }) {
                   <button
                     key={r.id}
                     onClick={() => setRegleActive(r)}
-                    className="rounded-full border px-2.5 py-1 text-xs font-bold transition active:scale-95"
-                    style={{ borderColor: couleur(r), color: couleur(r) }}
+                    className="flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-bold transition active:scale-95"
+                    style={{ borderColor: couleur(r), color: "var(--text)" }}
                   >
+                    <span
+                      className="inline-block h-2 w-2 rounded-full"
+                      style={{ backgroundColor: couleur(r) }}
+                    />
                     {r.nom.split(" (")[0]}
                   </button>
                 ))

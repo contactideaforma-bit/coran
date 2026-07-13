@@ -3,10 +3,11 @@
  * restent disponibles sans connexion après une première visite.
  * (L'audio n'est pas mis en cache pour préserver l'espace de stockage.)
  */
-const CACHE = "coran-tajwid-v1";
+const CACHE = "coran-tajwid-v2";
 
 const HOTES_DONNEES = [
   "api.quran.com",
+  "static.quranwbw.com",
   "fonts.googleapis.com",
   "fonts.gstatic.com",
 ];

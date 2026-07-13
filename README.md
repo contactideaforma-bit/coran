@@ -11,6 +11,12 @@ npm run dev
 
 Puis ouvrir http://localhost:3000
 
+## Fonctionnalités (V5)
+
+- Traduction française mot à mot : toucher un mot affiche son sens (source : QuranWBW, Dr. Usama Nonnenmacher) à côté de sa prononciation
+- Audio mot à mot fiabilisé : numérotation officielle respectée même avec les signes de pause (ۖ ۗ ۞)
+- Icône de lecture redessinée (haut-parleur blanc sur fond accent), lisibilité vérifiée en clair et sombre
+
 ## Fonctionnalités (V4)
 
 - Lecture de la sourate entière : les versets s'enchaînent avec suivi visuel et défilement automatique
