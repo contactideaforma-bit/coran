@@ -1,4 +1,4 @@
-/* Service worker — cache hors-ligne de Coran Tajwid.
+/* Service worker — cache hors-ligne de My Easy Muslim.
  * Texte des sourates (API Quran.com), polices et pages visitées
  * restent disponibles sans connexion après une première visite.
  * (L'audio n'est pas mis en cache pour préserver l'espace de stockage.)
