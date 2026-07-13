@@ -62,7 +62,7 @@ const MODULES = [
     href: "/jeux",
     icone: Manette,
     nom: "Jeux",
-    description: "Jeu des lettres (3 niveaux) et quiz de connaissances",
+    description: "Jeu Nourania (niveaux par leçon) et quiz de connaissances",
   },
 ];
 

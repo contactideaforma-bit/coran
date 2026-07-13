@@ -10,6 +10,7 @@ import {
   type Lettre,
 } from "@/data/nourania";
 import { usePrefs } from "@/lib/prefs";
+import { urlMot } from "@/lib/audio";
 import Entete from "@/components/Entete";
 import { HautParleur, Lettres, Verifie } from "@/components/Icones";
 
@@ -84,6 +85,20 @@ export default function Nourania() {
   }, []);
 
   const lecon: Lecon | undefined = LECONS.find((l) => l.id === leconActive);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  /** Joue l'élément : vrai enregistrement du Coran si disponible, sinon synthèse. */
+  const jouerElement = (e: ElementLecon) => {
+    audioRef.current?.pause();
+    if (e.audio) {
+      const [s, v, w] = e.audio;
+      const audio = new Audio(urlMot(s, v, w));
+      audioRef.current = audio;
+      audio.play().catch(() => prononcer(e.vocal));
+    } else {
+      prononcer(e.vocal);
+    }
+  };
 
   const clicLettre = (l: Lettre) => {
     setLettreActive(l);
@@ -92,7 +107,7 @@ export default function Nourania() {
 
   const clicElement = (e: ElementLecon) => {
     setElementActif(e);
-    prononcer(e.vocal);
+    jouerElement(e);
   };
 
   const terminer = (id: number) => {
@@ -304,7 +319,7 @@ export default function Nourania() {
           </h3>
           {elementActif.aide && <p className="mt-3">{elementActif.aide}</p>}
           <BoutonsFiche
-            ecouter={() => prononcer(elementActif.vocal)}
+            ecouter={() => jouerElement(elementActif)}
             fermer={() => setElementActif(null)}
           />
         </Fiche>

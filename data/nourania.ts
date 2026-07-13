@@ -45,6 +45,8 @@ export interface ElementLecon {
   translit: string;
   vocal: string; // texte lu par la synthèse vocale
   aide?: string;
+  /** Référence audio réelle [sourate, verset, mot] (prioritaire sur la synthèse). */
+  audio?: [number, number, number];
 }
 
 export interface Lecon {
@@ -103,7 +105,8 @@ export const LECONS: Lecon[] = [
     elements: CONSONNES.map((l) => ({
       principal: `${l.arabe}${FATHA} ${l.arabe}${KASRA} ${l.arabe}${DAMMA}`,
       translit: `${base(l)}a • ${base(l)}i • ${base(l)}ou`,
-      vocal: `${l.arabe}${FATHA}. ${l.arabe}${KASRA}. ${l.arabe}${DAMMA}`,
+      // Style du maître Nourania : « bâ' fatha ba, bâ' kasra bi… »
+      vocal: `${l.nomArabe} فَتْحَة ${l.arabe}${FATHA}، ${l.nomArabe} كَسْرَة ${l.arabe}${KASRA}، ${l.nomArabe} ضَمَّة ${l.arabe}${DAMMA}`,
     })),
   },
   {
@@ -115,7 +118,7 @@ export const LECONS: Lecon[] = [
     elements: CONSONNES.map((l) => ({
       principal: `${l.arabe}${FATHATAN} ${l.arabe}${KASRATAN} ${l.arabe}${DAMMATAN}`,
       translit: `${base(l)}an • ${base(l)}in • ${base(l)}oun`,
-      vocal: `${l.arabe}${FATHATAN}. ${l.arabe}${KASRATAN}. ${l.arabe}${DAMMATAN}`,
+      vocal: `${l.nomArabe} فَتْحَتَان ${l.arabe}${FATHATAN}ا، ${l.nomArabe} كَسْرَتَان ${l.arabe}${KASRATAN}، ${l.nomArabe} ضَمَّتَان ${l.arabe}${DAMMATAN}`,
     })),
   },
   {
@@ -127,7 +130,7 @@ export const LECONS: Lecon[] = [
     elements: CONSONNES.map((l) => ({
       principal: `${l.arabe}${FATHA}ا ${l.arabe}${KASRA}ي ${l.arabe}${DAMMA}و`,
       translit: `${base(l)}â • ${base(l)}î • ${base(l)}oû`,
-      vocal: `${l.arabe}${FATHA}ا. ${l.arabe}${KASRA}ي. ${l.arabe}${DAMMA}و`,
+      vocal: `${l.arabe}${FATHA}ا، ${l.arabe}${KASRA}ي، ${l.arabe}${DAMMA}و`,
     })),
   },
   {
@@ -139,7 +142,7 @@ export const LECONS: Lecon[] = [
     elements: CONSONNES.filter((l) => l.arabe !== "أ").map((l) => ({
       principal: `أ${FATHA}${l.arabe}${SUKUN} إ${KASRA}${l.arabe}${SUKUN} أ${DAMMA}${l.arabe}${SUKUN}`,
       translit: `a${base(l)} • i${base(l)} • ou${base(l)}`,
-      vocal: `أ${FATHA}${l.arabe}${SUKUN}. إ${KASRA}${l.arabe}${SUKUN}. أ${DAMMA}${l.arabe}${SUKUN}`,
+      vocal: `أ${FATHA}${l.arabe}${SUKUN}، إ${KASRA}${l.arabe}${SUKUN}، أ${DAMMA}${l.arabe}${SUKUN}`,
     })),
   },
   {
@@ -151,7 +154,7 @@ export const LECONS: Lecon[] = [
     elements: CONSONNES.filter((l) => l.arabe !== "أ").map((l) => ({
       principal: `أ${FATHA}${l.arabe}${SHADDA}${FATHA} إ${KASRA}${l.arabe}${SHADDA}${KASRA} أ${DAMMA}${l.arabe}${SHADDA}${DAMMA}`,
       translit: `a${base(l)}${base(l)}a • i${base(l)}${base(l)}i • ou${base(l)}${base(l)}ou`,
-      vocal: `أ${FATHA}${l.arabe}${SHADDA}${FATHA}. إ${KASRA}${l.arabe}${SHADDA}${KASRA}. أ${DAMMA}${l.arabe}${SHADDA}${DAMMA}`,
+      vocal: `أ${FATHA}${l.arabe}${SHADDA}${FATHA}، إ${KASRA}${l.arabe}${SHADDA}${KASRA}، أ${DAMMA}${l.arabe}${SHADDA}${DAMMA}`,
     })),
   },
   {
@@ -161,23 +164,25 @@ export const LECONS: Lecon[] = [
     intro:
       "Bravo, tu sais maintenant tout déchiffrer ! Voici des mots du Coran qui combinent voyelles, prolongations, soukoun et shadda. Lis-les à voix haute, puis vérifie avec l'audio.",
     grandeGrille: true,
+    // Chaque mot vient d'Al-Fâtiha ou d'Al-Ikhlas : l'audio est la vraie
+    // prononciation enregistrée (mot à mot Quran.com), pas la synthèse vocale.
     elements: [
-      { principal: "بِسْمِ", translit: "bismi", vocal: "بِسْمِ", aide: "« Au nom de » — le tout premier mot du Coran." },
-      { principal: "رَبِّ", translit: "rabbi", vocal: "رَبِّ", aide: "« Seigneur » — remarque la shadda sur le ب." },
-      { principal: "قُلْ", translit: "qoul", vocal: "قُلْ", aide: "« Dis » — soukoun final sur le ل." },
-      { principal: "نُورٌ", translit: "noûroun", vocal: "نُورٌ", aide: "« Lumière » — madd en و puis tanwîn." },
-      { principal: "كِتَابٌ", translit: "kitâboun", vocal: "كِتَابٌ", aide: "« Livre » — madd en ا." },
-      { principal: "رَحِيمٌ", translit: "rahîmoun", vocal: "رَحِيمٌ", aide: "« Très Miséricordieux » — madd en ي." },
-      { principal: "مَلِكٌ", translit: "malikoun", vocal: "مَلِكٌ", aide: "« Roi » — trois voyelles simples." },
-      { principal: "يَوْمٌ", translit: "yawmoun", vocal: "يَوْمٌ", aide: "« Jour » — le و porte un soukoun." },
-      { principal: "عَلِيمٌ", translit: "'alîmoun", vocal: "عَلِيمٌ", aide: "« Omniscient » — commence par la lettre ع." },
-      { principal: "سَلَامٌ", translit: "salâmoun", vocal: "سَلَامٌ", aide: "« Paix » — deux madd à suivre." },
-      { principal: "دِينٌ", translit: "dînoun", vocal: "دِينٌ", aide: "« Religion » — madd en ي." },
-      { principal: "عَبْدٌ", translit: "'abdoun", vocal: "عَبْدٌ", aide: "« Serviteur » — soukoun au milieu." },
-      { principal: "شَمْسٌ", translit: "chamsoun", vocal: "شَمْسٌ", aide: "« Soleil » — soukoun sur le م." },
-      { principal: "قَمَرٌ", translit: "qamaroun", vocal: "قَمَرٌ", aide: "« Lune » — le ق profond." },
-      { principal: "جَنَّةٌ", translit: "jannatoun", vocal: "جَنَّةٌ", aide: "« Paradis » — shadda sur le ن." },
-      { principal: "حَمْدٌ", translit: "hamdoun", vocal: "حَمْدٌ", aide: "« Louange » — le ح soufflé." },
+      { principal: "بِسْمِ", translit: "bismi", vocal: "بِسْمِ", aide: "« Au nom de » — le tout premier mot du Coran.", audio: [1, 1, 1] },
+      { principal: "ٱلْحَمْدُ", translit: "al-hamdou", vocal: "الحمد", aide: "« La louange » — le ح soufflé, soukoun sur le م.", audio: [1, 2, 1] },
+      { principal: "لِلَّهِ", translit: "lillâhi", vocal: "لله", aide: "« À Allah » — lâm doublé par la shadda.", audio: [1, 2, 2] },
+      { principal: "رَبِّ", translit: "rabbi", vocal: "رب", aide: "« Seigneur » — appuie sur la shadda du ب.", audio: [1, 2, 3] },
+      { principal: "ٱلْعَٰلَمِينَ", translit: "al-'âlamîna", vocal: "العالمين", aide: "« Les mondes » — la lettre ع puis un madd en ي.", audio: [1, 2, 4] },
+      { principal: "ٱلرَّحِيمِ", translit: "ar-rahîmi", vocal: "الرحيم", aide: "« Le Très Miséricordieux » — lâm solaire muet, madd en ي.", audio: [1, 3, 2] },
+      { principal: "مَٰلِكِ", translit: "mâliki", vocal: "مالك", aide: "« Maître » — le petit alif suspendu se lit « â ».", audio: [1, 4, 1] },
+      { principal: "يَوْمِ", translit: "yawmi", vocal: "يوم", aide: "« Jour » — le و porte un soukoun.", audio: [1, 4, 2] },
+      { principal: "ٱلدِّينِ", translit: "ad-dîni", vocal: "الدين", aide: "« La rétribution » — lâm solaire, shadda sur le د.", audio: [1, 4, 3] },
+      { principal: "إِيَّاكَ", translit: "iyyâka", vocal: "إياك", aide: "« C'est Toi » — shadda sur le ي.", audio: [1, 5, 1] },
+      { principal: "نَعْبُدُ", translit: "na'boudou", vocal: "نعبد", aide: "« Nous adorons » — le ع avec soukoun.", audio: [1, 5, 2] },
+      { principal: "نَسْتَعِينُ", translit: "nasta'înou", vocal: "نستعين", aide: "« Nous implorons l'aide » — madd en ي vers la fin.", audio: [1, 5, 4] },
+      { principal: "قُلْ", translit: "qoul", vocal: "قل", aide: "« Dis » — le ق profond, soukoun final.", audio: [112, 1, 1] },
+      { principal: "هُوَ", translit: "houwa", vocal: "هو", aide: "« Lui » — deux lettres simples.", audio: [112, 1, 2] },
+      { principal: "أَحَدٌ", translit: "ahadoun", vocal: "أحد", aide: "« Unique » — se termine par un tanwîn « oun ».", audio: [112, 1, 4] },
+      { principal: "ٱلصَّمَدُ", translit: "as-samadou", vocal: "الصمد", aide: "« L'Absolu » — lâm solaire, ص emphatique.", audio: [112, 2, 2] },
     ],
   },
 ];

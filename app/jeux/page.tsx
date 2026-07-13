@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { ALPHABET, type Lettre } from "@/data/nourania";
+import { ALPHABET, LECONS, type Lettre } from "@/data/nourania";
 import { QUESTIONS_QUIZ } from "@/data/quiz";
 import { usePrefs } from "@/lib/prefs";
+import { urlMot } from "@/lib/audio";
 import Entete from "@/components/Entete";
 import {
   HautParleur,
@@ -45,32 +46,42 @@ function enregistrerRecord(cle: string, score: number) {
   }
 }
 
-/* ===== Niveaux du jeu des lettres ===== */
+function lireProgressionNourania(): number[] {
+  try {
+    const p = JSON.parse(localStorage.getItem("coran-nourania") ?? "[]");
+    return Array.isArray(p) ? p : [];
+  } catch {
+    return [];
+  }
+}
 
-type Niveau = "facile" | "moyen" | "difficile";
+/* ===== Niveaux basés sur les leçons Nourania ===== */
 
-const NIVEAUX: { id: Niveau; nom: string; description: string; choix: number }[] = [
-  {
-    id: "facile",
-    nom: "Facile",
-    description: "3 propositions, lettres bien différentes",
-    choix: 3,
-  },
-  {
-    id: "moyen",
-    nom: "Moyen",
-    description: "4 propositions au hasard",
-    choix: 4,
-  },
-  {
-    id: "difficile",
-    nom: "Difficile",
-    description: "6 propositions, avec les lettres qui se ressemblent",
-    choix: 6,
-  },
+type NiveauId =
+  | "lettres"
+  | "voyelles"
+  | "tanwin"
+  | "madd"
+  | "soukoun"
+  | "shadda"
+  | "mots";
+
+const NIVEAUX: {
+  id: NiveauId;
+  nom: string;
+  lecon: number;
+  description: string;
+}[] = [
+  { id: "lettres", nom: "Les lettres", lecon: 1, description: "Reconnaître les 28 lettres à l'oreille" },
+  { id: "voyelles", nom: "Les voyelles", lecon: 3, description: "ba, bi, bou : retrouver la bonne syllabe" },
+  { id: "tanwin", nom: "Le tanwîn", lecon: 4, description: "ban, bin, boun : les doubles voyelles" },
+  { id: "madd", nom: "Les prolongations", lecon: 5, description: "bâ, bî, boû : entendre le son qui s'allonge" },
+  { id: "soukoun", nom: "Le soukoun", lecon: 6, description: "ab, ib, oub : les syllabes fermées" },
+  { id: "shadda", nom: "La shadda", lecon: 7, description: "abba, ibbi : les lettres doublées" },
+  { id: "mots", nom: "Les mots du Coran", lecon: 8, description: "Reconnaître de vrais mots (audio récité)" },
 ];
 
-/** Familles de lettres visuellement ou auditivement proches. */
+/** Familles de lettres proches (pour des pièges pertinents). */
 const FAMILLES: string[][] = [
   ["ب", "ت", "ث", "ن", "ي"],
   ["ج", "ح", "خ"],
@@ -80,16 +91,142 @@ const FAMILLES: string[][] = [
   ["ع", "غ"],
   ["ف", "ق"],
   ["ك", "ل"],
-  ["ه", "ة", "م"],
+  ["ه", "م"],
   ["ا", "و"],
 ];
 
-function famille(lettre: string): string[] {
-  return FAMILLES.find((f) => f.includes(lettre)) ?? [];
+const memeFamille = (a: string, b: string) =>
+  FAMILLES.some((f) => f.includes(a) && f.includes(b));
+
+// Signes (Unicode)
+const F = "َ", K = "ِ", D = "ُ";
+const FN = "ً", KN = "ٍ", DN = "ٌ";
+const SK = "ْ", SH = "ّ";
+
+const CONSONNES = ALPHABET.filter((l) => l.arabe !== "ا");
+
+interface Choix {
+  arabe: string;
+  translit: string;
 }
 
-function memeFamille(a: string, b: string): boolean {
-  return famille(a).includes(b);
+interface Question {
+  vocal: string; // texte pour la synthèse vocale
+  audio?: [number, number, number]; // enregistrement réel si disponible
+  bonne: Choix;
+  options: Choix[];
+  explication: string;
+}
+
+/** Les trois variantes d'une lettre pour un niveau syllabique. */
+function variantes(l: Lettre, niveau: NiveauId): Choix[] {
+  const a = l.arabe;
+  const t = l.translit;
+  switch (niveau) {
+    case "voyelles":
+      return [
+        { arabe: `${a}${F}`, translit: `${t}a` },
+        { arabe: `${a}${K}`, translit: `${t}i` },
+        { arabe: `${a}${D}`, translit: `${t}ou` },
+      ];
+    case "tanwin":
+      return [
+        { arabe: `${a}${FN}`, translit: `${t}an` },
+        { arabe: `${a}${KN}`, translit: `${t}in` },
+        { arabe: `${a}${DN}`, translit: `${t}oun` },
+      ];
+    case "madd":
+      return [
+        { arabe: `${a}${F}ا`, translit: `${t}â` },
+        { arabe: `${a}${K}ي`, translit: `${t}î` },
+        { arabe: `${a}${D}و`, translit: `${t}oû` },
+      ];
+    case "soukoun":
+      return [
+        { arabe: `أ${F}${a}${SK}`, translit: `a${t}` },
+        { arabe: `إ${K}${a}${SK}`, translit: `i${t}` },
+        { arabe: `أ${D}${a}${SK}`, translit: `ou${t}` },
+      ];
+    case "shadda":
+      return [
+        { arabe: `أ${F}${a}${SH}${F}`, translit: `a${t}${t}a` },
+        { arabe: `إ${K}${a}${SH}${K}`, translit: `i${t}${t}i` },
+        { arabe: `أ${D}${a}${SH}${D}`, translit: `ou${t}${t}ou` },
+      ];
+    default:
+      return [];
+  }
+}
+
+function genererQuestions(niveau: NiveauId): Question[] {
+  // Niveau lettres : retrouver la lettre entendue
+  if (niveau === "lettres") {
+    return melanger(ALPHABET)
+      .slice(0, NB_QUESTIONS)
+      .map((bonne) => {
+        const distracteurs = melanger(
+          ALPHABET.filter((l) => l.nom !== bonne.nom)
+        ).slice(0, 3);
+        return {
+          vocal: bonne.nomArabe,
+          bonne: { arabe: bonne.arabe, translit: bonne.nom },
+          options: melanger(
+            [bonne, ...distracteurs].map((l) => ({
+              arabe: l.arabe,
+              translit: l.nom,
+            }))
+          ),
+          explication: `C'était ${bonne.nom} (${bonne.translit}) — ${bonne.conseil}`,
+        };
+      });
+  }
+
+  // Niveau mots : vrais mots du Coran avec audio récité
+  if (niveau === "mots") {
+    const mots = LECONS.find((l) => l.id === 8)!.elements;
+    return melanger(mots)
+      .slice(0, NB_QUESTIONS)
+      .map((bon) => {
+        const distracteurs = melanger(
+          mots.filter((m) => m.principal !== bon.principal)
+        ).slice(0, 3);
+        return {
+          vocal: bon.vocal,
+          audio: bon.audio,
+          bonne: { arabe: bon.principal, translit: bon.translit },
+          options: melanger(
+            [bon, ...distracteurs].map((m) => ({
+              arabe: m.principal,
+              translit: m.translit,
+            }))
+          ),
+          explication: `${bon.translit} — ${bon.aide ?? ""}`,
+        };
+      });
+  }
+
+  // Niveaux syllabiques : la bonne syllabe parmi les 3 variantes de la
+  // lettre + une variante d'une lettre proche (piège)
+  return melanger(CONSONNES)
+    .slice(0, NB_QUESTIONS)
+    .map((lettre) => {
+      const formes = variantes(lettre, niveau);
+      const idx = Math.floor(Math.random() * 3);
+      const bonne = formes[idx];
+      const proches = CONSONNES.filter(
+        (l) => l.nom !== lettre.nom && memeFamille(l.arabe, lettre.arabe)
+      );
+      const autre =
+        proches[Math.floor(Math.random() * proches.length)] ??
+        melanger(CONSONNES.filter((l) => l.nom !== lettre.nom))[0];
+      const piege = variantes(autre, niveau)[idx];
+      return {
+        vocal: bonne.arabe,
+        bonne,
+        options: melanger([...formes, piege]),
+        explication: `C'était « ${bonne.translit} » (lettre ${lettre.nom}).`,
+      };
+    });
 }
 
 /* ===== Habillage commun ===== */
@@ -224,56 +361,24 @@ function BoutonReponse({
   );
 }
 
-/* ===== Jeu des lettres ===== */
+/* ===== Jeu Nourania (tous niveaux) ===== */
 
-interface QuestionLettre {
-  bonne: Lettre;
-  options: Lettre[];
-}
-
-function genererQuestions(niveau: Niveau): QuestionLettre[] {
-  const nbChoix = NIVEAUX.find((n) => n.id === niveau)!.choix;
-  return melanger(ALPHABET)
-    .slice(0, NB_QUESTIONS)
-    .map((bonne) => {
-      const autres = ALPHABET.filter((l) => l.nom !== bonne.nom);
-      let distracteurs: Lettre[];
-      if (niveau === "facile") {
-        // Lettres d'autres familles : visuellement bien distinctes
-        distracteurs = melanger(
-          autres.filter((l) => !memeFamille(bonne.arabe, l.arabe))
-        ).slice(0, nbChoix - 1);
-      } else if (niveau === "difficile") {
-        // D'abord les lettres de la même famille, puis compléter au hasard
-        const proches = melanger(
-          autres.filter((l) => memeFamille(bonne.arabe, l.arabe))
-        );
-        const restants = melanger(
-          autres.filter((l) => !memeFamille(bonne.arabe, l.arabe))
-        );
-        distracteurs = [...proches, ...restants].slice(0, nbChoix - 1);
-      } else {
-        distracteurs = melanger(autres).slice(0, nbChoix - 1);
-      }
-      return { bonne, options: melanger([bonne, ...distracteurs]) };
-    });
-}
-
-function JeuLettres({
+function JeuNourania({
   niveau,
   quitter,
 }: {
-  niveau: Niveau;
+  niveau: NiveauId;
   quitter: () => void;
 }) {
   const { prefs } = usePrefs();
-  const [questions, setQuestions] = useState<QuestionLettre[]>([]);
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [idx, setIdx] = useState(0);
   const [score, setScore] = useState(0);
-  const [choix, setChoix] = useState<Lettre | null>(null);
+  const [choix, setChoix] = useState<Choix | null>(null);
   const [fini, setFini] = useState(false);
   const [voixArabe, setVoixArabe] = useState<boolean | null>(null);
   const voixRef = useRef<SpeechSynthesisVoice | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     if (typeof speechSynthesis === "undefined") {
@@ -303,27 +408,43 @@ function JeuLettres({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(nouvellePartie, [niveau]);
 
-  const prononcer = (l: Lettre) => {
+  const ecouter = (q: Question) => {
+    audioRef.current?.pause();
+    if (q.audio) {
+      const [s, v, w] = q.audio;
+      const audio = new Audio(urlMot(s, v, w));
+      audioRef.current = audio;
+      audio.play().catch(() => {});
+      return;
+    }
     if (typeof speechSynthesis === "undefined") return;
     speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(l.nomArabe);
+    const u = new SpeechSynthesisUtterance(q.vocal);
     if (voixRef.current) u.voice = voixRef.current;
     u.lang = "ar-SA";
-    u.rate = 0.75;
+    u.rate = 0.7;
     speechSynthesis.speak(u);
   };
 
-  // Prononcer automatiquement à chaque nouvelle question
+  // Jouer automatiquement à chaque nouvelle question
   useEffect(() => {
     const q = questions[idx];
-    if (q && voixArabe) prononcer(q.bonne);
+    if (q && (q.audio || voixArabe)) ecouter(q);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idx, questions, voixArabe]);
+
+  // Couper l'audio en quittant
+  useEffect(() => {
+    return () => {
+      audioRef.current?.pause();
+      if (typeof speechSynthesis !== "undefined") speechSynthesis.cancel();
+    };
+  }, []);
 
   if (fini)
     return (
       <EcranFin
-        cleRecord={`lettres-${niveau}`}
+        cleRecord={`nourania-${niveau}`}
         score={score}
         rejouer={nouvellePartie}
         menu={quitter}
@@ -333,10 +454,13 @@ function JeuLettres({
   const q = questions[idx];
   if (!q) return null;
 
-  const repondre = (l: Lettre) => {
+  const infos = NIVEAUX.find((n) => n.id === niveau)!;
+  const audible = !!q.audio || voixArabe;
+
+  const repondre = (c: Choix) => {
     if (choix) return;
-    setChoix(l);
-    if (l.nom === q.bonne.nom) setScore((s) => s + 1);
+    setChoix(c);
+    if (c.arabe === q.bonne.arabe) setScore((s) => s + 1);
   };
 
   const suivant = () => {
@@ -345,25 +469,29 @@ function JeuLettres({
     else setIdx((i) => i + 1);
   };
 
-  const nomNiveau = NIVEAUX.find((n) => n.id === niveau)!.nom;
-
   return (
     <CadrePartie question={idx} score={score} quitter={quitter}>
       <p
         className="mb-2 text-center text-xs font-bold uppercase tracking-wide"
         style={{ color: "var(--muted)" }}
       >
-        Niveau {nomNiveau}
+        {infos.nom} (leçon {infos.lecon})
       </p>
-      {voixArabe ? (
+      {audible ? (
         <>
-          <p className="text-center font-bold">Quelle lettre entends-tu ?</p>
+          <p className="text-center font-bold">
+            {niveau === "mots"
+              ? "Quel mot entends-tu ?"
+              : niveau === "lettres"
+                ? "Quelle lettre entends-tu ?"
+                : "Quelle syllabe entends-tu ?"}
+          </p>
           <div className="mt-4 flex justify-center">
             <button
-              onClick={() => prononcer(q.bonne)}
+              onClick={() => ecouter(q)}
               className="flex h-16 w-16 items-center justify-center rounded-full text-white transition hover:scale-105 active:scale-95"
               style={{ backgroundColor: "var(--accent)" }}
-              aria-label="Réécouter la lettre"
+              aria-label="Réécouter"
             >
               <HautParleur taille={28} className="text-white" />
             </button>
@@ -371,8 +499,8 @@ function JeuLettres({
         </>
       ) : (
         <p className="text-center font-bold">
-          Trouve la lettre : {q.bonne.nom}{" "}
-          <span style={{ color: "var(--accent)" }}>({q.bonne.translit})</span>
+          Trouve :{" "}
+          <span style={{ color: "var(--accent)" }}>{q.bonne.translit}</span>
         </p>
       )}
       <div
@@ -380,25 +508,28 @@ function JeuLettres({
           q.options.length > 4 ? "grid-cols-3" : "grid-cols-2"
         }`}
       >
-        {q.options.map((l) => (
+        {q.options.map((c) => (
           <BoutonReponse
-            key={l.nom}
+            key={c.arabe}
             desactive={!!choix}
-            onClick={() => repondre(l)}
+            onClick={() => repondre(c)}
             etat={
               !choix
                 ? "neutre"
-                : l.nom === q.bonne.nom
+                : c.arabe === q.bonne.arabe
                   ? "bon"
-                  : l.nom === choix.nom
+                  : c.arabe === choix.arabe
                     ? "mauvais"
                     : "neutre"
             }
             contenu={
               <span
-                className={`arabic block text-center text-4xl ${prefs.police}`}
+                className={`arabic block text-center ${
+                  niveau === "mots" ? "text-3xl" : "text-4xl"
+                } ${prefs.police}`}
+                dir="rtl"
               >
-                {l.arabe}
+                {c.arabe}
               </span>
             }
           />
@@ -407,7 +538,7 @@ function JeuLettres({
       {choix && (
         <div className="mt-4 space-y-3">
           <p className="text-sm" style={{ color: "var(--muted)" }}>
-            C&apos;était {q.bonne.nom} ({q.bonne.translit}) — {q.bonne.conseil}
+            {q.explication}
           </p>
           <button
             onClick={suivant}
@@ -422,36 +553,61 @@ function JeuLettres({
   );
 }
 
-/** Écran de choix du niveau. */
+/** Choix du niveau, aligné sur la progression Nourania. */
 function ChoixNiveau({
   records,
   choisir,
   retour,
 }: {
   records: Record<string, number>;
-  choisir: (n: Niveau) => void;
+  choisir: (n: NiveauId) => void;
   retour: () => void;
 }) {
+  const progression = lireProgressionNourania();
+  // Niveau conseillé : celui de la leçon terminée la plus avancée
+  const derniereLecon = Math.max(0, ...progression);
+  const conseille =
+    [...NIVEAUX].reverse().find((n) => n.lecon <= derniereLecon)?.id ??
+    "lettres";
+
   return (
     <div className="mt-6 space-y-3">
-      <p className="text-center font-bold">Choisis ton niveau :</p>
+      <p className="text-center font-bold">
+        Choisis ton niveau (suivant tes leçons Nourania) :
+      </p>
       {NIVEAUX.map((n) => (
         <button
           key={n.id}
           onClick={() => choisir(n.id)}
-          className="card flex w-full items-center gap-4 rounded-2xl p-5 text-left shadow-soft transition hover:scale-[1.02] active:scale-[0.98]"
+          className="card flex w-full items-center gap-4 rounded-2xl p-4 text-left shadow-soft transition hover:scale-[1.01] active:scale-[0.99]"
         >
+          <span
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border text-sm font-extrabold"
+            style={{ borderColor: "var(--accent)", color: "var(--accent)" }}
+          >
+            L{n.lecon}
+          </span>
           <span className="min-w-0 flex-1">
-            <span className="block font-extrabold">{n.nom}</span>
+            <span className="flex items-center gap-2 font-extrabold">
+              {n.nom}
+              {n.id === conseille && (
+                <span
+                  className="rounded-full px-2 py-0.5 text-[10px] font-bold text-white"
+                  style={{ backgroundColor: "var(--accent)" }}
+                >
+                  Conseillé
+                </span>
+              )}
+            </span>
             <span className="block text-sm" style={{ color: "var(--muted)" }}>
               {n.description}
             </span>
-            {(records[`lettres-${n.id}`] ?? 0) > 0 && (
+            {(records[`nourania-${n.id}`] ?? 0) > 0 && (
               <span
                 className="mt-1 flex items-center gap-1 text-xs font-bold"
                 style={{ color: "var(--accent)" }}
               >
-                <Trophee taille={13} /> Record : {records[`lettres-${n.id}`]}/
+                <Trophee taille={13} /> Record : {records[`nourania-${n.id}`]}/
                 {NB_QUESTIONS}
               </span>
             )}
@@ -573,7 +729,7 @@ function JeuQuiz({ quitter }: { quitter: () => void }) {
 type Ecran =
   | { vue: "menu" }
   | { vue: "choix-niveau" }
-  | { vue: "lettres"; niveau: Niveau }
+  | { vue: "nourania"; niveau: NiveauId }
   | { vue: "quiz" };
 
 export default function Jeux() {
@@ -586,10 +742,9 @@ export default function Jeux() {
     }
   }, [ecran]);
 
-  const meilleurLettres = Math.max(
-    records["lettres-facile"] ?? 0,
-    records["lettres-moyen"] ?? 0,
-    records["lettres-difficile"] ?? 0
+  const meilleurNourania = Math.max(
+    0,
+    ...NIVEAUX.map((n) => records[`nourania-${n.id}`] ?? 0)
   );
 
   return (
@@ -632,20 +787,20 @@ export default function Jeux() {
                 <Lettres taille={24} />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block font-extrabold">Jeu des lettres</span>
+                <span className="block font-extrabold">Jeu Nourania</span>
                 <span
                   className="block text-sm"
                   style={{ color: "var(--muted)" }}
                 >
-                  Écoute une lettre et retrouve-la — 3 niveaux de difficulté
+                  Entraîne ton oreille, leçon par leçon (7 niveaux)
                 </span>
-                {meilleurLettres > 0 && (
+                {meilleurNourania > 0 && (
                   <span
                     className="mt-1 flex items-center gap-1 text-xs font-bold"
                     style={{ color: "var(--accent)" }}
                   >
-                    <Trophee taille={13} /> Meilleur record : {meilleurLettres}/
-                    {NB_QUESTIONS}
+                    <Trophee taille={13} /> Meilleur record : {meilleurNourania}
+                    /{NB_QUESTIONS}
                   </span>
                 )}
               </span>
@@ -693,13 +848,13 @@ export default function Jeux() {
       {ecran.vue === "choix-niveau" && (
         <ChoixNiveau
           records={records}
-          choisir={(niveau) => setEcran({ vue: "lettres", niveau })}
+          choisir={(niveau) => setEcran({ vue: "nourania", niveau })}
           retour={() => setEcran({ vue: "menu" })}
         />
       )}
 
-      {ecran.vue === "lettres" && (
-        <JeuLettres
+      {ecran.vue === "nourania" && (
+        <JeuNourania
           niveau={ecran.niveau}
           quitter={() => setEcran({ vue: "choix-niveau" })}
         />
