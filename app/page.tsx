@@ -23,6 +23,7 @@ import {
   Lettres,
   LivreOuvert,
   Lune,
+  Manette,
   MarquePageIcone,
 } from "@/components/Icones";
 
@@ -56,6 +57,12 @@ const MODULES = [
     icone: IconeCalendrier,
     nom: "Calendrier",
     description: "Événements de l'année, conseils et récompenses",
+  },
+  {
+    href: "/jeux",
+    icone: Manette,
+    nom: "Jeux",
+    description: "Quiz tajwid, lettres et connaissances : apprends en t'amusant",
   },
 ];
 
