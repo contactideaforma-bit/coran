@@ -219,7 +219,7 @@ export default function Lecteur({ n }: { n: number }) {
       <section className="mt-5 space-y-3">
         <div className="flex items-center justify-between gap-3">
           <Link
-            href="/"
+            href="/coran"
             className="card rounded-full px-4 py-2 text-sm font-bold shadow-soft transition hover:scale-105 active:scale-95"
           >
             ← Sourates

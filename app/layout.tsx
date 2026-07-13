@@ -4,9 +4,9 @@ import EnregistrerSW from "@/components/EnregistrerSW";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Coran Tajwid — Lire et apprendre",
+  title: "Coran Tajwid — Ton compagnon du quotidien",
   description:
-    "Application francophone pour lire le Coran avec les règles de tajwid en couleur, la prononciation mot à mot et la récitation.",
+    "Coran avec tajwid en couleur, hadith du jour, horaires de prière, invocations, apprentissage Nourania et calendrier des événements religieux — en français.",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,

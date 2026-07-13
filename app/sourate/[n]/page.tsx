@@ -21,7 +21,7 @@ export default function PageSourate({ params }: { params: { n: string } }) {
           Vérifie le numéro de la sourate (1 à 114).
         </p>
         <Link
-          href="/"
+          href="/coran"
           className="mt-5 inline-block rounded-full px-6 py-2 font-bold text-white transition active:scale-95"
           style={{ backgroundColor: "var(--accent)" }}
         >
