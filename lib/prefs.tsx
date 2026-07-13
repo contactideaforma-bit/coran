@@ -34,6 +34,15 @@ export const TAILLES = [
   { label: "XL", arabe: "text-5xl", trad: "text-xl" },
 ];
 
+export const RECITATEURS = [
+  { id: "Husary_128kbps", nom: "Mahmoud Khalil Al-Husary", detail: "Référence pour apprendre le tajwid, débit posé" },
+  { id: "Abdul_Basit_Murattal_192kbps", nom: "Abdul Basit Abdus-Samad", detail: "Voix légendaire, récitation murattal" },
+  { id: "Minshawy_Murattal_128kbps", nom: "Mohamed Siddiq El-Minshawi", detail: "Grand classique égyptien" },
+  { id: "Abdurrahmaan_As-Sudais_192kbps", nom: "Abdurrahman As-Sudais", detail: "Imam de la Mecque" },
+  { id: "Saood_ash-Shuraym_128kbps", nom: "Saoud Ash-Shuraym", detail: "Imam de la Mecque" },
+  { id: "Ghamadi_40kbps", nom: "Saad Al-Ghamdi", detail: "Voix douce très appréciée" },
+];
+
 export const POLICES = [
   { id: "font-amiri", nom: "Amiri" },
   { id: "font-scheherazade", nom: "Scheherazade" },
@@ -48,6 +57,7 @@ export interface Prefs {
   police: string;
   fond: string; // id dans FONDS
   accent: string; // id dans ACCENTS
+  recitateur: string; // id dans RECITATEURS (dossier everyayah.com)
 }
 
 const DEFAUTS: Prefs = {
@@ -56,6 +66,7 @@ const DEFAUTS: Prefs = {
   police: "font-amiri",
   fond: "creme",
   accent: "or",
+  recitateur: "Husary_128kbps",
 };
 
 const CLE = "coran-prefs";

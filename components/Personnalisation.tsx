@@ -4,6 +4,7 @@ import {
   ACCENTS,
   FONDS,
   POLICES,
+  RECITATEURS,
   TAILLES,
   usePrefs,
 } from "@/lib/prefs";
@@ -159,6 +160,52 @@ export default function Personnalisation({
             >
               <span className="arabic text-xl leading-none">بسم الله</span>
               <span className="ml-2 text-xs font-semibold">{f.nom}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Récitateur */}
+        <p className="mb-2 mt-5 text-sm font-bold">🎙️ Récitateur</p>
+        <div className="space-y-2">
+          {RECITATEURS.map((r) => (
+            <button
+              key={r.id}
+              onClick={() => maj({ recitateur: r.id })}
+              className="flex w-full items-center gap-3 rounded-xl border p-3 text-left transition active:scale-[0.99]"
+              style={{
+                borderColor:
+                  prefs.recitateur === r.id ? "var(--accent)" : "var(--border)",
+                backgroundColor:
+                  prefs.recitateur === r.id
+                    ? "color-mix(in srgb, var(--accent) 12%, transparent)"
+                    : "var(--card)",
+              }}
+            >
+              <span
+                className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2"
+                style={{
+                  borderColor:
+                    prefs.recitateur === r.id
+                      ? "var(--accent)"
+                      : "var(--border)",
+                }}
+              >
+                {prefs.recitateur === r.id && (
+                  <span
+                    className="h-2.5 w-2.5 rounded-full"
+                    style={{ backgroundColor: "var(--accent)" }}
+                  />
+                )}
+              </span>
+              <span>
+                <span className="block font-bold">{r.nom}</span>
+                <span
+                  className="block text-xs"
+                  style={{ color: "var(--muted)" }}
+                >
+                  {r.detail}
+                </span>
+              </span>
             </button>
           ))}
         </div>

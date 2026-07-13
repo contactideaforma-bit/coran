@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { FATIHA, type Word } from "@/data/fatiha";
 import { TAJWID_RULES, RULE_BY_ID, type TajwidRule } from "@/lib/tajwid";
 import { urlMot, urlVerset } from "@/lib/audio";
-import { TAILLES, usePrefs } from "@/lib/prefs";
+import { RECITATEURS, TAILLES, usePrefs } from "@/lib/prefs";
 import Entete from "@/components/Entete";
 
 type Lecture =
@@ -65,9 +65,15 @@ export default function Lecteur() {
     if (lecture?.type === "verset" && lecture.v === v) {
       stopAudio();
     } else {
-      jouer(urlVerset(FATIHA.sourate, v), { type: "verset", v });
+      jouer(urlVerset(FATIHA.sourate, v, prefs.recitateur), {
+        type: "verset",
+        v,
+      });
     }
   };
+
+  const nomRecitateur =
+    RECITATEURS.find((r) => r.id === prefs.recitateur)?.nom ?? "";
 
   const reglesDuMot = (word: Word): TajwidRule[] => {
     const ids = new Set(word.segments.filter((s) => s.r).map((s) => s.r!));
@@ -166,7 +172,7 @@ export default function Lecteur() {
                       ? "var(--accent)"
                       : "transparent",
                 }}
-                aria-label={`Écouter le verset ${v.n} récité par Al-Afasy`}
+                aria-label={`Écouter le verset ${v.n} récité par ${nomRecitateur}`}
               >
                 {lecture?.type === "verset" && lecture.v === v.n
                   ? "⏸ Stop"
@@ -178,8 +184,8 @@ export default function Lecteur() {
       </main>
 
       <p className="mt-6 text-center text-xs" style={{ color: "var(--muted)" }}>
-        💡 Touche un mot pour l&apos;entendre • ▶ Verset pour la récitation
-        d&apos;Al-Afasy • 🎨 pour le code couleur
+        💡 Touche un mot pour l&apos;entendre • ▶ Verset : récitation de{" "}
+        {nomRecitateur} (modifiable dans ✨) • 🎨 code couleur
       </p>
 
       {/* ===== Bouton flottant légende ===== */}

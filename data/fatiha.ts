@@ -21,7 +21,7 @@ export interface Verse {
  * par un spécialiste avant publication.
  *
  * Audio mot à mot : https://verses.quran.com/wbw/001_{verset}_{mot}.mp3
- * Audio verset (Al-Afasy) : https://everyayah.com/data/Alafasy_128kbps/001{verset}.mp3
+ * Audio verset : https://everyayah.com/data/{recitateur}/001{verset}.mp3
  */
 export const FATIHA: { nomArabe: string; nomFr: string; sourate: number; verses: Verse[] } = {
   nomArabe: "الفاتحة",

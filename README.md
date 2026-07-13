@@ -25,7 +25,8 @@ Puis ouvrir http://localhost:3000
 - 4 tailles de texte (S / M / L / XL)
 - 3 polices arabes : Amiri, Scheherazade New, Noto Naskh Arabic
 - Mode clair (fond texturé papier) / mode sombre, préférences sauvegardées
-- Audio : toucher un mot → sa prononciation (mot à mot Quran.com) ; bouton ▶ Verset → récitation complète par Mishary Rashid Al-Afasy (everyayah.com)
+- Audio : toucher un mot → sa prononciation (mot à mot Quran.com) ; bouton ▶ Verset → récitation complète par le récitateur choisi (everyayah.com)
+- 6 récitateurs au choix : Al-Husary (défaut), Abdul Basit, El-Minshawi, As-Sudais, Ash-Shuraym, Al-Ghamdi
 
 ## Stack
 
