@@ -24,6 +24,13 @@ const scriptTheme = `
 try {
   var p = JSON.parse(localStorage.getItem('coran-prefs') || '{}');
   if (p.dark) document.documentElement.classList.add('dark');
+  var c = JSON.parse(localStorage.getItem('coran-couleurs') || 'null');
+  if (c) {
+    var r = document.documentElement.style;
+    r.setProperty('--bg', c.bg); r.setProperty('--card', c.card);
+    r.setProperty('--border', c.border); r.setProperty('--text', c.text);
+    r.setProperty('--muted', c.muted); r.setProperty('--accent', c.accent);
+  }
 } catch (e) {}
 `;
 

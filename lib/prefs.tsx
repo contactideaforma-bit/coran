@@ -98,6 +98,22 @@ function appliquer(p: Prefs) {
   root.style.setProperty("--text", vars.text);
   root.style.setProperty("--muted", vars.muted);
   root.style.setProperty("--accent", vars.accent);
+
+  // Mémoriser les couleurs calculées pour les appliquer dès le prochain
+  // chargement de page, avant React (évite le flash de thème)
+  try {
+    localStorage.setItem(
+      "coran-couleurs",
+      JSON.stringify({
+        bg: vars.bg,
+        card: vars.card,
+        border: vars.border,
+        text: vars.text,
+        muted: vars.muted,
+        accent: vars.accent,
+      })
+    );
+  } catch {}
 }
 
 /* ========== Contexte React ========== */

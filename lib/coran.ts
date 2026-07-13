@@ -100,9 +100,14 @@ function segmentsEnMots(segments: Segment[]): Word[] {
   return mots;
 }
 
-/** Retire les balises HTML de la traduction (notes de bas de page, etc.). */
+/** Retire les balises HTML de la traduction, y compris les appels de notes
+ *  de bas de page (<sup>1</sup>) dont le chiffre resterait sinon collé au texte. */
 function nettoyerTraduction(texte: string): string {
-  return texte.replace(/<[^>]+>/g, "").trim();
+  return texte
+    .replace(/<sup[^>]*>[\s\S]*?<\/sup>/g, "")
+    .replace(/<[^>]+>/g, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
 }
 
 /* ===== Chargement d'une sourate ===== */

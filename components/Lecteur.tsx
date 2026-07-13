@@ -66,9 +66,12 @@ export default function Lecteur({ n }: { n: number }) {
       sections.findIndex((s) => v >= s.debut && v <= s.fin)
     );
 
-  // Charger la sourate + marque-page
+  // Charger la sourate + marque-page (et couper l'audio en cours)
   useEffect(() => {
     let annule = false;
+    audioRef.current?.pause();
+    audioRef.current = null;
+    setLecture(null);
     setData(null);
     setErreur(false);
     setMotActif(null);
@@ -330,10 +333,9 @@ export default function Lecteur({ n }: { n: number }) {
                 id={`v-${v.n}`}
                 className="card rounded-2xl p-5 shadow-soft transition"
                 style={{
-                  borderColor: versetEnLecture(v.n)
-                    ? "var(--accent)"
+                  boxShadow: versetEnLecture(v.n)
+                    ? "0 0 0 2px var(--accent)"
                     : undefined,
-                  borderWidth: versetEnLecture(v.n) ? 2 : undefined,
                 }}
               >
                 {/* En-tête de carte : numéro + actions */}
