@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { PrefsProvider } from "@/lib/prefs";
+import EnregistrerSW from "@/components/EnregistrerSW";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -48,6 +49,7 @@ export default function RootLayout({
       </head>
       <body className="font-ui min-h-screen antialiased">
         <PrefsProvider>{children}</PrefsProvider>
+        <EnregistrerSW />
       </body>
     </html>
   );

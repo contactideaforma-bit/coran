@@ -45,8 +45,16 @@ body {
 
 .arabic {
   direction: rtl;
-  line-height: 2.2;
-  word-spacing: 0.15em;
+  line-height: 1.9;
+}
+
+/* Texte d'un verset : mots compacts qui passent à la ligne naturellement */
+.verset-mots {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.35em;
+  row-gap: 0.5em;
 }
 
 /* Pastille de couleur tajwid */

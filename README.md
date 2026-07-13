@@ -11,6 +11,14 @@ npm run dev
 
 Puis ouvrir http://localhost:3000
 
+## Fonctionnalités (V4)
+
+- Lecture de la sourate entière : les versets s'enchaînent avec suivi visuel et défilement automatique
+- Cache hors-ligne (service worker) : texte, traduction et polices disponibles sans connexion après une première visite (l'audio nécessite une connexion)
+- Marque-page 🔖 : pose-le sur un verset, reprends depuis l'accueil (propre à chaque appareil)
+- Pagination par juz' pour les longues sourates
+- Mise en page mobile corrigée : mots compacts, traduction sous le texte arabe
+
 ## Fonctionnalités (V3)
 
 - Les 114 sourates complètes : texte arabe avec balisage tajwid officiel (API Quran.com, celui des mushafs colorés imprimés) + traduction française de Muhammad Hamidullah, chargés à l'ouverture

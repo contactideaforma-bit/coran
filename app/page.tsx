@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SOURATES } from "@/data/sourates";
 import { usePrefs } from "@/lib/prefs";
+import { lireMarquePage, type MarquePage } from "@/lib/marquePage";
 import Entete from "@/components/Entete";
 
 function normaliser(s: string) {
@@ -17,6 +18,15 @@ function normaliser(s: string) {
 export default function Accueil() {
   const { prefs } = usePrefs();
   const [recherche, setRecherche] = useState("");
+  const [marque, setMarque] = useState<MarquePage | null>(null);
+
+  useEffect(() => {
+    setMarque(lireMarquePage());
+  }, []);
+
+  const sourateMarquee = marque
+    ? SOURATES.find((s) => s.n === marque.s)
+    : null;
 
   const q = normaliser(recherche.trim());
   const resultats = SOURATES.filter(
@@ -40,6 +50,24 @@ export default function Accueil() {
           Que veux-tu lire aujourd&apos;hui ?
         </p>
       </section>
+
+      {/* Reprendre la lecture (marque-page) */}
+      {marque && sourateMarquee && (
+        <Link
+          href={`/sourate/${marque.s}#v-${marque.v}`}
+          className="card mt-5 flex items-center gap-3 rounded-2xl p-4 shadow-soft transition hover:scale-[1.02] active:scale-[0.98]"
+          style={{ borderColor: "var(--accent)" }}
+        >
+          <span className="text-2xl">🔖</span>
+          <span className="min-w-0 flex-1">
+            <span className="block font-bold">Reprendre la lecture</span>
+            <span className="block text-sm" style={{ color: "var(--muted)" }}>
+              {sourateMarquee.nom} — verset {marque.v}
+            </span>
+          </span>
+          <span style={{ color: "var(--accent)" }}>→</span>
+        </Link>
+      )}
 
       {/* Recherche */}
       <div className="card mt-5 flex items-center gap-2 rounded-2xl px-4 py-3 shadow-soft">
