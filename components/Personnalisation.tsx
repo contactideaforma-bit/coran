@@ -8,6 +8,13 @@ import {
   TAILLES,
   usePrefs,
 } from "@/lib/prefs";
+import {
+  Cadenas,
+  Etincelles,
+  Lune,
+  Micro,
+  Soleil,
+} from "@/components/Icones";
 
 export default function Personnalisation({
   ouvert,
@@ -30,7 +37,12 @@ export default function Personnalisation({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-extrabold">✨ Personnaliser mon appli</h2>
+          <h2 className="flex items-center gap-2 text-lg font-extrabold">
+            <span style={{ color: "var(--accent)" }}>
+              <Etincelles taille={20} />
+            </span>
+            Personnaliser mon appli
+          </h2>
           <button
             onClick={fermer}
             className="card rounded-full px-3 py-1 font-bold"
@@ -43,13 +55,13 @@ export default function Personnalisation({
         <p className="mb-2 text-sm font-bold">Thème</p>
         <div className="flex gap-2">
           {[
-            { dark: false, label: "☀️ Clair" },
-            { dark: true, label: "🌙 Sombre" },
+            { dark: false, label: "Clair", icone: <Soleil taille={18} /> },
+            { dark: true, label: "Sombre", icone: <Lune taille={18} /> },
           ].map((t) => (
             <button
               key={t.label}
               onClick={() => maj({ dark: t.dark })}
-              className="flex-1 rounded-xl border px-4 py-3 font-bold transition active:scale-95"
+              className="flex flex-1 items-center justify-center gap-2 rounded-xl border px-4 py-3 font-bold transition active:scale-95"
               style={{
                 borderColor:
                   prefs.dark === t.dark ? "var(--accent)" : "var(--border)",
@@ -58,6 +70,7 @@ export default function Personnalisation({
                 color: prefs.dark === t.dark ? "#fff" : "var(--text)",
               }}
             >
+              {t.icone}
               {t.label}
             </button>
           ))}
@@ -165,7 +178,9 @@ export default function Personnalisation({
         </div>
 
         {/* Récitateur */}
-        <p className="mb-2 mt-5 text-sm font-bold">🎙️ Récitateur</p>
+        <p className="mb-2 mt-5 flex items-center gap-1.5 text-sm font-bold">
+          <Micro taille={16} /> Récitateur
+        </p>
         <div className="space-y-2">
           {RECITATEURS.map((r) => (
             <button
@@ -210,9 +225,12 @@ export default function Personnalisation({
           ))}
         </div>
 
-        <p className="mt-5 text-center text-xs" style={{ color: "var(--muted)" }}>
-          🔒 Ces réglages sont enregistrés sur cet appareil uniquement — chacun
-          garde les siens.
+        <p
+          className="mt-5 flex items-center justify-center gap-1.5 text-center text-xs"
+          style={{ color: "var(--muted)" }}
+        >
+          <Cadenas taille={14} /> Ces réglages sont enregistrés sur cet
+          appareil uniquement — chacun garde les siens.
         </p>
       </div>
     </div>

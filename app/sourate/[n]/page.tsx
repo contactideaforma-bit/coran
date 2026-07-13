@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Lecteur from "@/components/Lecteur";
 import Entete from "@/components/Entete";
+import { Alerte } from "@/components/Icones";
 
 export default function PageSourate({ params }: { params: { n: string } }) {
   const n = Number(params.n);
@@ -13,7 +14,9 @@ export default function PageSourate({ params }: { params: { n: string } }) {
     <div className="mx-auto max-w-3xl px-4 pb-16 pt-4">
       <Entete />
       <div className="card mt-10 rounded-3xl p-8 text-center shadow-soft">
-        <p className="text-4xl">🤔</p>
+        <p className="flex justify-center" style={{ color: "var(--accent)" }}>
+          <Alerte taille={40} />
+        </p>
         <h2 className="mt-3 text-xl font-extrabold">
           Cette sourate n&apos;existe pas
         </h2>

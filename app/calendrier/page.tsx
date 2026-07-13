@@ -10,6 +10,13 @@ import {
   versHijri,
 } from "@/lib/hijri";
 import Entete from "@/components/Entete";
+import {
+  Cadeau,
+  Calendrier as IconeCalendrier,
+  ICONES_EVENEMENTS,
+  Lune,
+  Verifie,
+} from "@/components/Icones";
 
 interface EvenementDate {
   evt: Evenement;
@@ -86,7 +93,9 @@ export default function Calendrier() {
         >
           ← Accueil
         </Link>
-        <h2 className="text-xl font-extrabold">📅 Calendrier religieux</h2>
+        <h2 className="flex items-center gap-2 text-xl font-extrabold">
+          <IconeCalendrier taille={22} /> Calendrier religieux
+        </h2>
       </section>
 
       {hijriAuj && (
@@ -104,7 +113,12 @@ export default function Calendrier() {
             className="card overflow-hidden rounded-2xl shadow-soft"
           >
             <summary className="flex cursor-pointer list-none items-center gap-3 p-4">
-              <span className="text-2xl">{evt.emoji}</span>
+              <span style={{ color: "var(--accent)" }}>
+                {(() => {
+                  const Icone = ICONES_EVENEMENTS[evt.icone] ?? Lune;
+                  return <Icone taille={24} />;
+                })()}
+              </span>
               <span className="min-w-0 flex-1">
                 <span className="block font-bold">{evt.nom}</span>
                 <span
@@ -139,7 +153,9 @@ export default function Calendrier() {
             >
               <p className="text-sm">{evt.description}</p>
               <div>
-                <p className="text-sm font-bold">✅ Conseillé :</p>
+                <p className="flex items-center gap-1.5 text-sm font-bold">
+                  <Verifie taille={15} /> Conseillé :
+                </p>
                 <ul className="mt-1 space-y-1">
                   {evt.conseils.map((c, i) => (
                     <li key={i} className="flex gap-2 text-sm">
@@ -156,7 +172,9 @@ export default function Calendrier() {
                     "color-mix(in srgb, var(--accent) 10%, transparent)",
                 }}
               >
-                <p className="font-bold">🎁 Récompense :</p>
+                <p className="flex items-center gap-1.5 font-bold">
+                  <Cadeau taille={15} /> Récompense :
+                </p>
                 <p className="mt-1 italic">{evt.recompense}</p>
                 <p className="mt-1 text-xs" style={{ color: "var(--muted)" }}>
                   — {evt.source}

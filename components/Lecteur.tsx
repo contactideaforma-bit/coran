@@ -21,6 +21,15 @@ import { TAJWID_RULES, RULE_BY_ID, type TajwidRule } from "@/lib/tajwid";
 import { urlMot, urlVerset } from "@/lib/audio";
 import { RECITATEURS, TAILLES, usePrefs } from "@/lib/prefs";
 import Entete from "@/components/Entete";
+import {
+  Alerte,
+  Goutte,
+  HautParleur,
+  Lecture as IconeLecture,
+  LivreOuvert,
+  MarquePageIcone,
+  Pause,
+} from "@/components/Icones";
 
 type Lecture =
   | { type: "mot"; v: number; w: number }
@@ -241,12 +250,20 @@ export default function Lecteur({ n }: { n: number }) {
         {data && (
           <button
             onClick={clicSourate}
-            className="w-full rounded-2xl px-4 py-3 font-bold text-white shadow-soft transition hover:scale-[1.01] active:scale-[0.99]"
+            className="flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 font-bold text-white shadow-soft transition hover:scale-[1.01] active:scale-[0.99]"
             style={{ backgroundColor: "var(--accent)" }}
           >
-            {lecture?.type === "sourate"
-              ? `⏸ Arrêter la lecture (verset ${lecture.v}/${meta.versets})`
-              : "▶ Écouter toute la sourate"}
+            {lecture?.type === "sourate" ? (
+              <>
+                <Pause taille={16} />
+                Arrêter la lecture (verset {lecture.v}/{meta.versets})
+              </>
+            ) : (
+              <>
+                <IconeLecture taille={16} />
+                Écouter toute la sourate
+              </>
+            )}
           </button>
         )}
 
@@ -290,7 +307,12 @@ export default function Lecteur({ n }: { n: number }) {
       {/* ===== Chargement / erreur ===== */}
       {!data && !erreur && (
         <div className="card mt-6 rounded-2xl p-8 text-center shadow-soft">
-          <p className="animate-pulse text-3xl">📖</p>
+          <p
+            className="flex animate-pulse justify-center"
+            style={{ color: "var(--accent)" }}
+          >
+            <LivreOuvert taille={36} />
+          </p>
           <p className="mt-2 font-bold">Chargement de la sourate…</p>
           <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
             Texte tajwid + traduction française
@@ -299,7 +321,12 @@ export default function Lecteur({ n }: { n: number }) {
       )}
       {erreur && (
         <div className="card mt-6 rounded-2xl p-8 text-center shadow-soft">
-          <p className="text-3xl">📡</p>
+          <p
+            className="flex justify-center"
+            style={{ color: "var(--accent)" }}
+          >
+            <Alerte taille={36} />
+          </p>
           <p className="mt-2 font-bold">Impossible de charger la sourate</p>
           <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
             Vérifie ta connexion internet, puis réessaie.
@@ -356,7 +383,12 @@ export default function Lecteur({ n }: { n: number }) {
                         estMarque ? "" : "opacity-40"
                       }`}
                       style={
-                        estMarque ? { borderColor: "var(--accent)" } : undefined
+                        estMarque
+                          ? {
+                              borderColor: "var(--accent)",
+                              color: "var(--accent)",
+                            }
+                          : undefined
                       }
                       aria-label={
                         estMarque
@@ -365,7 +397,7 @@ export default function Lecteur({ n }: { n: number }) {
                       }
                       title={estMarque ? "Marque-page posé" : "Marque-page"}
                     >
-                      🔖
+                      <MarquePageIcone taille={16} rempli={estMarque} />
                     </button>
                     <button
                       onClick={() => clicVerset(v.n)}
@@ -379,7 +411,15 @@ export default function Lecteur({ n }: { n: number }) {
                       }}
                       aria-label={`Écouter le verset ${v.n} récité par ${nomRecitateur}`}
                     >
-                      {versetEnLecture(v.n) ? "⏸ Stop" : "▶ Écouter"}
+                      {versetEnLecture(v.n) ? (
+                        <>
+                          <Pause taille={13} /> Stop
+                        </>
+                      ) : (
+                        <>
+                          <IconeLecture taille={13} /> Écouter
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>
@@ -472,8 +512,9 @@ export default function Lecteur({ n }: { n: number }) {
       )}
 
       <p className="mt-6 text-center text-xs" style={{ color: "var(--muted)" }}>
-        💡 Touche un mot pour l&apos;entendre • Récitation : {nomRecitateur}{" "}
-        (modifiable dans ✨) • 🔖 pour reprendre plus tard
+        Touche un mot pour l&apos;entendre • Récitation : {nomRecitateur}{" "}
+        (modifiable dans les réglages) • Pose un marque-page pour reprendre
+        plus tard
       </p>
 
       {/* ===== Bouton flottant légende ===== */}
@@ -484,7 +525,7 @@ export default function Lecteur({ n }: { n: number }) {
         }`}
         style={{ backgroundColor: "var(--accent)" }}
       >
-        🎨 Règles
+        <Goutte taille={18} className="text-white" /> Règles
       </button>
 
       {/* ===== Barre mot actif ===== */}
@@ -497,17 +538,7 @@ export default function Lecteur({ n }: { n: number }) {
               style={{ backgroundColor: "var(--accent)" }}
               aria-label="Réécouter le mot"
             >
-              <svg
-                viewBox="0 0 24 24"
-                width="22"
-                height="22"
-                fill="#fff"
-                aria-hidden="true"
-              >
-                <path d="M3 9v6h4l5 5V4L7 9H3z" />
-                <path d="M16.5 12a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4z" />
-                <path d="M14 3.8v2.1a6.5 6.5 0 0 1 0 12.2v2.1a8.5 8.5 0 0 0 0-16.4z" />
-              </svg>
+              <HautParleur taille={22} className="text-white" />
             </button>
             <span className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-0.5">
               <span className={`arabic text-2xl ${police}`} dir="rtl">
@@ -574,8 +605,11 @@ export default function Lecteur({ n }: { n: number }) {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-lg font-extrabold">
-                🎨 Code couleur du tajwid
+              <h2 className="flex items-center gap-2 text-lg font-extrabold">
+                <span style={{ color: "var(--accent)" }}>
+                  <Goutte taille={20} />
+                </span>
+                Code couleur du tajwid
               </h2>
               <button
                 onClick={() => setLegendeOuverte(false)}

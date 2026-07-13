@@ -6,6 +6,11 @@ import { SOURATES } from "@/data/sourates";
 import { usePrefs } from "@/lib/prefs";
 import { lireMarquePage, type MarquePage } from "@/lib/marquePage";
 import Entete from "@/components/Entete";
+import {
+  LivreOuvert,
+  MarquePageIcone,
+  Recherche,
+} from "@/components/Icones";
 
 function normaliser(s: string) {
   return s
@@ -48,7 +53,9 @@ export default function Coran() {
         >
           ← Accueil
         </Link>
-        <h2 className="text-xl font-extrabold">📖 Le Coran</h2>
+        <h2 className="flex items-center gap-2 text-xl font-extrabold">
+          <LivreOuvert taille={22} /> Le Coran
+        </h2>
       </section>
 
       {/* Reprendre la lecture (marque-page) */}
@@ -58,7 +65,9 @@ export default function Coran() {
           className="card mt-5 flex items-center gap-3 rounded-2xl p-4 shadow-soft transition hover:scale-[1.02] active:scale-[0.98]"
           style={{ borderColor: "var(--accent)" }}
         >
-          <span className="text-2xl">🔖</span>
+          <span style={{ color: "var(--accent)" }}>
+            <MarquePageIcone taille={24} rempli />
+          </span>
           <span className="min-w-0 flex-1">
             <span className="block font-bold">Reprendre la lecture</span>
             <span className="block text-sm" style={{ color: "var(--muted)" }}>
@@ -71,7 +80,9 @@ export default function Coran() {
 
       {/* Recherche */}
       <div className="card mt-5 flex items-center gap-2 rounded-2xl px-4 py-3 shadow-soft">
-        <span>🔍</span>
+        <span style={{ color: "var(--muted)" }}>
+          <Recherche taille={18} />
+        </span>
         <input
           value={recherche}
           onChange={(e) => setRecherche(e.target.value)}

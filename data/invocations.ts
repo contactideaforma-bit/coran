@@ -10,7 +10,7 @@ export interface Invocation {
 export interface CategorieInvocations {
   id: string;
   nom: string;
-  emoji: string;
+  icone: string; // id dans ICONES_CATEGORIES
   invocations: Invocation[];
 }
 
@@ -19,7 +19,7 @@ export const CATEGORIES_INVOCATIONS: CategorieInvocations[] = [
   {
     id: "matin-soir",
     nom: "Matin & soir",
-    emoji: "🌅",
+    icone: "aube",
     invocations: [
       {
         titre: "La meilleure demande de pardon (Sayyid al-Istighfâr)",
@@ -46,7 +46,7 @@ export const CATEGORIES_INVOCATIONS: CategorieInvocations[] = [
   {
     id: "sommeil",
     nom: "Sommeil & réveil",
-    emoji: "🌙",
+    icone: "lune",
     invocations: [
       {
         titre: "Avant de dormir",
@@ -69,7 +69,7 @@ export const CATEGORIES_INVOCATIONS: CategorieInvocations[] = [
   {
     id: "maison-mosquee",
     nom: "Maison & mosquée",
-    emoji: "🕌",
+    icone: "maison",
     invocations: [
       {
         titre: "En sortant de la maison",
@@ -106,7 +106,7 @@ export const CATEGORIES_INVOCATIONS: CategorieInvocations[] = [
   {
     id: "repas",
     nom: "Repas",
-    emoji: "🍽️",
+    icone: "couverts",
     invocations: [
       {
         titre: "Avant de manger",
@@ -129,7 +129,7 @@ export const CATEGORIES_INVOCATIONS: CategorieInvocations[] = [
   {
     id: "difficulte",
     nom: "Difficulté & pardon",
-    emoji: "🤲",
+    icone: "coeur",
     invocations: [
       {
         titre: "Dans l'angoisse et l'épreuve",

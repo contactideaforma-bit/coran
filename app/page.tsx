@@ -13,35 +13,47 @@ import {
 } from "@/lib/hijri";
 import { lireMarquePage, type MarquePage } from "@/lib/marquePage";
 import Entete from "@/components/Entete";
+import {
+  Calendrier as IconeCalendrier,
+  Citation,
+  Coeur,
+  Etincelles,
+  Horloge,
+  ICONES_EVENEMENTS,
+  Lettres,
+  LivreOuvert,
+  Lune,
+  MarquePageIcone,
+} from "@/components/Icones";
 
 const MODULES = [
   {
     href: "/coran",
-    emoji: "📖",
+    icone: LivreOuvert,
     nom: "Coran",
     description: "Lire avec le tajwid en couleur, écouter mot à mot",
   },
   {
     href: "/nourania",
-    emoji: "🔤",
+    icone: Lettres,
     nom: "Nourania",
     description: "Apprendre à lire l'arabe pas à pas",
   },
   {
     href: "/invocations",
-    emoji: "🤲",
+    icone: Coeur,
     nom: "Invocations",
     description: "Les douas authentiques du quotidien",
   },
   {
     href: "/prieres",
-    emoji: "🕌",
+    icone: Horloge,
     nom: "Prières",
     description: "Les horaires selon ta ville",
   },
   {
     href: "/calendrier",
-    emoji: "📅",
+    icone: IconeCalendrier,
     nom: "Calendrier",
     description: "Événements de l'année, conseils et récompenses",
   },
@@ -99,7 +111,7 @@ export default function Accueil() {
 
       {/* Salutation + date hijri */}
       <section className="mt-6 text-center">
-        <h2 className="text-2xl font-extrabold">Assalâmu alaykum 👋</h2>
+        <h2 className="text-2xl font-extrabold">Assalâmu alaykum</h2>
         {hijri && (
           <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
             Nous sommes le <span className="font-bold">{hijri} H</span>
@@ -113,8 +125,11 @@ export default function Accueil() {
           className="card mt-5 rounded-3xl p-6 shadow-soft"
           style={{ borderColor: "var(--accent)" }}
         >
-          <p className="text-sm font-bold" style={{ color: "var(--accent)" }}>
-            💬 Hadith du jour
+          <p
+            className="flex items-center gap-1.5 text-sm font-bold"
+            style={{ color: "var(--accent)" }}
+          >
+            <Citation taille={16} /> Hadith du jour
           </p>
           <p className="mt-2 text-lg leading-relaxed">
             « {hadith.texte} »
@@ -131,7 +146,9 @@ export default function Accueil() {
           href={`/sourate/${marque.s}#v-${marque.v}`}
           className="card mt-4 flex items-center gap-3 rounded-2xl p-4 shadow-soft transition hover:scale-[1.02] active:scale-[0.98]"
         >
-          <span className="text-2xl">🔖</span>
+          <span style={{ color: "var(--accent)" }}>
+            <MarquePageIcone taille={24} rempli />
+          </span>
           <span className="min-w-0 flex-1">
             <span className="block font-bold">Reprendre ma lecture</span>
             <span className="block text-sm" style={{ color: "var(--muted)" }}>
@@ -148,7 +165,12 @@ export default function Accueil() {
           href="/calendrier"
           className="card mt-4 flex items-center gap-3 rounded-2xl p-4 shadow-soft transition hover:scale-[1.02] active:scale-[0.98]"
         >
-          <span className="text-2xl">{prochain.evt.emoji}</span>
+          <span style={{ color: "var(--accent)" }}>
+            {(() => {
+              const Icone = ICONES_EVENEMENTS[prochain.evt.icone] ?? Lune;
+              return <Icone taille={24} />;
+            })()}
+          </span>
           <span className="min-w-0 flex-1">
             <span className="block font-bold">{prochain.evt.nom}</span>
             <span className="block text-sm" style={{ color: "var(--muted)" }}>
@@ -184,13 +206,14 @@ export default function Accueil() {
             className="card flex items-center gap-4 rounded-2xl p-5 shadow-soft transition hover:scale-[1.02] active:scale-[0.98]"
           >
             <span
-              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-2xl"
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl"
               style={{
                 backgroundColor:
                   "color-mix(in srgb, var(--accent) 15%, transparent)",
+                color: "var(--accent)",
               }}
             >
-              {m.emoji}
+              <m.icone taille={24} />
             </span>
             <span className="min-w-0 flex-1">
               <span className="block font-extrabold">{m.nom}</span>
@@ -203,9 +226,12 @@ export default function Accueil() {
         ))}
       </main>
 
-      <p className="mt-8 text-center text-xs" style={{ color: "var(--muted)" }}>
-        ✨ Personnalise ton appli (thème, couleurs, récitateur) — tes réglages
-        restent sur ton appareil.
+      <p
+        className="mt-8 flex items-center justify-center gap-1.5 text-center text-xs"
+        style={{ color: "var(--muted)" }}
+      >
+        <Etincelles taille={14} /> Personnalise ton appli (thème, couleurs,
+        récitateur) — tes réglages restent sur ton appareil.
       </p>
     </div>
   );

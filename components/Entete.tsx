@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { usePrefs } from "@/lib/prefs";
 import Personnalisation from "@/components/Personnalisation";
+import { Etincelles, LivreOuvert, Lune, Soleil } from "@/components/Icones";
 
 export default function Entete() {
   const { prefs, maj } = usePrefs();
@@ -12,14 +13,16 @@ export default function Entete() {
   return (
     <>
       <header className="card sticky top-3 z-20 flex items-center justify-between rounded-2xl px-4 py-3 shadow-soft">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="text-2xl">📖</span>
+        <Link href="/" className="flex items-center gap-3">
+          <span style={{ color: "var(--accent)" }}>
+            <LivreOuvert taille={26} />
+          </span>
           <span>
             <span className="block text-lg font-extrabold leading-tight">
               Coran Tajwid
             </span>
             <span className="block text-xs" style={{ color: "var(--muted)" }}>
-              Lire, écouter, perfectionner
+              Ton compagnon du quotidien
             </span>
           </span>
         </Link>
@@ -27,16 +30,18 @@ export default function Entete() {
           <button
             onClick={() => setPersoOuverte(true)}
             aria-label="Personnaliser l'appli"
-            className="card rounded-xl px-3 py-2 text-lg transition hover:scale-105 active:scale-95"
+            className="card rounded-xl p-2.5 transition hover:scale-105 active:scale-95"
+            style={{ color: "var(--accent)" }}
           >
-            ✨
+            <Etincelles taille={20} />
           </button>
           <button
             onClick={() => maj({ dark: !prefs.dark })}
             aria-label="Basculer le mode sombre"
-            className="card rounded-xl px-3 py-2 text-lg transition hover:scale-105 active:scale-95"
+            className="card rounded-xl p-2.5 transition hover:scale-105 active:scale-95"
+            style={{ color: "var(--accent)" }}
           >
-            {prefs.dark ? "☀️" : "🌙"}
+            {prefs.dark ? <Soleil taille={20} /> : <Lune taille={20} />}
           </button>
         </div>
       </header>

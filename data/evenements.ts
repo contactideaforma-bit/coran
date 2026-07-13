@@ -1,7 +1,7 @@
 export interface Evenement {
   id: string;
   nom: string;
-  emoji: string;
+  icone: string; // id dans ICONES_EVENEMENTS
   /** Date hégirienne : mois (1-12) et jour ; duree en jours (défaut 1).
    *  Les jours blancs (13-15 de chaque mois) sont gérés à part. */
   hijri?: { mois: number; jour: number; duree?: number };
@@ -16,7 +16,7 @@ export const EVENEMENTS: Evenement[] = [
   {
     id: "nouvel-an",
     nom: "Nouvel an hégirien",
-    emoji: "🌙",
+    icone: "lune",
     hijri: { mois: 1, jour: 1 },
     description:
       "Début de l'année musulmane, qui commémore l'Hégire (émigration du Prophète ﷺ de La Mecque à Médine). Muharram est l'un des quatre mois sacrés.",
@@ -31,7 +31,7 @@ export const EVENEMENTS: Evenement[] = [
   {
     id: "achoura",
     nom: "Achoura (9-10 Muharram)",
-    emoji: "⭐",
+    icone: "etoile",
     hijri: { mois: 1, jour: 9, duree: 2 },
     description:
       "Le 10 Muharram, jour où Allah sauva Moussa (Moïse) et son peuple. Le Prophète ﷺ a recommandé d'y joindre le 9 pour se distinguer.",
@@ -46,7 +46,7 @@ export const EVENEMENTS: Evenement[] = [
   {
     id: "ramadan",
     nom: "Début du Ramadan",
-    emoji: "🌜",
+    icone: "lune",
     hijri: { mois: 9, jour: 1, duree: 29 },
     description:
       "Le mois du jeûne, de la révélation du Coran et de la générosité. Un pilier de l'islam.",
@@ -63,7 +63,7 @@ export const EVENEMENTS: Evenement[] = [
   {
     id: "dix-dernieres-nuits",
     nom: "Les 10 dernières nuits de Ramadan",
-    emoji: "✨",
+    icone: "etincelles",
     hijri: { mois: 9, jour: 21, duree: 9 },
     description:
       "Les nuits les plus précieuses de l'année : l'une d'elles est Laylat al-Qadr, « meilleure que mille mois » (Coran 97:3), à rechercher surtout les nuits impaires.",
@@ -79,7 +79,7 @@ export const EVENEMENTS: Evenement[] = [
   {
     id: "eid-fitr",
     nom: "Aïd al-Fitr",
-    emoji: "🎉",
+    icone: "cadeau",
     hijri: { mois: 10, jour: 1 },
     description:
       "La fête de la rupture du jeûne, jour de joie, de prière en commun et de partage. Il est interdit de jeûner ce jour-là.",
@@ -95,7 +95,7 @@ export const EVENEMENTS: Evenement[] = [
   {
     id: "six-chawwal",
     nom: "Les 6 jours de Chawwal",
-    emoji: "🗓️",
+    icone: "calendrier",
     hijri: { mois: 10, jour: 2, duree: 28 },
     description:
       "Jeûner six jours durant le mois de Chawwal (après l'Aïd), d'affilée ou non.",
@@ -107,7 +107,7 @@ export const EVENEMENTS: Evenement[] = [
   {
     id: "dix-dhul-hijja",
     nom: "Les 10 premiers jours de Dhoul-Hijja",
-    emoji: "🕋",
+    icone: "cube",
     hijri: { mois: 12, jour: 1, duree: 10 },
     description:
       "Les meilleurs jours de l'année pour les bonnes œuvres, période du pèlerinage.",
@@ -123,7 +123,7 @@ export const EVENEMENTS: Evenement[] = [
   {
     id: "arafat",
     nom: "Jour de 'Arafat",
-    emoji: "⛰️",
+    icone: "montagne",
     hijri: { mois: 12, jour: 9 },
     description:
       "Le 9 Dhoul-Hijja, jour où les pèlerins se tiennent sur le mont 'Arafat. Le jeûne y est fortement recommandé pour les non-pèlerins.",
@@ -138,7 +138,7 @@ export const EVENEMENTS: Evenement[] = [
   {
     id: "eid-adha",
     nom: "Aïd al-Adha",
-    emoji: "🐑",
+    icone: "cadeau",
     hijri: { mois: 12, jour: 10 },
     description:
       "La fête du sacrifice, en souvenir d'Ibrahim (Abraham). Jour de prière, de sacrifice et de partage.",
@@ -154,7 +154,7 @@ export const EVENEMENTS: Evenement[] = [
   {
     id: "jours-blancs",
     nom: "Les jours blancs (13-14-15 du mois)",
-    emoji: "🌕",
+    icone: "lune-pleine",
     recurrent: "mensuel",
     description:
       "Les 13, 14 et 15 de chaque mois lunaire, quand la lune est pleine. Le Prophète ﷺ recommandait d'y jeûner.",
@@ -166,7 +166,7 @@ export const EVENEMENTS: Evenement[] = [
   {
     id: "lundi-jeudi",
     nom: "Lundi et jeudi",
-    emoji: "📿",
+    icone: "repeter",
     recurrent: "hebdomadaire",
     description:
       "Le Prophète ﷺ jeûnait régulièrement le lundi et le jeudi : les œuvres y sont présentées à Allah.",

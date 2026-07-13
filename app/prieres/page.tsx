@@ -12,14 +12,27 @@ import {
   type HorairesJour,
 } from "@/lib/prieres";
 import Entete from "@/components/Entete";
+import {
+  Alerte,
+  Aube,
+  Cadenas,
+  Epingle,
+  Horloge,
+  Lune,
+  Soleil,
+} from "@/components/Icones";
 
-const LIGNES: { id: keyof HorairesJour; nom: string; emoji: string }[] = [
-  { id: "fajr", nom: "Fajr", emoji: "🌄" },
-  { id: "lever", nom: "Lever du soleil", emoji: "☀️" },
-  { id: "dhuhr", nom: "Dhuhr", emoji: "🕛" },
-  { id: "asr", nom: "Asr", emoji: "🕒" },
-  { id: "maghrib", nom: "Maghrib", emoji: "🌇" },
-  { id: "isha", nom: "Isha", emoji: "🌃" },
+const LIGNES: {
+  id: keyof HorairesJour;
+  nom: string;
+  icone: (p: { taille?: number }) => JSX.Element;
+}[] = [
+  { id: "fajr", nom: "Fajr", icone: Aube },
+  { id: "lever", nom: "Lever du soleil", icone: Soleil },
+  { id: "dhuhr", nom: "Dhuhr", icone: Soleil },
+  { id: "asr", nom: "Asr", icone: Horloge },
+  { id: "maghrib", nom: "Maghrib", icone: Lune },
+  { id: "isha", nom: "Isha", icone: Lune },
 ];
 
 export default function Prieres() {
@@ -79,7 +92,9 @@ export default function Prieres() {
         >
           ← Accueil
         </Link>
-        <h2 className="text-xl font-extrabold">🕌 Horaires de prière</h2>
+        <h2 className="flex items-center gap-2 text-xl font-extrabold">
+          <Horloge taille={22} /> Horaires de prière
+        </h2>
       </section>
 
       {/* Choix ville + méthode */}
@@ -166,8 +181,11 @@ export default function Prieres() {
               </button>
             )}
           </div>
-          <p className="text-center text-xs" style={{ color: "var(--muted)" }}>
-            🔒 Ta ville reste sur ton appareil.
+          <p
+            className="flex items-center justify-center gap-1.5 text-center text-xs"
+            style={{ color: "var(--muted)" }}
+          >
+            <Cadenas taille={14} /> Ta ville reste sur ton appareil.
           </p>
         </form>
       )}
@@ -177,7 +195,9 @@ export default function Prieres() {
         <div className="mt-6 space-y-4">
           <div className="card flex items-center justify-between rounded-2xl p-4 shadow-soft">
             <div>
-              <p className="font-bold">📍 {config.ville}</p>
+              <p className="flex items-center gap-1.5 font-bold">
+                <Epingle taille={16} className="shrink-0" /> {config.ville}
+              </p>
               <p className="text-sm" style={{ color: "var(--muted)" }}>
                 {horaires
                   ? `${new Date().toLocaleDateString("fr-FR", {
@@ -198,7 +218,13 @@ export default function Prieres() {
 
           {erreur && (
             <div className="card rounded-2xl p-6 text-center shadow-soft">
-              <p>📡 {erreur}</p>
+              <p
+                className="flex justify-center"
+                style={{ color: "var(--accent)" }}
+              >
+                <Alerte taille={28} />
+              </p>
+              <p className="mt-2">{erreur}</p>
               <button
                 onClick={() => setFormulaire(true)}
                 className="mt-3 rounded-full px-5 py-2 font-bold text-white"
@@ -211,7 +237,12 @@ export default function Prieres() {
 
           {!horaires && !erreur && (
             <div className="card rounded-2xl p-8 text-center shadow-soft">
-              <p className="animate-pulse text-3xl">🕌</p>
+              <p
+                className="flex animate-pulse justify-center"
+                style={{ color: "var(--accent)" }}
+              >
+                <Horloge taille={36} />
+              </p>
               <p className="mt-2 font-bold">Chargement des horaires…</p>
             </div>
           )}
@@ -235,7 +266,9 @@ export default function Prieres() {
                     }
                   >
                     <span className="flex items-center gap-3 font-bold">
-                      <span className="text-xl">{l.emoji}</span>
+                      <span style={{ color: "var(--accent)" }}>
+                        <l.icone taille={20} />
+                      </span>
                       {l.nom}
                       {estSuivante && (
                         <span
