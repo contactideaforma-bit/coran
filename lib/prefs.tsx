@@ -63,7 +63,7 @@ export interface Prefs {
 const DEFAUTS: Prefs = {
   dark: false,
   taille: 1,
-  police: "font-amiri",
+  police: "font-scheherazade",
   fond: "creme",
   accent: "or",
   recitateur: "Husary_128kbps",

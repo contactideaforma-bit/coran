@@ -3,14 +3,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { hadithDuJour, type Hadith } from "@/data/hadiths";
-import { EVENEMENTS, type Evenement } from "@/data/evenements";
 import { SOURATES } from "@/data/sourates";
-import {
-  joursRestants,
-  libelleHijri,
-  prochaineDateHijri,
-  versHijri,
-} from "@/lib/hijri";
+import { libelleHijri, versHijri } from "@/lib/hijri";
 import { lireMarquePage, type MarquePage } from "@/lib/marquePage";
 import Entete from "@/components/Entete";
 import {
@@ -19,10 +13,8 @@ import {
   Coeur,
   Etincelles,
   Horloge,
-  ICONES_EVENEMENTS,
   Lettres,
   LivreOuvert,
-  Lune,
   Manette,
   MarquePageIcone,
 } from "@/components/Icones";
@@ -66,45 +58,15 @@ const MODULES = [
   },
 ];
 
-interface ProchainEvenement {
-  evt: Evenement;
-  date: Date;
-  jours: number;
-}
-
-function prochainEvenement(): ProchainEvenement | null {
-  const auj = new Date();
-  let meilleur: ProchainEvenement | null = null;
-  for (const evt of EVENEMENTS) {
-    if (!evt.hijri) continue;
-    let date = prochaineDateHijri(evt.hijri.mois, evt.hijri.jour, auj);
-    const duree = evt.hijri.duree ?? 1;
-    const h = versHijri(auj);
-    if (
-      h.mois === evt.hijri.mois &&
-      h.jour >= evt.hijri.jour &&
-      h.jour < evt.hijri.jour + duree
-    ) {
-      date = new Date(auj);
-    }
-    const jours = joursRestants(date);
-    if (!meilleur || jours < meilleur.jours) {
-      meilleur = { evt, date, jours };
-    }
-  }
-  return meilleur;
-}
 
 export default function Accueil() {
   const [hadith, setHadith] = useState<Hadith | null>(null);
   const [hijri, setHijri] = useState("");
-  const [prochain, setProchain] = useState<ProchainEvenement | null>(null);
   const [marque, setMarque] = useState<MarquePage | null>(null);
 
   useEffect(() => {
     setHadith(hadithDuJour());
     setHijri(libelleHijri(versHijri(new Date())));
-    setProchain(prochainEvenement());
     setMarque(lireMarquePage());
   }, []);
 
@@ -174,43 +136,6 @@ export default function Accueil() {
         </Link>
       )}
 
-      {/* Prochain événement */}
-      {prochain && (
-        <Link
-          href="/calendrier"
-          className="card mt-4 flex items-center gap-3 rounded-2xl p-4 shadow-soft transition hover:scale-[1.02] active:scale-[0.98]"
-        >
-          <span style={{ color: "var(--accent)" }}>
-            {(() => {
-              const Icone = ICONES_EVENEMENTS[prochain.evt.icone] ?? Lune;
-              return <Icone taille={24} />;
-            })()}
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="block font-bold">{prochain.evt.nom}</span>
-            <span className="block text-sm" style={{ color: "var(--muted)" }}>
-              {prochain.date.toLocaleDateString("fr-FR", {
-                weekday: "long",
-                day: "numeric",
-                month: "long",
-              })}
-            </span>
-          </span>
-          <span
-            className="shrink-0 rounded-full px-3 py-1 text-xs font-bold text-white"
-            style={{
-              backgroundColor:
-                prochain.jours <= 0 ? "#2e7d5b" : "var(--accent)",
-            }}
-          >
-            {prochain.jours <= 0
-              ? "En cours !"
-              : prochain.jours === 1
-                ? "Demain"
-                : `Dans ${prochain.jours} jours`}
-          </span>
-        </Link>
-      )}
 
       {/* Modules */}
       <main className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">

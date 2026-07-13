@@ -33,10 +33,14 @@ export default function Personnalisation({
       onClick={fermer}
     >
       <div
-        className="card pop max-h-[80vh] w-full max-w-3xl overflow-y-auto rounded-t-3xl p-5"
+        className="card pop flex max-h-[85vh] w-full max-w-3xl flex-col rounded-t-3xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="mb-4 flex items-center justify-between">
+        {/* En-tête fixe */}
+        <div
+          className="flex items-center justify-between border-b p-5"
+          style={{ borderColor: "var(--border)" }}
+        >
           <h2 className="flex items-center gap-2 text-lg font-extrabold">
             <span style={{ color: "var(--accent)" }}>
               <Etincelles taille={20} />
@@ -50,6 +54,9 @@ export default function Personnalisation({
             ✕
           </button>
         </div>
+
+        {/* Contenu défilant */}
+        <div className="flex-1 overflow-y-auto p-5">
 
         {/* Thème */}
         <p className="mb-2 text-sm font-bold">Thème</p>
@@ -232,6 +239,24 @@ export default function Personnalisation({
           <Cadenas taille={14} /> Ces réglages sont enregistrés sur cet
           appareil uniquement — chacun garde les siens.
         </p>
+        </div>
+
+        {/* Pied fixe */}
+        <div
+          className="border-t p-4"
+          style={{
+            borderColor: "var(--border)",
+            paddingBottom: "max(1rem, env(safe-area-inset-bottom))",
+          }}
+        >
+          <button
+            onClick={fermer}
+            className="w-full rounded-full px-6 py-3 font-bold text-white transition active:scale-95"
+            style={{ backgroundColor: "var(--accent)" }}
+          >
+            Fermer
+          </button>
+        </div>
       </div>
     </div>
   );

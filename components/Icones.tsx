@@ -349,4 +349,6 @@ export const ICONES_CATEGORIES: Record<
   maison: Maison,
   couverts: Couverts,
   coeur: Coeur,
+  horloge: Horloge,
+  epingle: Epingle,
 };

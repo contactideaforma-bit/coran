@@ -41,6 +41,26 @@ export const CATEGORIES_INVOCATIONS: CategorieInvocations[] = [
         source: "Abu Dawud & At-Tirmidhi",
         note: "À dire trois fois le matin et le soir.",
       },
+      {
+        titre: "La satisfaction (3 fois)",
+        arabe:
+          "رَضِيتُ بِاللَّهِ رَبًّا، وَبِالْإِسْلَامِ دِينًا، وَبِمُحَمَّدٍ ﷺ نَبِيًّا",
+        translit:
+          "Raḍîtu billâhi rabban, wa bil-islâmi dînan, wa bi-Muḥammadin ﷺ nabiyyan.",
+        fr: "Je suis satisfait d'Allah comme Seigneur, de l'islam comme religion et de Muhammad ﷺ comme Prophète.",
+        source: "Abu Dawud & At-Tirmidhi",
+        note: "Trois fois matin et soir : le Paradis lui est dû.",
+      },
+      {
+        titre: "Au matin (et au soir)",
+        arabe:
+          "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ",
+        translit:
+          "Aṣbaḥnâ wa aṣbaḥal-mulku lillâh, wal-ḥamdu lillâh, lâ ilâha illâ-llâhu waḥdahu lâ sharîka lah.",
+        fr: "Nous voici au matin, et le règne appartient à Allah. Louange à Allah ! Il n'y a de divinité qu'Allah, Seul, sans associé.",
+        source: "Muslim",
+        note: "Le soir, dire « Amsaynâ wa amsal-mulku lillâh… » (Nous voici au soir…).",
+      },
     ],
   },
   {
@@ -54,6 +74,23 @@ export const CATEGORIES_INVOCATIONS: CategorieInvocations[] = [
         translit: "Bismika Allâhumma amûtu wa aḥyâ.",
         fr: "C'est en Ton nom, ô Allah, que je meurs et que je vis.",
         source: "Al-Bukhari",
+      },
+      {
+        titre: "Âyat al-Kursî avant de dormir",
+        arabe:
+          "اللَّهُ لَا إِلَهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ ۚ لَهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ ۗ مَنْ ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلَّا بِإِذْنِهِ ۚ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ ۖ وَلَا يُحِيطُونَ بِشَيْءٍ مِنْ عِلْمِهِ إِلَّا بِمَا شَاءَ ۚ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ ۖ وَلَا يَئُودُهُ حِفْظُهُمَا ۚ وَهُوَ الْعَلِيُّ الْعَظِيمُ",
+        translit:
+          "Allâhu lâ ilâha illâ huwal-Ḥayyul-Qayyûm… (Coran 2:255)",
+        fr: "Le verset du Trône (Coran 2:255) : Allah ! Point de divinité que Lui, le Vivant, Celui qui subsiste par Lui-même…",
+        source: "Al-Bukhari",
+        note: "Qui le récite en se couchant reste sous la protection d'Allah : aucun démon ne l'approche jusqu'au matin.",
+      },
+      {
+        titre: "En se couchant sur le côté droit",
+        arabe: "اللَّهُمَّ قِنِي عَذَابَكَ يَوْمَ تَبْعَثُ عِبَادَكَ",
+        translit: "Allâhumma qinî 'adhâbaka yawma tab'athu 'ibâdak.",
+        fr: "Ô Allah, préserve-moi de Ton châtiment le jour où Tu ressusciteras Tes serviteurs.",
+        source: "Abu Dawud & At-Tirmidhi",
       },
       {
         titre: "Au réveil",
@@ -101,6 +138,13 @@ export const CATEGORIES_INVOCATIONS: CategorieInvocations[] = [
         fr: "Ô Allah, je cherche protection auprès de Toi contre les démons mâles et femelles.",
         source: "Al-Bukhari & Muslim",
       },
+      {
+        titre: "En sortant des toilettes",
+        arabe: "غُفْرَانَكَ",
+        translit: "Ghufrânak.",
+        fr: "(Je Te demande) Ton pardon.",
+        source: "Abu Dawud & At-Tirmidhi",
+      },
     ],
   },
   {
@@ -123,6 +167,84 @@ export const CATEGORIES_INVOCATIONS: CategorieInvocations[] = [
           "Al-ḥamdu lillâhi-lladhî aṭ'amanâ wa saqânâ wa ja'alanâ muslimîn.",
         fr: "Louange à Allah qui nous a nourris, abreuvés et a fait de nous des musulmans.",
         source: "Abu Dawud & At-Tirmidhi",
+      },
+      {
+        titre: "À la rupture du jeûne",
+        arabe:
+          "ذَهَبَ الظَّمَأُ وَابْتَلَّتِ الْعُرُوقُ وَثَبَتَ الْأَجْرُ إِنْ شَاءَ اللَّهُ",
+        translit:
+          "Dhahaba-ẓ-ẓama'u wabtallatil-'urûqu wa thabatal-ajru in shâ'a-llâh.",
+        fr: "La soif est partie, les veines sont abreuvées et la récompense est confirmée, si Allah le veut.",
+        source: "Abu Dawud (bon)",
+      },
+      {
+        titre: "Pour celui qui t'a offert à manger",
+        arabe: "اللَّهُمَّ أَطْعِمْ مَنْ أَطْعَمَنِي وَاسْقِ مَنْ سَقَانِي",
+        translit: "Allâhumma aṭ'im man aṭ'amanî wasqi man saqânî.",
+        fr: "Ô Allah, nourris celui qui m'a nourri et abreuve celui qui m'a abreuvé.",
+        source: "Muslim",
+      },
+    ],
+  },
+  {
+    id: "apres-priere",
+    nom: "Après la prière",
+    icone: "horloge",
+    invocations: [
+      {
+        titre: "Demande de pardon et salutation",
+        arabe:
+          "أَسْتَغْفِرُ اللَّهَ (٣ مرات) اللَّهُمَّ أَنْتَ السَّلَامُ وَمِنْكَ السَّلَامُ، تَبَارَكْتَ يَا ذَا الْجَلَالِ وَالْإِكْرَامِ",
+        translit:
+          "Astaghfirullâh (3 fois). Allâhumma antas-salâm wa minkas-salâm, tabârakta yâ dhal-jalâli wal-ikrâm.",
+        fr: "Je demande pardon à Allah (3 fois). Ô Allah, Tu es la Paix et de Toi vient la paix. Béni sois-Tu, ô Détenteur de la majesté et de la générosité.",
+        source: "Muslim",
+      },
+      {
+        titre: "Le tasbîh (33-33-34)",
+        arabe:
+          "سُبْحَانَ اللَّهِ (٣٣) الْحَمْدُ لِلَّهِ (٣٣) اللَّهُ أَكْبَرُ (٣٣) لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+        translit:
+          "SubḥânAllâh (33), al-ḥamdu lillâh (33), Allâhu akbar (33), puis : lâ ilâha illâ-llâhu waḥdahu lâ sharîka lah, lahul-mulku wa lahul-ḥamdu wa huwa 'alâ kulli shay'in qadîr.",
+        fr: "Gloire à Allah (33 fois), louange à Allah (33 fois), Allah est le plus Grand (33 fois), puis la parole d'unicité pour compléter la centaine.",
+        source: "Muslim",
+        note: "Ses fautes sont pardonnées, fussent-elles comme l'écume de la mer.",
+      },
+      {
+        titre: "Aide-moi à T'adorer",
+        arabe:
+          "اللَّهُمَّ أَعِنِّي عَلَى ذِكْرِكَ وَشُكْرِكَ وَحُسْنِ عِبَادَتِكَ",
+        translit:
+          "Allâhumma a'innî 'alâ dhikrika wa shukrika wa ḥusni 'ibâdatik.",
+        fr: "Ô Allah, aide-moi à me souvenir de Toi, à Te remercier et à T'adorer de la meilleure façon.",
+        source: "Abu Dawud & An-Nasa'i",
+        note: "Le Prophète ﷺ recommanda à Mu'adh de ne jamais la délaisser après chaque prière.",
+      },
+    ],
+  },
+  {
+    id: "voyage",
+    nom: "Voyage",
+    icone: "epingle",
+    invocations: [
+      {
+        titre: "En montant dans un véhicule",
+        arabe:
+          "سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ وَإِنَّا إِلَى رَبِّنَا لَمُنْقَلِبُونَ",
+        translit:
+          "Subḥânalladhî sakhkhara lanâ hâdhâ wa mâ kunnâ lahu muqrinîn, wa innâ ilâ rabbinâ lamunqalibûn.",
+        fr: "Gloire à Celui qui a mis ceci à notre service alors que nous n'aurions pu le dominer, et c'est vers notre Seigneur que nous retournerons. (Coran 43:13-14)",
+        source: "Muslim",
+      },
+      {
+        titre: "Invocation du voyageur",
+        arabe:
+          "اللَّهُمَّ إِنَّا نَسْأَلُكَ فِي سَفَرِنَا هَذَا الْبِرَّ وَالتَّقْوَى، وَمِنَ الْعَمَلِ مَا تَرْضَى",
+        translit:
+          "Allâhumma innâ nas'aluka fî safarinâ hâdhal-birra wat-taqwâ, wa minal-'amali mâ tarḍâ.",
+        fr: "Ô Allah, nous Te demandons dans ce voyage la bonté et la piété, et des œuvres que Tu agrées.",
+        source: "Muslim",
+        note: "L'invocation du voyageur est exaucée.",
       },
     ],
   },
