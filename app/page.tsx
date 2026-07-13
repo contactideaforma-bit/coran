@@ -62,7 +62,7 @@ const MODULES = [
     href: "/jeux",
     icone: Manette,
     nom: "Jeux",
-    description: "Quiz tajwid, lettres et connaissances : apprends en t'amusant",
+    description: "Jeu des lettres (3 niveaux) et quiz de connaissances",
   },
 ];
 

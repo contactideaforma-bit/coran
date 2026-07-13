@@ -2,14 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { chargerSourate, type Word } from "@/lib/coran";
 import { ALPHABET, type Lettre } from "@/data/nourania";
 import { QUESTIONS_QUIZ } from "@/data/quiz";
-import { TAJWID_RULES, RULE_BY_ID, type TajwidRule } from "@/lib/tajwid";
 import { usePrefs } from "@/lib/prefs";
 import Entete from "@/components/Entete";
 import {
-  Goutte,
   HautParleur,
   Lettres,
   LivreOuvert,
@@ -30,32 +27,72 @@ function melanger<T>(liste: T[]): T[] {
   return copie;
 }
 
-type JeuId = "tajwid" | "lettres" | "quiz";
-
-function lireRecords(): Record<JeuId, number> {
+function lireRecords(): Record<string, number> {
   try {
-    return {
-      tajwid: 0,
-      lettres: 0,
-      quiz: 0,
-      ...JSON.parse(localStorage.getItem("coran-jeux") ?? "{}"),
-    };
+    return JSON.parse(localStorage.getItem("coran-jeux") ?? "{}");
   } catch {
-    return { tajwid: 0, lettres: 0, quiz: 0 };
+    return {};
   }
 }
 
-function enregistrerRecord(jeu: JeuId, score: number) {
+function enregistrerRecord(cle: string, score: number) {
   const records = lireRecords();
-  if (score > records[jeu]) {
-    records[jeu] = score;
+  if (score > (records[cle] ?? 0)) {
+    records[cle] = score;
     try {
       localStorage.setItem("coran-jeux", JSON.stringify(records));
     } catch {}
   }
 }
 
-/* ===== Habillage commun d'une partie ===== */
+/* ===== Niveaux du jeu des lettres ===== */
+
+type Niveau = "facile" | "moyen" | "difficile";
+
+const NIVEAUX: { id: Niveau; nom: string; description: string; choix: number }[] = [
+  {
+    id: "facile",
+    nom: "Facile",
+    description: "3 propositions, lettres bien différentes",
+    choix: 3,
+  },
+  {
+    id: "moyen",
+    nom: "Moyen",
+    description: "4 propositions au hasard",
+    choix: 4,
+  },
+  {
+    id: "difficile",
+    nom: "Difficile",
+    description: "6 propositions, avec les lettres qui se ressemblent",
+    choix: 6,
+  },
+];
+
+/** Familles de lettres visuellement ou auditivement proches. */
+const FAMILLES: string[][] = [
+  ["ب", "ت", "ث", "ن", "ي"],
+  ["ج", "ح", "خ"],
+  ["د", "ذ", "ر", "ز"],
+  ["س", "ش", "ص", "ض"],
+  ["ط", "ظ"],
+  ["ع", "غ"],
+  ["ف", "ق"],
+  ["ك", "ل"],
+  ["ه", "ة", "م"],
+  ["ا", "و"],
+];
+
+function famille(lettre: string): string[] {
+  return FAMILLES.find((f) => f.includes(lettre)) ?? [];
+}
+
+function memeFamille(a: string, b: string): boolean {
+  return famille(a).includes(b);
+}
+
+/* ===== Habillage commun ===== */
 
 function CadrePartie({
   question,
@@ -97,12 +134,12 @@ function CadrePartie({
 }
 
 function EcranFin({
-  jeu,
+  cleRecord,
   score,
   rejouer,
   menu,
 }: {
-  jeu: JeuId;
+  cleRecord: string;
   score: number;
   rejouer: () => void;
   menu: () => void;
@@ -110,9 +147,9 @@ function EcranFin({
   const [record, setRecord] = useState(0);
 
   useEffect(() => {
-    enregistrerRecord(jeu, score);
-    setRecord(Math.max(lireRecords()[jeu], score));
-  }, [jeu, score]);
+    enregistrerRecord(cleRecord, score);
+    setRecord(Math.max(lireRecords()[cleRecord] ?? 0, score));
+  }, [cleRecord, score]);
 
   const message =
     score === NB_QUESTIONS
@@ -151,7 +188,6 @@ function EcranFin({
   );
 }
 
-/** Bouton de réponse avec feedback (vert = bon, contour rouge = mauvais choix). */
 function BoutonReponse({
   contenu,
   etat,
@@ -188,174 +224,48 @@ function BoutonReponse({
   );
 }
 
-/* ===== Jeu 1 : Quiz tajwid ===== */
-
-const SOURATES_JEU = [1, 78, 82, 84, 86, 87, 89, 91, 93, 95, 97, 99, 101, 103, 107, 109, 112, 113, 114];
-
-interface QuestionTajwid {
-  word: Word;
-  bonne: TajwidRule;
-  options: TajwidRule[];
-}
-
-function JeuTajwid({ quitter }: { quitter: () => void }) {
-  const { prefs } = usePrefs();
-  const [questions, setQuestions] = useState<QuestionTajwid[] | null>(null);
-  const [idx, setIdx] = useState(0);
-  const [score, setScore] = useState(0);
-  const [choix, setChoix] = useState<TajwidRule | null>(null);
-  const [fini, setFini] = useState(false);
-  const [cle, setCle] = useState(0); // pour rejouer
-
-  useEffect(() => {
-    let annule = false;
-    setQuestions(null);
-    setIdx(0);
-    setScore(0);
-    setChoix(null);
-    setFini(false);
-    (async () => {
-      const pool = melanger(SOURATES_JEU).slice(0, 3);
-      const candidats: { word: Word; regles: TajwidRule[] }[] = [];
-      for (const n of pool) {
-        try {
-          const d = await chargerSourate(n);
-          for (const v of d.verses) {
-            for (const w of v.words) {
-              const ids = Array.from(
-                new Set(w.segments.filter((s) => s.r).map((s) => s.r!))
-              );
-              if (ids.length >= 1 && w.segments.length >= 2) {
-                candidats.push({ word: w, regles: ids.map((i) => RULE_BY_ID[i]) });
-              }
-            }
-          }
-        } catch {}
-      }
-      if (annule) return;
-      const qs: QuestionTajwid[] = melanger(candidats)
-        .slice(0, NB_QUESTIONS)
-        .map((c) => {
-          const bonne = c.regles[Math.floor(Math.random() * c.regles.length)];
-          const distracteurs = melanger(
-            TAJWID_RULES.filter((r) => !c.regles.some((x) => x.id === r.id))
-          ).slice(0, 3);
-          return { word: c.word, bonne, options: melanger([bonne, ...distracteurs]) };
-        });
-      setQuestions(qs);
-    })();
-    return () => {
-      annule = true;
-    };
-  }, [cle]);
-
-  if (fini)
-    return (
-      <EcranFin
-        jeu="tajwid"
-        score={score}
-        rejouer={() => setCle((c) => c + 1)}
-        menu={quitter}
-      />
-    );
-
-  if (!questions)
-    return (
-      <div className="card mt-6 rounded-3xl p-8 text-center shadow-soft">
-        <p className="flex animate-pulse justify-center" style={{ color: "var(--accent)" }}>
-          <LivreOuvert taille={36} />
-        </p>
-        <p className="mt-2 font-bold">Préparation des questions…</p>
-      </div>
-    );
-
-  const q = questions[idx];
-  const couleur = (r: TajwidRule) => (prefs.dark ? r.couleurSombre : r.couleur);
-
-  const repondre = (r: TajwidRule) => {
-    if (choix) return;
-    setChoix(r);
-    if (r.id === q.bonne.id) setScore((s) => s + 1);
-  };
-
-  const suivant = () => {
-    setChoix(null);
-    if (idx + 1 >= questions.length) setFini(true);
-    else setIdx((i) => i + 1);
-  };
-
-  return (
-    <CadrePartie question={idx} score={score} quitter={quitter}>
-      <p className="text-center font-bold">
-        Quelle règle de tajwid est colorée dans ce mot ?
-      </p>
-      <p
-        className={`arabic mt-4 text-center text-5xl ${prefs.police}`}
-        dir="rtl"
-      >
-        {q.word.segments.map((s, si) =>
-          s.r ? (
-            <span key={si} style={{ color: couleur(RULE_BY_ID[s.r]) }}>
-              {s.t}
-            </span>
-          ) : (
-            <span key={si}>{s.t}</span>
-          )
-        )}
-      </p>
-      <div className="mt-5 space-y-2">
-        {q.options.map((r) => (
-          <BoutonReponse
-            key={r.id}
-            desactive={!!choix}
-            onClick={() => repondre(r)}
-            etat={
-              !choix
-                ? "neutre"
-                : r.id === q.bonne.id
-                  ? "bon"
-                  : r.id === choix.id
-                    ? "mauvais"
-                    : "neutre"
-            }
-            contenu={
-              <span className="flex items-center gap-2">
-                <span
-                  className="tajwid-dot"
-                  style={{ backgroundColor: couleur(r) }}
-                />
-                {r.nom}
-              </span>
-            }
-          />
-        ))}
-      </div>
-      {choix && (
-        <div className="mt-4 space-y-3">
-          <p className="text-sm" style={{ color: "var(--muted)" }}>
-            {q.bonne.resume} — {q.bonne.detail}
-          </p>
-          <button
-            onClick={suivant}
-            className="w-full rounded-full px-6 py-3 font-bold text-white transition active:scale-95"
-            style={{ backgroundColor: "var(--accent)" }}
-          >
-            {idx + 1 >= questions.length ? "Voir mon score" : "Question suivante"}
-          </button>
-        </div>
-      )}
-    </CadrePartie>
-  );
-}
-
-/* ===== Jeu 2 : Jeu des lettres ===== */
+/* ===== Jeu des lettres ===== */
 
 interface QuestionLettre {
   bonne: Lettre;
   options: Lettre[];
 }
 
-function JeuLettres({ quitter }: { quitter: () => void }) {
+function genererQuestions(niveau: Niveau): QuestionLettre[] {
+  const nbChoix = NIVEAUX.find((n) => n.id === niveau)!.choix;
+  return melanger(ALPHABET)
+    .slice(0, NB_QUESTIONS)
+    .map((bonne) => {
+      const autres = ALPHABET.filter((l) => l.nom !== bonne.nom);
+      let distracteurs: Lettre[];
+      if (niveau === "facile") {
+        // Lettres d'autres familles : visuellement bien distinctes
+        distracteurs = melanger(
+          autres.filter((l) => !memeFamille(bonne.arabe, l.arabe))
+        ).slice(0, nbChoix - 1);
+      } else if (niveau === "difficile") {
+        // D'abord les lettres de la même famille, puis compléter au hasard
+        const proches = melanger(
+          autres.filter((l) => memeFamille(bonne.arabe, l.arabe))
+        );
+        const restants = melanger(
+          autres.filter((l) => !memeFamille(bonne.arabe, l.arabe))
+        );
+        distracteurs = [...proches, ...restants].slice(0, nbChoix - 1);
+      } else {
+        distracteurs = melanger(autres).slice(0, nbChoix - 1);
+      }
+      return { bonne, options: melanger([bonne, ...distracteurs]) };
+    });
+}
+
+function JeuLettres({
+  niveau,
+  quitter,
+}: {
+  niveau: Niveau;
+  quitter: () => void;
+}) {
   const { prefs } = usePrefs();
   const [questions, setQuestions] = useState<QuestionLettre[]>([]);
   const [idx, setIdx] = useState(0);
@@ -383,23 +293,15 @@ function JeuLettres({ quitter }: { quitter: () => void }) {
   }, []);
 
   const nouvellePartie = () => {
-    const qs = melanger(ALPHABET)
-      .slice(0, NB_QUESTIONS)
-      .map((bonne) => ({
-        bonne,
-        options: melanger([
-          bonne,
-          ...melanger(ALPHABET.filter((l) => l.nom !== bonne.nom)).slice(0, 3),
-        ]),
-      }));
-    setQuestions(qs);
+    setQuestions(genererQuestions(niveau));
     setIdx(0);
     setScore(0);
     setChoix(null);
     setFini(false);
   };
 
-  useEffect(nouvellePartie, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(nouvellePartie, [niveau]);
 
   const prononcer = (l: Lettre) => {
     if (typeof speechSynthesis === "undefined") return;
@@ -420,7 +322,12 @@ function JeuLettres({ quitter }: { quitter: () => void }) {
 
   if (fini)
     return (
-      <EcranFin jeu="lettres" score={score} rejouer={nouvellePartie} menu={quitter} />
+      <EcranFin
+        cleRecord={`lettres-${niveau}`}
+        score={score}
+        rejouer={nouvellePartie}
+        menu={quitter}
+      />
     );
 
   const q = questions[idx];
@@ -438,8 +345,16 @@ function JeuLettres({ quitter }: { quitter: () => void }) {
     else setIdx((i) => i + 1);
   };
 
+  const nomNiveau = NIVEAUX.find((n) => n.id === niveau)!.nom;
+
   return (
     <CadrePartie question={idx} score={score} quitter={quitter}>
+      <p
+        className="mb-2 text-center text-xs font-bold uppercase tracking-wide"
+        style={{ color: "var(--muted)" }}
+      >
+        Niveau {nomNiveau}
+      </p>
       {voixArabe ? (
         <>
           <p className="text-center font-bold">Quelle lettre entends-tu ?</p>
@@ -460,7 +375,11 @@ function JeuLettres({ quitter }: { quitter: () => void }) {
           <span style={{ color: "var(--accent)" }}>({q.bonne.translit})</span>
         </p>
       )}
-      <div className="mt-5 grid grid-cols-2 gap-2">
+      <div
+        className={`mt-5 grid gap-2 ${
+          q.options.length > 4 ? "grid-cols-3" : "grid-cols-2"
+        }`}
+      >
         {q.options.map((l) => (
           <BoutonReponse
             key={l.nom}
@@ -503,7 +422,54 @@ function JeuLettres({ quitter }: { quitter: () => void }) {
   );
 }
 
-/* ===== Jeu 3 : Quiz connaissances ===== */
+/** Écran de choix du niveau. */
+function ChoixNiveau({
+  records,
+  choisir,
+  retour,
+}: {
+  records: Record<string, number>;
+  choisir: (n: Niveau) => void;
+  retour: () => void;
+}) {
+  return (
+    <div className="mt-6 space-y-3">
+      <p className="text-center font-bold">Choisis ton niveau :</p>
+      {NIVEAUX.map((n) => (
+        <button
+          key={n.id}
+          onClick={() => choisir(n.id)}
+          className="card flex w-full items-center gap-4 rounded-2xl p-5 text-left shadow-soft transition hover:scale-[1.02] active:scale-[0.98]"
+        >
+          <span className="min-w-0 flex-1">
+            <span className="block font-extrabold">{n.nom}</span>
+            <span className="block text-sm" style={{ color: "var(--muted)" }}>
+              {n.description}
+            </span>
+            {(records[`lettres-${n.id}`] ?? 0) > 0 && (
+              <span
+                className="mt-1 flex items-center gap-1 text-xs font-bold"
+                style={{ color: "var(--accent)" }}
+              >
+                <Trophee taille={13} /> Record : {records[`lettres-${n.id}`]}/
+                {NB_QUESTIONS}
+              </span>
+            )}
+          </span>
+          <span style={{ color: "var(--accent)" }}>→</span>
+        </button>
+      ))}
+      <button
+        onClick={retour}
+        className="card mx-auto block rounded-full px-6 py-2 font-bold"
+      >
+        ← Retour aux jeux
+      </button>
+    </div>
+  );
+}
+
+/* ===== Quiz connaissances ===== */
 
 interface QuestionPreparee {
   question: string;
@@ -539,7 +505,12 @@ function JeuQuiz({ quitter }: { quitter: () => void }) {
 
   if (fini)
     return (
-      <EcranFin jeu="quiz" score={score} rejouer={nouvellePartie} menu={quitter} />
+      <EcranFin
+        cleRecord="quiz"
+        score={score}
+        rejouer={nouvellePartie}
+        menu={quitter}
+      />
     );
 
   const q = questions[idx];
@@ -599,39 +570,27 @@ function JeuQuiz({ quitter }: { quitter: () => void }) {
 
 /* ===== Page ===== */
 
-const JEUX: {
-  id: JeuId;
-  nom: string;
-  description: string;
-  icone: (p: { taille?: number }) => JSX.Element;
-}[] = [
-  {
-    id: "tajwid",
-    nom: "Quiz tajwid",
-    description: "Retrouve la règle colorée dans un vrai mot du Coran",
-    icone: Goutte,
-  },
-  {
-    id: "lettres",
-    nom: "Jeu des lettres",
-    description: "Écoute une lettre et retrouve-la parmi quatre",
-    icone: Lettres,
-  },
-  {
-    id: "quiz",
-    nom: "Quiz connaissances",
-    description: "Événements, hadiths, tajwid : teste-toi !",
-    icone: LivreOuvert,
-  },
-];
+type Ecran =
+  | { vue: "menu" }
+  | { vue: "choix-niveau" }
+  | { vue: "lettres"; niveau: Niveau }
+  | { vue: "quiz" };
 
 export default function Jeux() {
-  const [jeu, setJeu] = useState<JeuId | null>(null);
-  const [records, setRecords] = useState<Record<JeuId, number> | null>(null);
+  const [ecran, setEcran] = useState<Ecran>({ vue: "menu" });
+  const [records, setRecords] = useState<Record<string, number>>({});
 
   useEffect(() => {
-    if (jeu === null) setRecords(lireRecords());
-  }, [jeu]);
+    if (ecran.vue === "menu" || ecran.vue === "choix-niveau") {
+      setRecords(lireRecords());
+    }
+  }, [ecran]);
+
+  const meilleurLettres = Math.max(
+    records["lettres-facile"] ?? 0,
+    records["lettres-moyen"] ?? 0,
+    records["lettres-difficile"] ?? 0
+  );
 
   return (
     <div className="mx-auto max-w-3xl px-4 pb-16 pt-4">
@@ -649,7 +608,7 @@ export default function Jeux() {
         </h2>
       </section>
 
-      {jeu === null && (
+      {ecran.vue === "menu" && (
         <>
           <p
             className="mt-4 text-center text-sm"
@@ -658,50 +617,97 @@ export default function Jeux() {
             10 questions par partie. Apprends en t&apos;amusant !
           </p>
           <main className="mt-5 space-y-3">
-            {JEUX.map((j) => (
-              <button
-                key={j.id}
-                onClick={() => setJeu(j.id)}
-                className="card flex w-full items-center gap-4 rounded-2xl p-5 text-left shadow-soft transition hover:scale-[1.02] active:scale-[0.98]"
+            <button
+              onClick={() => setEcran({ vue: "choix-niveau" })}
+              className="card flex w-full items-center gap-4 rounded-2xl p-5 text-left shadow-soft transition hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <span
+                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl"
+                style={{
+                  backgroundColor:
+                    "color-mix(in srgb, var(--accent) 15%, transparent)",
+                  color: "var(--accent)",
+                }}
               >
+                <Lettres taille={24} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block font-extrabold">Jeu des lettres</span>
                 <span
-                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl"
-                  style={{
-                    backgroundColor:
-                      "color-mix(in srgb, var(--accent) 15%, transparent)",
-                    color: "var(--accent)",
-                  }}
+                  className="block text-sm"
+                  style={{ color: "var(--muted)" }}
                 >
-                  <j.icone taille={24} />
+                  Écoute une lettre et retrouve-la — 3 niveaux de difficulté
                 </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block font-extrabold">{j.nom}</span>
+                {meilleurLettres > 0 && (
                   <span
-                    className="block text-sm"
-                    style={{ color: "var(--muted)" }}
+                    className="mt-1 flex items-center gap-1 text-xs font-bold"
+                    style={{ color: "var(--accent)" }}
                   >
-                    {j.description}
+                    <Trophee taille={13} /> Meilleur record : {meilleurLettres}/
+                    {NB_QUESTIONS}
                   </span>
-                  {records && records[j.id] > 0 && (
-                    <span
-                      className="mt-1 flex items-center gap-1 text-xs font-bold"
-                      style={{ color: "var(--accent)" }}
-                    >
-                      <Trophee taille={13} /> Record : {records[j.id]}/
-                      {NB_QUESTIONS}
-                    </span>
-                  )}
+                )}
+              </span>
+              <span style={{ color: "var(--accent)" }}>→</span>
+            </button>
+
+            <button
+              onClick={() => setEcran({ vue: "quiz" })}
+              className="card flex w-full items-center gap-4 rounded-2xl p-5 text-left shadow-soft transition hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <span
+                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl"
+                style={{
+                  backgroundColor:
+                    "color-mix(in srgb, var(--accent) 15%, transparent)",
+                  color: "var(--accent)",
+                }}
+              >
+                <LivreOuvert taille={24} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block font-extrabold">Quiz connaissances</span>
+                <span
+                  className="block text-sm"
+                  style={{ color: "var(--muted)" }}
+                >
+                  Événements, hadiths, tajwid : teste-toi !
                 </span>
-                <span style={{ color: "var(--accent)" }}>→</span>
-              </button>
-            ))}
+                {(records["quiz"] ?? 0) > 0 && (
+                  <span
+                    className="mt-1 flex items-center gap-1 text-xs font-bold"
+                    style={{ color: "var(--accent)" }}
+                  >
+                    <Trophee taille={13} /> Record : {records["quiz"]}/
+                    {NB_QUESTIONS}
+                  </span>
+                )}
+              </span>
+              <span style={{ color: "var(--accent)" }}>→</span>
+            </button>
           </main>
         </>
       )}
 
-      {jeu === "tajwid" && <JeuTajwid quitter={() => setJeu(null)} />}
-      {jeu === "lettres" && <JeuLettres quitter={() => setJeu(null)} />}
-      {jeu === "quiz" && <JeuQuiz quitter={() => setJeu(null)} />}
+      {ecran.vue === "choix-niveau" && (
+        <ChoixNiveau
+          records={records}
+          choisir={(niveau) => setEcran({ vue: "lettres", niveau })}
+          retour={() => setEcran({ vue: "menu" })}
+        />
+      )}
+
+      {ecran.vue === "lettres" && (
+        <JeuLettres
+          niveau={ecran.niveau}
+          quitter={() => setEcran({ vue: "choix-niveau" })}
+        />
+      )}
+
+      {ecran.vue === "quiz" && (
+        <JeuQuiz quitter={() => setEcran({ vue: "menu" })} />
+      )}
     </div>
   );
 }

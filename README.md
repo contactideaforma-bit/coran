@@ -10,7 +10,7 @@ Application francophone complète : Coran avec tajwid en couleur, hadith du jour
 - 🤲 Invocations : douas authentiques (Hisn al-Muslim) avec arabe, translittération, traduction et source
 - 🕌 Horaires de prière : par ville (API AlAdhan), méthode de calcul au choix (UOIF 12°, LIM 18°, ISNA…), prochaine prière mise en avant
 - 📅 Calendrier religieux : Ramadan, Aïds, Arafat, Achoura, jours blancs… avec dates hégiriennes calculées (Umm al-Qura), conseils et récompenses sourcées
-- 🎮 Jeux (10 questions par partie, records par appareil) : quiz tajwid sur de vrais mots du Coran, jeu des lettres à l'oreille (synthèse vocale), quiz de connaissances (20 questions rédigées)
+- 🎮 Jeux (10 questions par partie, records par appareil) : jeu des lettres à l'oreille avec 3 niveaux de difficulté (facile 3 choix distincts / moyen 4 choix / difficile 6 choix avec lettres ressemblantes), quiz de connaissances (20 questions rédigées)
 - Interface 100 % icônes SVG (fin des emojis), invocations en accordéons, lettres Nourania prononcées à la voix
 
 ## Lancer l'appli
