@@ -2,21 +2,46 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { ALPHABET, LECONS_A_VENIR, type Lettre } from "@/data/nourania";
+import {
+  ALPHABET,
+  LECONS,
+  type ElementLecon,
+  type Lecon,
+  type Lettre,
+} from "@/data/nourania";
 import { usePrefs } from "@/lib/prefs";
 import Entete from "@/components/Entete";
-import { HautParleur, Lettres, LivreOuvert } from "@/components/Icones";
+import { HautParleur, Lettres, Verifie } from "@/components/Icones";
 
-export default function Nourania() {
-  const { prefs } = usePrefs();
-  const [lettreActive, setLettreActive] = useState<Lettre | null>(null);
-  const [voixArabe, setVoixArabe] = useState<boolean | null>(null);
+/* ===== Progression (sur l'appareil) ===== */
+
+function lireProgression(): number[] {
+  try {
+    const p = JSON.parse(localStorage.getItem("coran-nourania") ?? "[]");
+    return Array.isArray(p) ? p : [];
+  } catch {
+    return [];
+  }
+}
+
+function basculerLecon(id: number): number[] {
+  const p = lireProgression();
+  const maj = p.includes(id) ? p.filter((x) => x !== id) : [...p, id];
+  try {
+    localStorage.setItem("coran-nourania", JSON.stringify(maj));
+  } catch {}
+  return maj;
+}
+
+/* ===== Synthèse vocale arabe (partagée) ===== */
+
+function useVoixArabe() {
+  const [dispo, setDispo] = useState<boolean | null>(null);
   const voixRef = useRef<SpeechSynthesisVoice | null>(null);
 
-  // Charger la voix arabe du téléphone (peut arriver de façon asynchrone)
   useEffect(() => {
     if (typeof speechSynthesis === "undefined") {
-      setVoixArabe(false);
+      setDispo(false);
       return;
     }
     const chercher = () => {
@@ -24,145 +49,347 @@ export default function Nourania() {
         .getVoices()
         .find((v) => v.lang.toLowerCase().startsWith("ar"));
       voixRef.current = voix ?? null;
-      setVoixArabe(!!voix);
+      setDispo(!!voix);
     };
     chercher();
     speechSynthesis.addEventListener("voiceschanged", chercher);
-    return () =>
-      speechSynthesis.removeEventListener("voiceschanged", chercher);
+    return () => speechSynthesis.removeEventListener("voiceschanged", chercher);
   }, []);
 
-  const prononcer = (lettre: Lettre) => {
+  const prononcer = (texte: string) => {
     if (typeof speechSynthesis === "undefined") return;
     speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(lettre.nomArabe);
+    const u = new SpeechSynthesisUtterance(texte);
     if (voixRef.current) u.voice = voixRef.current;
     u.lang = "ar-SA";
-    u.rate = 0.75;
+    u.rate = 0.7;
     speechSynthesis.speak(u);
   };
 
-  const clicLettre = (lettre: Lettre) => {
-    setLettreActive(lettre);
-    prononcer(lettre);
+  return { dispo, prononcer };
+}
+
+/* ===== Page ===== */
+
+export default function Nourania() {
+  const { prefs } = usePrefs();
+  const { dispo, prononcer } = useVoixArabe();
+  const [leconActive, setLeconActive] = useState<number | null>(null);
+  const [progression, setProgression] = useState<number[]>([]);
+  const [lettreActive, setLettreActive] = useState<Lettre | null>(null);
+  const [elementActif, setElementActif] = useState<ElementLecon | null>(null);
+
+  useEffect(() => {
+    setProgression(lireProgression());
+  }, []);
+
+  const lecon: Lecon | undefined = LECONS.find((l) => l.id === leconActive);
+
+  const clicLettre = (l: Lettre) => {
+    setLettreActive(l);
+    prononcer(l.nomArabe);
   };
+
+  const clicElement = (e: ElementLecon) => {
+    setElementActif(e);
+    prononcer(e.vocal);
+  };
+
+  const terminer = (id: number) => {
+    setProgression(basculerLecon(id));
+    setLeconActive(null);
+  };
+
+  const titreLecon = (id: number) =>
+    id === 1
+      ? "Leçon 1 — L'alphabet arabe"
+      : `${LECONS.find((l) => l.id === id)?.titre} — ${
+          LECONS.find((l) => l.id === id)?.sousTitre
+        }`;
 
   return (
     <div className="mx-auto max-w-3xl px-4 pb-16 pt-4">
       <Entete />
 
       <section className="mt-6 flex items-center justify-between gap-3">
-        <Link
-          href="/"
-          className="card rounded-full px-4 py-2 text-sm font-bold shadow-soft transition hover:scale-105 active:scale-95"
-        >
-          ← Accueil
-        </Link>
+        {leconActive === null ? (
+          <Link
+            href="/"
+            className="card rounded-full px-4 py-2 text-sm font-bold shadow-soft transition hover:scale-105 active:scale-95"
+          >
+            ← Accueil
+          </Link>
+        ) : (
+          <button
+            onClick={() => setLeconActive(null)}
+            className="card rounded-full px-4 py-2 text-sm font-bold shadow-soft transition hover:scale-105 active:scale-95"
+          >
+            ← Leçons
+          </button>
+        )}
         <h2 className="flex items-center gap-2 text-xl font-extrabold">
           <Lettres taille={22} /> Nourania
         </h2>
       </section>
 
-      <div className="card mt-5 rounded-2xl p-4 shadow-soft">
-        <p className="font-bold">Leçon 1 — L&apos;alphabet arabe</p>
-        <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
-          Touche une lettre pour l&apos;entendre et découvrir comment la
-          prononcer.
-        </p>
-        {voixArabe === false && (
-          <p className="mt-2 text-xs" style={{ color: "var(--muted)" }}>
-            Aucune voix arabe détectée sur cet appareil : la prononciation
-            vocale sera approximative ou muette. Sur iPhone : Réglages →
-            Accessibilité → Contenu énoncé → Voix → ajouter l&apos;arabe.
-          </p>
-        )}
-      </div>
-
-      {/* Grille des lettres */}
-      <main className="mt-5 grid grid-cols-4 gap-2 sm:grid-cols-7">
-        {ALPHABET.map((l) => (
-          <button
-            key={l.nom}
-            onClick={() => clicLettre(l)}
-            className="card flex flex-col items-center rounded-2xl p-3 shadow-soft transition hover:scale-105 active:scale-95"
+      {/* ===== Menu des leçons ===== */}
+      {leconActive === null && (
+        <>
+          <p
+            className="mt-4 text-center text-sm"
+            style={{ color: "var(--muted)" }}
           >
-            <span className={`arabic text-4xl ${prefs.police}`}>{l.arabe}</span>
-            <span className="mt-1 text-xs font-bold">{l.nom}</span>
-          </button>
-        ))}
-      </main>
-
-      {/* Leçons à venir */}
-      <section className="mt-8">
-        <h3 className="mb-2 flex items-center gap-2 text-lg font-extrabold">
-          <LivreOuvert taille={20} /> La suite du programme
-        </h3>
-        <div className="space-y-2">
-          {LECONS_A_VENIR.map((lecon) => (
-            <div
-              key={lecon.titre}
-              className="card relative flex items-center gap-3 rounded-2xl p-4 opacity-60"
+            La Qâ&apos;ida Nourania, pas à pas : {progression.length}/8 leçons
+            terminées.
+          </p>
+          <main className="mt-5 space-y-2">
+            {[1, ...LECONS.map((l) => l.id)].map((id) => {
+              const faite = progression.includes(id);
+              return (
+                <button
+                  key={id}
+                  onClick={() => setLeconActive(id)}
+                  className="card flex w-full items-center gap-4 rounded-2xl p-4 text-left shadow-soft transition hover:scale-[1.01] active:scale-[0.99]"
+                >
+                  <span
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border font-extrabold"
+                    style={{
+                      borderColor: "var(--accent)",
+                      backgroundColor: faite ? "var(--accent)" : "transparent",
+                      color: faite ? "#fff" : "var(--accent)",
+                    }}
+                  >
+                    {faite ? <Verifie taille={18} /> : id}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block font-bold">{titreLecon(id)}</span>
+                    <span
+                      className="block text-sm"
+                      style={{ color: "var(--muted)" }}
+                    >
+                      {id === 1
+                        ? "Les 28 lettres, avec conseils de prononciation"
+                        : LECONS.find((l) => l.id === id)?.intro.slice(0, 70) +
+                          "…"}
+                    </span>
+                  </span>
+                  <span style={{ color: "var(--accent)" }}>→</span>
+                </button>
+              );
+            })}
+          </main>
+          {dispo === false && (
+            <p
+              className="mt-4 text-center text-xs"
+              style={{ color: "var(--muted)" }}
             >
-              <span className="min-w-0 flex-1">
-                <span className="block font-bold">{lecon.titre}</span>
+              Aucune voix arabe détectée sur cet appareil : la prononciation
+              vocale sera approximative ou muette. Sur iPhone : Réglages →
+              Accessibilité → Contenu énoncé → Voix → ajouter l&apos;arabe.
+            </p>
+          )}
+        </>
+      )}
+
+      {/* ===== Leçon 1 : alphabet ===== */}
+      {leconActive === 1 && (
+        <>
+          <div className="card mt-5 rounded-2xl p-4 shadow-soft">
+            <p className="font-bold">Leçon 1 — L&apos;alphabet arabe</p>
+            <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
+              Touche une lettre pour l&apos;entendre et découvrir comment la
+              prononcer.
+            </p>
+          </div>
+          <main className="mt-5 grid grid-cols-4 gap-2 sm:grid-cols-7">
+            {ALPHABET.map((l) => (
+              <button
+                key={l.nom}
+                onClick={() => clicLettre(l)}
+                className="card flex flex-col items-center rounded-2xl p-3 shadow-soft transition hover:scale-105 active:scale-95"
+              >
+                <span className={`arabic text-4xl ${prefs.police}`}>
+                  {l.arabe}
+                </span>
+                <span className="mt-1 text-xs font-bold">{l.nom}</span>
+              </button>
+            ))}
+          </main>
+          <BoutonTerminer
+            id={1}
+            faite={progression.includes(1)}
+            terminer={terminer}
+          />
+        </>
+      )}
+
+      {/* ===== Leçons 2 à 8 ===== */}
+      {lecon && (
+        <>
+          <div className="card mt-5 rounded-2xl p-4 shadow-soft">
+            <p className="font-bold">
+              {lecon.titre} — {lecon.sousTitre}
+            </p>
+            <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
+              {lecon.intro}
+            </p>
+          </div>
+          <main
+            className={`mt-5 grid gap-2 ${
+              lecon.grandeGrille
+                ? "grid-cols-2 sm:grid-cols-3"
+                : "grid-cols-2 sm:grid-cols-4"
+            }`}
+          >
+            {lecon.elements.map((e, i) => (
+              <button
+                key={i}
+                onClick={() => clicElement(e)}
+                className="card flex flex-col items-center rounded-2xl p-3 shadow-soft transition hover:scale-105 active:scale-95"
+              >
                 <span
-                  className="block text-sm"
+                  className={`arabic text-3xl leading-relaxed ${prefs.police}`}
+                  dir="rtl"
+                >
+                  {e.principal}
+                </span>
+                <span
+                  className="mt-1 text-center text-xs font-bold"
                   style={{ color: "var(--muted)" }}
                 >
-                  {lecon.description}
+                  {e.translit}
                 </span>
-              </span>
-              <span
-                className="absolute -top-2 right-3 rounded-full px-2 py-0.5 text-[10px] font-bold text-white"
-                style={{ backgroundColor: "var(--muted)" }}
-              >
-                Bientôt
-              </span>
-            </div>
-          ))}
-        </div>
-      </section>
+              </button>
+            ))}
+          </main>
+          <BoutonTerminer
+            id={lecon.id}
+            faite={progression.includes(lecon.id)}
+            terminer={terminer}
+          />
+        </>
+      )}
 
-      {/* Fiche lettre */}
+      {/* ===== Fiche lettre (leçon 1) ===== */}
       {lettreActive && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-6"
-          onClick={() => setLettreActive(null)}
-        >
-          <div
-            className="card pop w-full max-w-md rounded-3xl p-6 text-center"
-            onClick={(e) => e.stopPropagation()}
+        <Fiche fermer={() => setLettreActive(null)}>
+          <p className={`arabic text-8xl ${prefs.police}`}>
+            {lettreActive.arabe}
+          </p>
+          <h3 className="mt-3 text-xl font-extrabold">
+            {lettreActive.nom}{" "}
+            <span style={{ color: "var(--accent)" }}>
+              ({lettreActive.translit})
+            </span>
+          </h3>
+          <p className="mt-3">{lettreActive.conseil}</p>
+          <BoutonsFiche
+            ecouter={() => prononcer(lettreActive.nomArabe)}
+            fermer={() => setLettreActive(null)}
+          />
+        </Fiche>
+      )}
+
+      {/* ===== Fiche élément (leçons 2-8) ===== */}
+      {elementActif && (
+        <Fiche fermer={() => setElementActif(null)}>
+          <p
+            className={`arabic text-5xl leading-relaxed ${prefs.police}`}
+            dir="rtl"
           >
-            <p className={`arabic text-8xl ${prefs.police}`}>
-              {lettreActive.arabe}
-            </p>
-            <h3 className="mt-3 text-xl font-extrabold">
-              {lettreActive.nom}{" "}
-              <span style={{ color: "var(--accent)" }}>
-                ({lettreActive.translit})
-              </span>
-            </h3>
-            <p className="mt-3">{lettreActive.conseil}</p>
-            <div className="mt-5 flex justify-center gap-2">
-              <button
-                onClick={() => prononcer(lettreActive)}
-                className="flex h-12 w-12 items-center justify-center rounded-full text-white transition active:scale-95"
-                style={{ backgroundColor: "var(--accent)" }}
-                aria-label="Écouter la lettre"
-              >
-                <HautParleur taille={22} className="text-white" />
-              </button>
-              <button
-                onClick={() => setLettreActive(null)}
-                className="rounded-full px-6 py-2 font-bold text-white transition active:scale-95"
-                style={{ backgroundColor: "var(--accent)" }}
-              >
-                Compris !
-              </button>
-            </div>
-          </div>
-        </div>
+            {elementActif.principal}
+          </p>
+          <h3 className="mt-3 text-lg font-extrabold" style={{ color: "var(--accent)" }}>
+            {elementActif.translit}
+          </h3>
+          {elementActif.aide && <p className="mt-3">{elementActif.aide}</p>}
+          <BoutonsFiche
+            ecouter={() => prononcer(elementActif.vocal)}
+            fermer={() => setElementActif(null)}
+          />
+        </Fiche>
       )}
     </div>
+  );
+}
+
+/* ===== Petits composants ===== */
+
+function Fiche({
+  children,
+  fermer,
+}: {
+  children: React.ReactNode;
+  fermer: () => void;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-6"
+      onClick={fermer}
+    >
+      <div
+        className="card pop w-full max-w-md rounded-3xl p-6 text-center"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function BoutonsFiche({
+  ecouter,
+  fermer,
+}: {
+  ecouter: () => void;
+  fermer: () => void;
+}) {
+  return (
+    <div className="mt-5 flex justify-center gap-2">
+      <button
+        onClick={ecouter}
+        className="flex h-12 w-12 items-center justify-center rounded-full text-white transition active:scale-95"
+        style={{ backgroundColor: "var(--accent)" }}
+        aria-label="Écouter"
+      >
+        <HautParleur taille={22} className="text-white" />
+      </button>
+      <button
+        onClick={fermer}
+        className="rounded-full px-6 py-2 font-bold text-white transition active:scale-95"
+        style={{ backgroundColor: "var(--accent)" }}
+      >
+        Compris !
+      </button>
+    </div>
+  );
+}
+
+function BoutonTerminer({
+  id,
+  faite,
+  terminer,
+}: {
+  id: number;
+  faite: boolean;
+  terminer: (id: number) => void;
+}) {
+  return (
+    <button
+      onClick={() => terminer(id)}
+      className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 font-bold shadow-soft transition hover:scale-[1.01] active:scale-[0.99]"
+      style={
+        faite
+          ? {
+              backgroundColor: "var(--card)",
+              border: "1px solid var(--border)",
+              color: "var(--muted)",
+            }
+          : { backgroundColor: "var(--accent)", color: "#fff" }
+      }
+    >
+      <Verifie taille={18} />
+      {faite ? "Leçon terminée — marquer à refaire" : "Marquer la leçon comme terminée"}
+    </button>
   );
 }

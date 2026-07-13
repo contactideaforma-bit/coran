@@ -6,7 +6,7 @@ Application francophone complète : Coran avec tajwid en couleur, hadith du jour
 
 - Accueil : hadith du jour (24 hadiths authentiques en rotation), date hégirienne, prochain événement religieux, reprise de lecture, accès aux 5 modules
 - 📖 Coran : tout l'existant, déplacé sur /coran
-- 🔤 Nourania : leçon 1 (alphabet, 28 lettres avec conseils de prononciation), programme des leçons suivantes
+- 🔤 Nourania : parcours complet en 8 leçons interactives avec audio et suivi de progression — alphabet, lettres liées, voyelles (harakât), tanwîn, prolongations (madd), soukoun, shadda, premiers mots du Coran
 - 🤲 Invocations : douas authentiques (Hisn al-Muslim) avec arabe, translittération, traduction et source
 - 🕌 Horaires de prière : par ville (API AlAdhan), méthode de calcul au choix (UOIF 12°, LIM 18°, ISNA…), prochaine prière mise en avant
 - 📅 Calendrier religieux : Ramadan, Aïds, Arafat, Achoura, jours blancs… avec dates hégiriennes calculées (Umm al-Qura), conseils et récompenses sourcées

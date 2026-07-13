@@ -38,18 +38,146 @@ export const ALPHABET: Lettre[] = [
   { arabe: "ي", nom: "Yâ'", nomArabe: "يَاء", translit: "y", conseil: "Comme le « y » de « yoga »." },
 ];
 
-export interface LeconAVenir {
-  titre: string;
-  description: string;
+/* ===== Leçons 2 à 8 ===== */
+
+export interface ElementLecon {
+  principal: string; // affichage arabe principal
+  translit: string;
+  vocal: string; // texte lu par la synthèse vocale
+  aide?: string;
 }
 
-/** Progression classique de la Qâ'ida Nourania. */
-export const LECONS_A_VENIR: LeconAVenir[] = [
-  { titre: "Leçon 2 — Les lettres liées", description: "Reconnaître les lettres attachées entre elles (début, milieu, fin de mot)." },
-  { titre: "Leçon 3 — Les voyelles (harakât)", description: "Fatha, kasra, damma : lire ses premières syllabes." },
-  { titre: "Leçon 4 — Le tanwîn", description: "Les doubles voyelles : an, in, oun." },
-  { titre: "Leçon 5 — Les prolongations (madd)", description: "Allonger les sons avec alif, wâw et yâ'." },
-  { titre: "Leçon 6 — Le soukoun", description: "Les lettres « fermées », sans voyelle." },
-  { titre: "Leçon 7 — La shadda", description: "Les lettres doublées." },
-  { titre: "Leçon 8 — Exercices de lecture", description: "Lire des mots complets du Coran en appliquant tout." },
+export interface Lecon {
+  id: number;
+  titre: string;
+  sousTitre: string;
+  intro: string;
+  elements: ElementLecon[];
+  grandeGrille?: boolean; // true = cartes larges (2 colonnes)
+}
+
+/** Lettres qui ne s'attachent pas à la lettre suivante. */
+const NON_LIEES = ["ا", "د", "ذ", "ر", "ز", "و"];
+
+// Voyelles et signes (Unicode)
+const FATHA = "َ";
+const KASRA = "ِ";
+const DAMMA = "ُ";
+const FATHATAN = "ً";
+const KASRATAN = "ٍ";
+const DAMMATAN = "ٌ";
+const SUKUN = "ْ";
+const SHADDA = "ّ";
+const TATWEEL = "ـ";
+
+/** Translit sans apostrophe finale gênante pour composer les syllabes. */
+const base = (l: Lettre) => l.translit;
+
+/** Lettres utilisées pour les leçons de voyelles (l'alif pur ne porte pas
+ *  de voyelle : c'est la hamza أ qui joue ce rôle). */
+const CONSONNES = ALPHABET.filter((l) => l.arabe !== "ا");
+
+export const LECONS: Lecon[] = [
+  // La leçon 1 (alphabet) est gérée à part avec ses conseils détaillés.
+  {
+    id: 2,
+    titre: "Leçon 2",
+    sousTitre: "Les lettres liées",
+    intro:
+      "En arabe, les lettres s'attachent entre elles : chaque lettre change légèrement de forme au début, au milieu ou à la fin d'un mot. Six lettres (ا د ذ ر ز و) ne s'attachent jamais à la lettre qui les suit. Touche une carte pour entendre la lettre et observer ses formes.",
+    elements: ALPHABET.map((l) => ({
+      principal: l.arabe,
+      translit: l.nom,
+      vocal: l.nomArabe,
+      aide: NON_LIEES.includes(l.arabe)
+        ? `Formes : ${l.arabe} • ${TATWEEL}${l.arabe} — cette lettre ne s'attache pas à la suivante.`
+        : `Formes : ${l.arabe} • ${l.arabe}${TATWEEL} (début) • ${TATWEEL}${l.arabe}${TATWEEL} (milieu) • ${TATWEEL}${l.arabe} (fin).`,
+    })),
+  },
+  {
+    id: 3,
+    titre: "Leçon 3",
+    sousTitre: "Les voyelles (harakât)",
+    intro:
+      "Trois petites marques donnent leur son aux lettres : la fatha (َ) se lit « a », la kasra (ِ) se lit « i », la damma (ُ) se lit « ou ». Touche une carte pour entendre les trois sons.",
+    elements: CONSONNES.map((l) => ({
+      principal: `${l.arabe}${FATHA} ${l.arabe}${KASRA} ${l.arabe}${DAMMA}`,
+      translit: `${base(l)}a • ${base(l)}i • ${base(l)}ou`,
+      vocal: `${l.arabe}${FATHA}. ${l.arabe}${KASRA}. ${l.arabe}${DAMMA}`,
+    })),
+  },
+  {
+    id: 4,
+    titre: "Leçon 4",
+    sousTitre: "Le tanwîn (doubles voyelles)",
+    intro:
+      "Quand la voyelle est doublée, on ajoute un son « n » : fathatân (ً) = « an », kasratân (ٍ) = « in », dammatân (ٌ) = « oun ». On le trouve à la fin des mots.",
+    elements: CONSONNES.map((l) => ({
+      principal: `${l.arabe}${FATHATAN} ${l.arabe}${KASRATAN} ${l.arabe}${DAMMATAN}`,
+      translit: `${base(l)}an • ${base(l)}in • ${base(l)}oun`,
+      vocal: `${l.arabe}${FATHATAN}. ${l.arabe}${KASRATAN}. ${l.arabe}${DAMMATAN}`,
+    })),
+  },
+  {
+    id: 5,
+    titre: "Leçon 5",
+    sousTitre: "Les prolongations (madd)",
+    intro:
+      "Trois lettres allongent le son de la voyelle qui les précède : l'alif après une fatha (بَا = bâ), le yâ' après une kasra (بِي = bî), le wâw après une damma (بُو = boû). On tient le son deux temps.",
+    elements: CONSONNES.map((l) => ({
+      principal: `${l.arabe}${FATHA}ا ${l.arabe}${KASRA}ي ${l.arabe}${DAMMA}و`,
+      translit: `${base(l)}â • ${base(l)}î • ${base(l)}oû`,
+      vocal: `${l.arabe}${FATHA}ا. ${l.arabe}${KASRA}ي. ${l.arabe}${DAMMA}و`,
+    })),
+  },
+  {
+    id: 6,
+    titre: "Leçon 6",
+    sousTitre: "Le soukoun",
+    intro:
+      "Le soukoun (ْ) indique une lettre « fermée », sans voyelle : elle s'arrête net. On s'entraîne avec une hamza devant : أَبْ = ab, إِبْ = ib, أُبْ = oub.",
+    elements: CONSONNES.filter((l) => l.arabe !== "أ").map((l) => ({
+      principal: `أ${FATHA}${l.arabe}${SUKUN} إ${KASRA}${l.arabe}${SUKUN} أ${DAMMA}${l.arabe}${SUKUN}`,
+      translit: `a${base(l)} • i${base(l)} • ou${base(l)}`,
+      vocal: `أ${FATHA}${l.arabe}${SUKUN}. إ${KASRA}${l.arabe}${SUKUN}. أ${DAMMA}${l.arabe}${SUKUN}`,
+    })),
+  },
+  {
+    id: 7,
+    titre: "Leçon 7",
+    sousTitre: "La shadda (lettre doublée)",
+    intro:
+      "La shadda (ّ) double la lettre : on la ferme puis on la rouvre aussitôt. أَبَّ = abba (comme « ab » + « ba » enchaînés). Appuie bien sur la lettre doublée.",
+    elements: CONSONNES.filter((l) => l.arabe !== "أ").map((l) => ({
+      principal: `أ${FATHA}${l.arabe}${SHADDA}${FATHA} إ${KASRA}${l.arabe}${SHADDA}${KASRA} أ${DAMMA}${l.arabe}${SHADDA}${DAMMA}`,
+      translit: `a${base(l)}${base(l)}a • i${base(l)}${base(l)}i • ou${base(l)}${base(l)}ou`,
+      vocal: `أ${FATHA}${l.arabe}${SHADDA}${FATHA}. إ${KASRA}${l.arabe}${SHADDA}${KASRA}. أ${DAMMA}${l.arabe}${SHADDA}${DAMMA}`,
+    })),
+  },
+  {
+    id: 8,
+    titre: "Leçon 8",
+    sousTitre: "Lire ses premiers mots",
+    intro:
+      "Bravo, tu sais maintenant tout déchiffrer ! Voici des mots du Coran qui combinent voyelles, prolongations, soukoun et shadda. Lis-les à voix haute, puis vérifie avec l'audio.",
+    grandeGrille: true,
+    elements: [
+      { principal: "بِسْمِ", translit: "bismi", vocal: "بِسْمِ", aide: "« Au nom de » — le tout premier mot du Coran." },
+      { principal: "رَبِّ", translit: "rabbi", vocal: "رَبِّ", aide: "« Seigneur » — remarque la shadda sur le ب." },
+      { principal: "قُلْ", translit: "qoul", vocal: "قُلْ", aide: "« Dis » — soukoun final sur le ل." },
+      { principal: "نُورٌ", translit: "noûroun", vocal: "نُورٌ", aide: "« Lumière » — madd en و puis tanwîn." },
+      { principal: "كِتَابٌ", translit: "kitâboun", vocal: "كِتَابٌ", aide: "« Livre » — madd en ا." },
+      { principal: "رَحِيمٌ", translit: "rahîmoun", vocal: "رَحِيمٌ", aide: "« Très Miséricordieux » — madd en ي." },
+      { principal: "مَلِكٌ", translit: "malikoun", vocal: "مَلِكٌ", aide: "« Roi » — trois voyelles simples." },
+      { principal: "يَوْمٌ", translit: "yawmoun", vocal: "يَوْمٌ", aide: "« Jour » — le و porte un soukoun." },
+      { principal: "عَلِيمٌ", translit: "'alîmoun", vocal: "عَلِيمٌ", aide: "« Omniscient » — commence par la lettre ع." },
+      { principal: "سَلَامٌ", translit: "salâmoun", vocal: "سَلَامٌ", aide: "« Paix » — deux madd à suivre." },
+      { principal: "دِينٌ", translit: "dînoun", vocal: "دِينٌ", aide: "« Religion » — madd en ي." },
+      { principal: "عَبْدٌ", translit: "'abdoun", vocal: "عَبْدٌ", aide: "« Serviteur » — soukoun au milieu." },
+      { principal: "شَمْسٌ", translit: "chamsoun", vocal: "شَمْسٌ", aide: "« Soleil » — soukoun sur le م." },
+      { principal: "قَمَرٌ", translit: "qamaroun", vocal: "قَمَرٌ", aide: "« Lune » — le ق profond." },
+      { principal: "جَنَّةٌ", translit: "jannatoun", vocal: "جَنَّةٌ", aide: "« Paradis » — shadda sur le ن." },
+      { principal: "حَمْدٌ", translit: "hamdoun", vocal: "حَمْدٌ", aide: "« Louange » — le ح soufflé." },
+    ],
+  },
 ];
