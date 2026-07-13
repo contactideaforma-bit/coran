@@ -1,11 +1,30 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { PrefsProvider } from "@/lib/prefs";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Coran Tajwid — Lire et apprendre",
   description:
-    "Application francophone pour lire le Coran avec les règles de tajwid en couleur.",
+    "Application francophone pour lire le Coran avec les règles de tajwid en couleur, la prononciation mot à mot et la récitation.",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Coran Tajwid",
+  },
 };
+
+export const viewport: Viewport = {
+  themeColor: "#c9a24b",
+};
+
+// Applique le thème sauvegardé AVANT le premier rendu (évite le flash)
+const scriptTheme = `
+try {
+  var p = JSON.parse(localStorage.getItem('coran-prefs') || '{}');
+  if (p.dark) document.documentElement.classList.add('dark');
+} catch (e) {}
+`;
 
 export default function RootLayout({
   children,
@@ -25,8 +44,11 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Scheherazade+New:wght@400;700&family=Noto+Naskh+Arabic:wght@400;700&family=Nunito:wght@400;600;700;800&display=swap"
           rel="stylesheet"
         />
+        <script dangerouslySetInnerHTML={{ __html: scriptTheme }} />
       </head>
-      <body className="font-ui min-h-screen antialiased">{children}</body>
+      <body className="font-ui min-h-screen antialiased">
+        <PrefsProvider>{children}</PrefsProvider>
+      </body>
     </html>
   );
 }

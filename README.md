@@ -11,6 +11,12 @@ npm run dev
 
 Puis ouvrir http://localhost:3000
 
+## Fonctionnalités (V2)
+
+- Page d'accueil : liste des 114 sourates avec recherche (Al-Fâtiha disponible, autres « bientôt »)
+- Personnalisation ✨ : thème clair/sombre, 6 couleurs de fond, 5 couleurs d'accent, tailles et polices — réglages enregistrés sur l'appareil uniquement (localStorage, aucun compte)
+- Installable sur téléphone (PWA : manifest + icônes)
+
 ## Fonctionnalités (V1)
 
 - Sourate Al-Fâtiha avec règles tajwid colorées (annotation de démo, à faire valider par un spécialiste)
