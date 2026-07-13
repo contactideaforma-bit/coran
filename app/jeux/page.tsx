@@ -776,14 +776,7 @@ export default function Jeux() {
               onClick={() => setEcran({ vue: "choix-niveau" })}
               className="card flex w-full items-center gap-4 rounded-2xl p-5 text-left shadow-soft transition hover:scale-[1.02] active:scale-[0.98]"
             >
-              <span
-                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl"
-                style={{
-                  backgroundColor:
-                    "color-mix(in srgb, var(--accent) 15%, transparent)",
-                  color: "var(--accent)",
-                }}
-              >
+              <span className="tuile-icone">
                 <Lettres taille={24} />
               </span>
               <span className="min-w-0 flex-1">
@@ -811,14 +804,7 @@ export default function Jeux() {
               onClick={() => setEcran({ vue: "quiz" })}
               className="card flex w-full items-center gap-4 rounded-2xl p-5 text-left shadow-soft transition hover:scale-[1.02] active:scale-[0.98]"
             >
-              <span
-                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl"
-                style={{
-                  backgroundColor:
-                    "color-mix(in srgb, var(--accent) 15%, transparent)",
-                  color: "var(--accent)",
-                }}
-              >
+              <span className="tuile-icone">
                 <LivreOuvert taille={24} />
               </span>
               <span className="min-w-0 flex-1">

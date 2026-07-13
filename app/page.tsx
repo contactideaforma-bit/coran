@@ -116,13 +116,21 @@ export default function Accueil() {
     <div className="mx-auto max-w-3xl px-4 pb-16 pt-4">
       <Entete />
 
-      {/* Salutation + date hijri */}
-      <section className="mt-6 text-center">
-        <h2 className="text-2xl font-extrabold">Assalâmu alaykum</h2>
+      {/* Basmala + salutation + date hijri */}
+      <section className="mt-8 text-center">
+        <p
+          className="arabic font-amiri text-4xl"
+          style={{ color: "var(--accent)" }}
+        >
+          ﷽
+        </p>
+        <h2 className="mt-4 text-2xl font-extrabold">Assalâmu alaykum</h2>
         {hijri && (
-          <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
-            Nous sommes le <span className="font-bold">{hijri} H</span>
-          </p>
+          <div className="ornement mx-auto mt-3 max-w-xs text-sm">
+            <span style={{ color: "var(--muted)" }}>
+              {hijri} <span className="font-bold">H</span>
+            </span>
+          </div>
         )}
       </section>
 
@@ -212,14 +220,7 @@ export default function Accueil() {
             href={m.href}
             className="card flex items-center gap-4 rounded-2xl p-5 shadow-soft transition hover:scale-[1.02] active:scale-[0.98]"
           >
-            <span
-              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl"
-              style={{
-                backgroundColor:
-                  "color-mix(in srgb, var(--accent) 15%, transparent)",
-                color: "var(--accent)",
-              }}
-            >
+            <span className="tuile-icone">
               <m.icone taille={24} />
             </span>
             <span className="min-w-0 flex-1">

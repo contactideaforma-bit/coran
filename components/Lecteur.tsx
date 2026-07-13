@@ -367,14 +367,8 @@ export default function Lecteur({ n }: { n: number }) {
               >
                 {/* En-tête de carte : numéro + actions */}
                 <div className="mb-3 flex items-center justify-between">
-                  <span
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-full border text-sm font-bold"
-                    style={{
-                      borderColor: "var(--accent)",
-                      color: "var(--accent)",
-                    }}
-                  >
-                    {v.n}
+                  <span className="badge-verset">
+                    <span className="relative z-10">{v.n}</span>
                   </span>
                   <div className="flex items-center gap-2">
                     <button

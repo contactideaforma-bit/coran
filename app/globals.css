@@ -24,21 +24,156 @@ html {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* ===== Fond : couleur du thème + motif géométrique + grain de papier ===== */
 body {
   background-color: var(--bg);
   color: var(--text);
-  /* Texture papier subtile (bruit SVG) */
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+  background-image:
+    /* Grain de papier */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"),
+    /* Treillis d'étoiles à 8 branches, très discret */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Cg fill='none' stroke='%23808080' stroke-opacity='0.07'%3E%3Cpath d='M48 8 L58 38 L88 48 L58 58 L48 88 L38 58 L8 48 L38 38 Z'/%3E%3Crect x='34' y='34' width='28' height='28' transform='rotate(45 48 48)'/%3E%3C/g%3E%3C/svg%3E");
   transition: background-color 0.3s ease, color 0.3s ease;
+  min-height: 100vh;
 }
 
+/* Halo lumineux en haut, dans la couleur d'accent choisie */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background:
+    radial-gradient(
+      900px 420px at 50% -8%,
+      color-mix(in srgb, var(--accent) 16%, transparent),
+      transparent 65%
+    ),
+    radial-gradient(
+      700px 500px at 110% 110%,
+      color-mix(in srgb, var(--accent) 7%, transparent),
+      transparent 60%
+    );
+}
+
+/* ===== Typographie : titres élégants, corps rond et lisible ===== */
+h1,
+h2,
+h3 {
+  font-family: "Marcellus", "Nunito", serif;
+  letter-spacing: 0.015em;
+  font-weight: 500;
+}
+
+/* ===== Cartes : profondeur douce, léger relief ===== */
 .card {
-  background-color: var(--card);
-  border: 1px solid var(--border);
-  transition: background-color 0.3s ease, border-color 0.3s ease;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--accent) 3%, var(--card)),
+      var(--card) 45%
+    );
+  border: 1px solid color-mix(in srgb, var(--accent) 14%, var(--border));
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    transform 0.18s ease,
+    box-shadow 0.25s ease;
 }
 
-/* Polices arabes disponibles */
+.shadow-soft {
+  box-shadow:
+    0 1px 2px rgba(40, 30, 10, 0.05),
+    0 10px 30px -12px color-mix(in srgb, var(--accent) 30%, rgba(60, 45, 15, 0.18));
+}
+
+/* Les cartes cliquables se soulèvent légèrement */
+a.card:hover,
+button.card:hover {
+  box-shadow:
+    0 2px 4px rgba(40, 30, 10, 0.06),
+    0 16px 38px -12px color-mix(in srgb, var(--accent) 40%, rgba(60, 45, 15, 0.22));
+}
+
+/* ===== En-tête effet verre ===== */
+.entete-verre {
+  background: color-mix(in srgb, var(--card) 78%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  backdrop-filter: blur(14px) saturate(1.4);
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border));
+}
+
+/* ===== Numéro de verset : étoile à huit branches des mushafs ===== */
+.badge-verset {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.badge-verset::before,
+.badge-verset::after {
+  content: "";
+  position: absolute;
+  inset: 0.15rem;
+  border: 1.5px solid color-mix(in srgb, var(--accent) 80%, transparent);
+  border-radius: 0.55rem;
+}
+.badge-verset::after {
+  transform: rotate(45deg);
+  background: color-mix(in srgb, var(--accent) 7%, transparent);
+}
+
+/* ===== Séparateur ornemental ===== */
+.ornement {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: color-mix(in srgb, var(--accent) 65%, transparent);
+}
+.ornement::before,
+.ornement::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    to var(--sens, right),
+    transparent,
+    color-mix(in srgb, var(--accent) 45%, transparent)
+  );
+}
+.ornement::before {
+  --sens: right;
+}
+.ornement::after {
+  --sens: left;
+}
+
+/* ===== Pastille d'icône des modules ===== */
+.tuile-icone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 1rem;
+  color: var(--accent);
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--accent) 22%, transparent),
+    color-mix(in srgb, var(--accent) 8%, transparent)
+  );
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+/* ===== Polices arabes disponibles ===== */
 .font-amiri { font-family: "Amiri", serif; }
 .font-scheherazade { font-family: "Scheherazade New", serif; }
 .font-noto { font-family: "Noto Naskh Arabic", serif; }
@@ -66,9 +201,19 @@ body {
   flex-shrink: 0;
 }
 
-/* Petit rebond ludique */
+/* ===== Animations ===== */
 @keyframes pop {
-  0% { transform: scale(0.9); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
+  0% { transform: scale(0.92) translateY(6px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
 }
-.pop { animation: pop 0.25s ease-out; }
+.pop {
+  animation: pop 0.32s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+@keyframes apparition {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+main {
+  animation: apparition 0.4s ease-out;
+}

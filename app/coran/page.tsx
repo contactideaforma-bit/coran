@@ -111,14 +111,8 @@ export default function Coran() {
             className="card flex items-center gap-3 rounded-2xl p-4 shadow-soft transition hover:scale-[1.02] active:scale-[0.98]"
             style={{ borderColor: "var(--accent)" }}
           >
-            <span
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border text-sm font-extrabold"
-              style={{
-                borderColor: "var(--accent)",
-                color: "var(--accent)",
-              }}
-            >
-              {s.n}
+            <span className="badge-verset">
+              <span className="relative z-10">{s.n}</span>
             </span>
             <span className="min-w-0 flex-1">
               <span className="block truncate font-bold">{s.nom}</span>

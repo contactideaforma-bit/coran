@@ -12,10 +12,10 @@ export default function Entete() {
 
   return (
     <>
-      <header className="card sticky top-3 z-20 flex items-center justify-between rounded-2xl px-4 py-3 shadow-soft">
+      <header className="entete-verre sticky top-3 z-20 flex items-center justify-between rounded-2xl px-4 py-3 shadow-soft">
         <Link href="/" className="flex items-center gap-3">
-          <span style={{ color: "var(--accent)" }}>
-            <LivreOuvert taille={26} />
+          <span className="tuile-icone !h-10 !w-10 !rounded-xl">
+            <LivreOuvert taille={22} />
           </span>
           <span>
             <span className="block text-lg font-extrabold leading-tight">
