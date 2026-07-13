@@ -1,4 +1,4 @@
-# Coran Tajwid 📖
+# My Easy Muslim 📖
 
 Application francophone complète : Coran avec tajwid en couleur, hadith du jour, horaires de prière, invocations, apprentissage de la lecture (Nourania) et calendrier des événements religieux.
 

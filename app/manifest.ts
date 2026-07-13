@@ -2,22 +2,16 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Coran Tajwid",
-    short_name: "Coran",
+    name: "My Easy Muslim",
+    short_name: "Easy Muslim",
     description:
-      "Lire le Coran avec les règles de tajwid en couleur, la prononciation mot à mot et la récitation.",
+      "Coran avec tajwid en couleur, hadith du jour, horaires de prière, invocations, Nourania et calendrier religieux — en français.",
     start_url: "/",
     display: "standalone",
-    background_color: "#faf6ef",
+    background_color: "#fefae7",
     theme_color: "#c9a24b",
     lang: "fr",
     icons: [
-      {
-        src: "/icone.svg",
-        sizes: "any",
-        type: "image/svg+xml",
-        purpose: "any",
-      },
       {
         src: "/icone-512.png",
         sizes: "512x512",

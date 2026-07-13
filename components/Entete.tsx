@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { usePrefs } from "@/lib/prefs";
 import Personnalisation from "@/components/Personnalisation";
-import { Etincelles, LivreOuvert, Lune, Soleil } from "@/components/Icones";
+import { Etincelles, Lune, Soleil } from "@/components/Icones";
 
 export default function Entete() {
   const { prefs, maj } = usePrefs();
@@ -14,12 +14,16 @@ export default function Entete() {
     <>
       <header className="entete-verre sticky top-3 z-20 flex items-center justify-between rounded-2xl px-4 py-3 shadow-soft">
         <Link href="/" className="flex items-center gap-3">
-          <span className="tuile-icone !h-10 !w-10 !rounded-xl">
-            <LivreOuvert taille={22} />
-          </span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo.png"
+            alt="My Easy Muslim"
+            className="h-10 w-10 rounded-xl border"
+            style={{ borderColor: "color-mix(in srgb, var(--accent) 25%, transparent)" }}
+          />
           <span>
             <span className="block text-lg font-extrabold leading-tight">
-              Coran Tajwid
+              My Easy Muslim
             </span>
             <span className="block text-xs" style={{ color: "var(--muted)" }}>
               Ton compagnon du quotidien

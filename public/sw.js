@@ -3,7 +3,7 @@
  * restent disponibles sans connexion après une première visite.
  * (L'audio n'est pas mis en cache pour préserver l'espace de stockage.)
  */
-const CACHE = "coran-tajwid-v2";
+const CACHE = "my-easy-muslim-v3";
 
 const HOTES_DONNEES = [
   "api.quran.com",

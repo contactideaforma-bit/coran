@@ -4,14 +4,14 @@ import EnregistrerSW from "@/components/EnregistrerSW";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Coran Tajwid — Ton compagnon du quotidien",
+  title: "My Easy Muslim — Ton compagnon du quotidien",
   description:
     "Coran avec tajwid en couleur, hadith du jour, horaires de prière, invocations, apprentissage Nourania et calendrier des événements religieux — en français.",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Coran Tajwid",
+    title: "My Easy Muslim",
   },
 };
 
