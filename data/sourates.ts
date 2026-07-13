@@ -123,13 +123,11 @@ const LISTE: [number, string, string, number][] = [
   [114, "الناس", "An-Nâs", 6],
 ];
 
-// Sourates dont le texte annoté tajwid est intégré dans l'appli
-const DISPONIBLES = new Set([1]);
-
+// Toutes les sourates sont disponibles (texte tajwid chargé via l'API Quran.com)
 export const SOURATES: Sourate[] = LISTE.map(([n, arabe, nom, versets]) => ({
   n,
   arabe,
   nom,
   versets,
-  disponible: DISPONIBLES.has(n),
+  disponible: true,
 }));

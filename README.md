@@ -11,9 +11,15 @@ npm run dev
 
 Puis ouvrir http://localhost:3000
 
+## Fonctionnalités (V3)
+
+- Les 114 sourates complètes : texte arabe avec balisage tajwid officiel (API Quran.com, celui des mushafs colorés imprimés) + traduction française de Muhammad Hamidullah, chargés à l'ouverture
+- 10 règles tajwid colorées : ghunna, madd (3 degrés), qalqala, ikhfa, idgham, iqlab, lam solaire, lettres muettes
+- Navigation sourate précédente/suivante
+
 ## Fonctionnalités (V2)
 
-- Page d'accueil : liste des 114 sourates avec recherche (Al-Fâtiha disponible, autres « bientôt »)
+- Page d'accueil : liste des 114 sourates avec recherche
 - Personnalisation ✨ : thème clair/sombre, 6 couleurs de fond, 5 couleurs d'accent, tailles et polices — réglages enregistrés sur l'appareil uniquement (localStorage, aucun compte)
 - Installable sur téléphone (PWA : manifest + icônes)
 

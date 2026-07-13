@@ -2,7 +2,13 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { FATIHA, type Word } from "@/data/fatiha";
+import {
+  BASMALA,
+  chargerSourate,
+  type SourateData,
+  type Word,
+} from "@/lib/coran";
+import { SOURATES } from "@/data/sourates";
 import { TAJWID_RULES, RULE_BY_ID, type TajwidRule } from "@/lib/tajwid";
 import { urlMot, urlVerset } from "@/lib/audio";
 import { RECITATEURS, TAILLES, usePrefs } from "@/lib/prefs";
@@ -19,16 +25,37 @@ interface MotActif {
   word: Word;
 }
 
-export default function Lecteur() {
+export default function Lecteur({ n }: { n: number }) {
   const { prefs } = usePrefs();
+  const [data, setData] = useState<SourateData | null>(null);
+  const [erreur, setErreur] = useState(false);
   const [legendeOuverte, setLegendeOuverte] = useState(false);
   const [regleActive, setRegleActive] = useState<TajwidRule | null>(null);
   const [lecture, setLecture] = useState<Lecture>(null);
   const [motActif, setMotActif] = useState<MotActif | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  const meta = SOURATES.find((s) => s.n === n)!;
   const police = prefs.police;
   const taille = prefs.taille;
+
+  // Charger la sourate depuis l'API Quran.com
+  useEffect(() => {
+    let annule = false;
+    setData(null);
+    setErreur(false);
+    setMotActif(null);
+    chargerSourate(n)
+      .then((d) => {
+        if (!annule) setData(d);
+      })
+      .catch(() => {
+        if (!annule) setErreur(true);
+      });
+    return () => {
+      annule = true;
+    };
+  }, [n]);
 
   // Couper l'audio quand on quitte la page
   useEffect(() => {
@@ -57,7 +84,7 @@ export default function Lecteur() {
   };
 
   const clicMot = (v: number, w: number, word: Word) => {
-    jouer(urlMot(FATIHA.sourate, v, w + 1), { type: "mot", v, w });
+    jouer(urlMot(n, v, w + 1), { type: "mot", v, w });
     setMotActif({ v, w, word });
   };
 
@@ -65,15 +92,9 @@ export default function Lecteur() {
     if (lecture?.type === "verset" && lecture.v === v) {
       stopAudio();
     } else {
-      jouer(urlVerset(FATIHA.sourate, v, prefs.recitateur), {
-        type: "verset",
-        v,
-      });
+      jouer(urlVerset(n, v, prefs.recitateur), { type: "verset", v });
     }
   };
-
-  const nomRecitateur =
-    RECITATEURS.find((r) => r.id === prefs.recitateur)?.nom ?? "";
 
   const reglesDuMot = (word: Word): TajwidRule[] => {
     const ids = new Set(word.segments.filter((s) => s.r).map((s) => s.r!));
@@ -82,6 +103,12 @@ export default function Lecteur() {
 
   const motEnLecture = (v: number, w: number) =>
     lecture?.type === "mot" && lecture.v === v && lecture.w === w;
+
+  const nomRecitateur =
+    RECITATEURS.find((r) => r.id === prefs.recitateur)?.nom ?? "";
+
+  const precedente = SOURATES.find((s) => s.n === n - 1);
+  const suivante = SOURATES.find((s) => s.n === n + 1);
 
   return (
     <div className="mx-auto max-w-3xl px-4 pb-36 pt-4">
@@ -100,88 +127,160 @@ export default function Lecteur() {
           style={{ borderColor: "var(--accent)" }}
         >
           <span className={`arabic text-2xl font-bold ${police}`}>
-            {FATIHA.nomArabe}
+            {meta.arabe}
           </span>
           <span className="mx-2" style={{ color: "var(--muted)" }}>
             •
           </span>
-          <span className="text-sm font-bold">{FATIHA.nomFr}</span>
+          <span className="text-sm font-bold">{meta.nom}</span>
         </div>
       </section>
 
+      {/* ===== Basmala décorative (sauf Al-Fâtiha et At-Tawba) ===== */}
+      {n !== 1 && n !== 9 && (
+        <p
+          className={`arabic mt-5 text-center text-2xl ${police}`}
+          dir="rtl"
+          style={{ color: "var(--accent)" }}
+        >
+          {BASMALA}
+        </p>
+      )}
+
+      {/* ===== Chargement / erreur ===== */}
+      {!data && !erreur && (
+        <div className="card mt-6 rounded-2xl p-8 text-center shadow-soft">
+          <p className="animate-pulse text-3xl">📖</p>
+          <p className="mt-2 font-bold">Chargement de la sourate…</p>
+          <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
+            Texte tajwid + traduction française
+          </p>
+        </div>
+      )}
+      {erreur && (
+        <div className="card mt-6 rounded-2xl p-8 text-center shadow-soft">
+          <p className="text-3xl">📡</p>
+          <p className="mt-2 font-bold">Impossible de charger la sourate</p>
+          <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
+            Vérifie ta connexion internet, puis réessaie.
+          </p>
+          <button
+            onClick={() => {
+              setErreur(false);
+              chargerSourate(n)
+                .then(setData)
+                .catch(() => setErreur(true));
+            }}
+            className="mt-4 rounded-full px-6 py-2 font-bold text-white transition active:scale-95"
+            style={{ backgroundColor: "var(--accent)" }}
+          >
+            Réessayer
+          </button>
+        </div>
+      )}
+
       {/* ===== Versets ===== */}
-      <main className="mt-5 space-y-4">
-        {FATIHA.verses.map((v) => (
-          <article key={v.n} className="card rounded-2xl p-5 shadow-soft">
-            <p
-              className={`arabic ${police} ${TAILLES[taille].arabe}`}
-              dir="rtl"
-            >
-              {v.words.map((word, wi) => (
-                <span key={wi}>
-                  <button
-                    onClick={() => clicMot(v.n, wi, word)}
-                    className="rounded-lg px-1 transition hover:opacity-75 active:scale-95"
-                    style={{
-                      backgroundColor: motEnLecture(v.n, wi)
-                        ? "color-mix(in srgb, var(--accent) 25%, transparent)"
-                        : undefined,
-                    }}
-                    title="Écouter ce mot"
-                  >
-                    {word.segments.map((s, si) =>
-                      s.r ? (
-                        <span
-                          key={si}
-                          style={{ color: couleur(RULE_BY_ID[s.r]) }}
-                        >
-                          {s.t}
-                        </span>
-                      ) : (
-                        <span key={si}>{s.t}</span>
-                      )
-                    )}
-                  </button>{" "}
-                </span>
-              ))}
-              <span
-                className="mx-1 inline-flex h-8 w-8 items-center justify-center rounded-full border text-sm font-bold"
-                style={{ borderColor: "var(--accent)", color: "var(--accent)" }}
-              >
-                {v.n}
-              </span>
-            </p>
-            <div className="mt-3 flex items-start justify-between gap-3">
+      {data && (
+        <main className="mt-5 space-y-4">
+          {data.verses.map((v) => (
+            <article key={v.n} className="card rounded-2xl p-5 shadow-soft">
               <p
-                className={TAILLES[taille].trad}
-                style={{ color: "var(--muted)" }}
+                className={`arabic ${police} ${TAILLES[taille].arabe}`}
+                dir="rtl"
               >
-                {v.n}. {v.traduction}
+                {v.words.map((word, wi) => (
+                  <span key={wi}>
+                    <button
+                      onClick={() => clicMot(v.n, wi, word)}
+                      className="rounded-lg px-1 transition hover:opacity-75 active:scale-95"
+                      style={{
+                        backgroundColor: motEnLecture(v.n, wi)
+                          ? "color-mix(in srgb, var(--accent) 25%, transparent)"
+                          : undefined,
+                      }}
+                      title="Écouter ce mot"
+                    >
+                      {word.segments.map((s, si) =>
+                        s.r ? (
+                          <span
+                            key={si}
+                            style={{ color: couleur(RULE_BY_ID[s.r]) }}
+                          >
+                            {s.t}
+                          </span>
+                        ) : (
+                          <span key={si}>{s.t}</span>
+                        )
+                      )}
+                    </button>{" "}
+                  </span>
+                ))}
+                <span
+                  className="mx-1 inline-flex h-8 w-8 items-center justify-center rounded-full border text-sm font-bold"
+                  style={{
+                    borderColor: "var(--accent)",
+                    color: "var(--accent)",
+                  }}
+                >
+                  {v.n}
+                </span>
               </p>
-              <button
-                onClick={() => clicVerset(v.n)}
-                className="flex shrink-0 items-center gap-1 rounded-full border px-3 py-1.5 text-sm font-bold transition hover:scale-105 active:scale-95"
-                style={{
-                  borderColor: "var(--accent)",
-                  color:
-                    lecture?.type === "verset" && lecture.v === v.n
-                      ? "#fff"
-                      : "var(--accent)",
-                  backgroundColor:
-                    lecture?.type === "verset" && lecture.v === v.n
-                      ? "var(--accent)"
-                      : "transparent",
-                }}
-                aria-label={`Écouter le verset ${v.n} récité par ${nomRecitateur}`}
+              <div className="mt-3 flex items-start justify-between gap-3">
+                <p
+                  className={TAILLES[taille].trad}
+                  style={{ color: "var(--muted)" }}
+                >
+                  {v.n}. {v.traduction}
+                </p>
+                <button
+                  onClick={() => clicVerset(v.n)}
+                  className="flex shrink-0 items-center gap-1 rounded-full border px-3 py-1.5 text-sm font-bold transition hover:scale-105 active:scale-95"
+                  style={{
+                    borderColor: "var(--accent)",
+                    color:
+                      lecture?.type === "verset" && lecture.v === v.n
+                        ? "#fff"
+                        : "var(--accent)",
+                    backgroundColor:
+                      lecture?.type === "verset" && lecture.v === v.n
+                        ? "var(--accent)"
+                        : "transparent",
+                  }}
+                  aria-label={`Écouter le verset ${v.n} récité par ${nomRecitateur}`}
+                >
+                  {lecture?.type === "verset" && lecture.v === v.n
+                    ? "⏸ Stop"
+                    : "▶ Verset"}
+                </button>
+              </div>
+            </article>
+          ))}
+
+          {/* Navigation entre sourates */}
+          <nav className="flex items-center justify-between gap-3 pt-2">
+            {precedente ? (
+              <Link
+                href={`/sourate/${precedente.n}`}
+                className="card rounded-full px-4 py-2 text-sm font-bold shadow-soft transition hover:scale-105 active:scale-95"
               >
-                {lecture?.type === "verset" && lecture.v === v.n
-                  ? "⏸ Stop"
-                  : "▶ Verset"}
-              </button>
-            </div>
-          </article>
-        ))}
-      </main>
+                ← {precedente.nom}
+              </Link>
+            ) : (
+              <span />
+            )}
+            {suivante ? (
+              <Link
+                href={`/sourate/${suivante.n}`}
+                className="card rounded-full px-4 py-2 text-sm font-bold shadow-soft transition hover:scale-105 active:scale-95"
+              >
+                {suivante.nom} →
+              </Link>
+            ) : (
+              <span />
+            )}
+          </nav>
+        </main>
+      )}
 
       <p className="mt-6 text-center text-xs" style={{ color: "var(--muted)" }}>
         💡 Touche un mot pour l&apos;entendre • ▶ Verset : récitation de{" "}

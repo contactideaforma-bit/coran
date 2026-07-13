@@ -6,7 +6,9 @@ export type TajwidRuleId =
   | "qalqala"
   | "ikhfa"
   | "idgham"
-  | "lam-shamsiyya";
+  | "iqlab"
+  | "lam-shamsiyya"
+  | "muet";
 
 export interface TajwidRule {
   id: TajwidRuleId;
@@ -90,6 +92,16 @@ export const TAJWID_RULES: TajwidRule[] = [
     exemple: "مِن رَّبِّهِمْ • مَن يَقُولُ",
   },
   {
+    id: "iqlab",
+    nom: "Iqlâb (transformation)",
+    couleur: "#be185d",
+    couleurSombre: "#f472b6",
+    resume: "Le noun devient un mim devant ب",
+    detail:
+      "Quand un noun sâkin (نْ) ou un tanwin est suivi de la lettre ب, le son noun se transforme en mim (م) léger, accompagné d'une ghunna.",
+    exemple: "مِنۢ بَعْدِ → mim ba'di",
+  },
+  {
     id: "lam-shamsiyya",
     nom: "Lâm solaire (muette)",
     couleur: "#9ca3af",
@@ -98,6 +110,16 @@ export const TAJWID_RULES: TajwidRule[] = [
     detail:
       "Devant une lettre solaire, le lâm de l'article الـ ne se prononce pas : la lettre suivante est doublée à la place.",
     exemple: "الرَّحْمَٰنِ → ar-Rahmân (pas al-Rahmân)",
+  },
+  {
+    id: "muet",
+    nom: "Lettre muette",
+    couleur: "#b8b0a3",
+    couleurSombre: "#5f5a52",
+    resume: "Lettre écrite mais non prononcée",
+    detail:
+      "Certaines lettres s'écrivent mais ne se prononcent pas, comme la hamza de liaison (ٱ) quand on enchaîne la lecture, ou l'alif après le waw du pluriel.",
+    exemple: "ٱلْحَمْدُ • قَالُوا۟",
   },
 ];
 
