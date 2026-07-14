@@ -285,6 +285,7 @@ export default function GuideInstallation() {
   const [promptNatif, setPromptNatif] = useState<EvenementInstallation | null>(
     null
   );
+  const [navigateurAlternatif, setNavigateurAlternatif] = useState(false);
 
   useEffect(() => {
     // Déjà installée (mode standalone) : ne rien afficher
@@ -298,6 +299,17 @@ export default function GuideInstallation() {
       /iphone|ipad|ipod/i.test(navigator.userAgent) ||
       (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
     setOs(estIos ? "ios" : "android");
+
+    // Navigateurs Android alternatifs (Mi Browser, Samsung Internet…) :
+    // leur raccourci peut déclencher un avertissement Google Play Protect.
+    // Chrome installe proprement, sans avertissement.
+    if (!estIos) {
+      setNavigateurAlternatif(
+        /miuibrowser|samsungbrowser|huaweibrowser|heytapbrowser|vivobrowser|ucbrowser|firefox|fxios|opr\/|opt\/|edga/i.test(
+          navigator.userAgent
+        )
+      );
+    }
 
     if (localStorage.getItem(CLE_MASQUE) !== "1") setBanniere(true);
 
@@ -445,6 +457,26 @@ export default function GuideInstallation() {
               ))}
             </div>
 
+            {/* Avertissement navigateur alternatif (Android) */}
+            {os === "android" && navigateurAlternatif && (
+              <div
+                className="mb-4 rounded-2xl border p-3 text-sm"
+                style={{
+                  borderColor: "var(--accent)",
+                  backgroundColor:
+                    "color-mix(in srgb, var(--accent) 10%, transparent)",
+                }}
+              >
+                <p className="font-bold">⚠️ Important : utilise Chrome</p>
+                <p className="mt-1" style={{ color: "var(--muted)" }}>
+                  Ton navigateur actuel peut afficher un faux avertissement de
+                  sécurité (Google Play Protect) au moment d&apos;installer.
+                  Ouvre <b>myeasycoran.vercel.app</b> dans <b>Chrome</b> et
+                  l&apos;installation se fera sans aucun message.
+                </p>
+              </div>
+            )}
+
             {/* Installation en 1 clic (Android/Chrome) */}
             {os === "android" && promptNatif && (
               <button
@@ -489,7 +521,7 @@ export default function GuideInstallation() {
             >
               {os === "ios"
                 ? "Astuce : sur iPhone, l'installation ne fonctionne que depuis Safari."
-                : "Astuce : sur Android, utilise Chrome pour installer l'appli."}
+                : "Astuce : sur Android, utilise Chrome — les autres navigateurs peuvent afficher un faux avertissement de sécurité."}
             </p>
           </div>
         </div>
