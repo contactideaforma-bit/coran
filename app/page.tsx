@@ -7,6 +7,7 @@ import { SOURATES } from "@/data/sourates";
 import { libelleHijri, versHijri } from "@/lib/hijri";
 import { lireMarquePage, type MarquePage } from "@/lib/marquePage";
 import Entete from "@/components/Entete";
+import GuideInstallation from "@/components/GuideInstallation";
 import {
   Calendrier as IconeCalendrier,
   Citation,
@@ -136,6 +137,8 @@ export default function Accueil() {
         </Link>
       )}
 
+      {/* Installer l'appli sur le téléphone */}
+      <GuideInstallation />
 
       {/* Modules */}
       <main className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
