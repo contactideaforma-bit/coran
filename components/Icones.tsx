@@ -142,6 +142,13 @@ export const Etincelles = (p: IconeProps) => (
   </Trait>
 );
 
+export const Cloche = (p: IconeProps) => (
+  <Trait {...p}>
+    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+  </Trait>
+);
+
 export const Pinceau = (p: IconeProps) => (
   <Trait {...p}>
     <path d="M18.37 2.63 14 7l-1.59-1.59a2 2 0 0 0-2.82 0L8 7l9 9 1.59-1.59a2 2 0 0 0 0-2.82L17 10l4.37-4.37a2.12 2.12 0 1 0-3-3Z" />

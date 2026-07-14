@@ -11,11 +11,18 @@ import {
   type ConfigPriere,
   type HorairesJour,
 } from "@/lib/prieres";
+import {
+  demanderPermission,
+  ecrireNotifs,
+  notifsActivees,
+  notifsSupportees,
+} from "@/lib/notifications";
 import Entete from "@/components/Entete";
 import {
   Alerte,
   Aube,
   Cadenas,
+  Cloche,
   Epingle,
   Horloge,
   Lune,
@@ -35,6 +42,88 @@ const LIGNES: {
   { id: "isha", nom: "Isha", icone: Lune },
 ];
 
+/** « 2 h 05 » ou « 12 min » avant l'heure hh:mm donnée. */
+function tempsRestant(hhmm: string, maintenant: Date): string {
+  const [hh, mm] = hhmm.split(":").map(Number);
+  const cible = hh * 60 + mm;
+  const actuel = maintenant.getHours() * 60 + maintenant.getMinutes();
+  const reste = cible - actuel;
+  if (reste <= 0) return "maintenant";
+  if (reste < 60) return `dans ${reste} min`;
+  return `dans ${Math.floor(reste / 60)} h ${String(reste % 60).padStart(2, "0")}`;
+}
+
+/** Interrupteur du rappel de prière. */
+function ToggleNotifs() {
+  const [actif, setActif] = useState(false);
+  const [refuse, setRefuse] = useState(false);
+  const [supporte, setSupporte] = useState(true);
+
+  useEffect(() => {
+    setSupporte(notifsSupportees());
+    setActif(notifsActivees());
+    if (notifsSupportees() && Notification.permission === "denied")
+      setRefuse(true);
+  }, []);
+
+  const basculer = async () => {
+    if (actif) {
+      ecrireNotifs(false);
+      setActif(false);
+      return;
+    }
+    const ok = await demanderPermission();
+    if (ok) {
+      ecrireNotifs(true);
+      setActif(true);
+      setRefuse(false);
+    } else {
+      setRefuse(true);
+    }
+  };
+
+  return (
+    <div className="card rounded-2xl p-4 shadow-soft">
+      <div className="flex items-center gap-3">
+        <span style={{ color: "var(--accent)" }}>
+          <Cloche taille={22} />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block font-bold">Rappel à l&apos;heure de la prière</span>
+          <span className="block text-xs" style={{ color: "var(--muted)" }}>
+            {supporte
+              ? "Une notification quand l'heure arrive, tant que l'appli est ouverte"
+              : "Non pris en charge par ce navigateur (sur iPhone : installe d'abord l'appli sur l'écran d'accueil)"}
+          </span>
+        </span>
+        {supporte && (
+          <button
+            onClick={basculer}
+            role="switch"
+            aria-checked={actif}
+            aria-label="Activer le rappel de prière"
+            className="relative h-7 w-12 shrink-0 rounded-full transition"
+            style={{
+              backgroundColor: actif ? "var(--accent)" : "var(--border)",
+            }}
+          >
+            <span
+              className="absolute top-0.5 h-6 w-6 rounded-full bg-white shadow transition-all"
+              style={{ left: actif ? "1.375rem" : "0.125rem" }}
+            />
+          </button>
+        )}
+      </div>
+      {refuse && !actif && (
+        <p className="mt-2 text-xs" style={{ color: "var(--muted)" }}>
+          Les notifications sont bloquées pour ce site. Autorise-les dans les
+          réglages de ton navigateur, puis réessaie.
+        </p>
+      )}
+    </div>
+  );
+}
+
 export default function Prieres() {
   const [config, setConfig] = useState<ConfigPriere | null>(null);
   const [charge, setCharge] = useState(false);
@@ -44,6 +133,14 @@ export default function Prieres() {
   const [ville, setVille] = useState("");
   const [pays, setPays] = useState("France");
   const [methode, setMethode] = useState(12);
+  const [maintenant, setMaintenant] = useState<Date | null>(null);
+
+  // Horloge : rafraîchir le temps restant chaque minute
+  useEffect(() => {
+    setMaintenant(new Date());
+    const t = setInterval(() => setMaintenant(new Date()), 60_000);
+    return () => clearInterval(t);
+  }, []);
 
   useEffect(() => {
     const c = lireConfigPriere();
@@ -275,7 +372,9 @@ export default function Prieres() {
                           className="rounded-full px-2 py-0.5 text-[10px] font-bold text-white"
                           style={{ backgroundColor: "var(--accent)" }}
                         >
-                          Prochaine
+                          {maintenant
+                            ? tempsRestant(horaires[l.id], maintenant)
+                            : "Prochaine"}
                         </span>
                       )}
                     </span>
@@ -287,6 +386,8 @@ export default function Prieres() {
               })}
             </ul>
           )}
+
+          <ToggleNotifs />
 
           <p className="text-center text-xs" style={{ color: "var(--muted)" }}>
             Source : AlAdhan.com •{" "}
