@@ -67,6 +67,68 @@ function parserTajweed(html: string): Segment[] {
   return segments;
 }
 
+/* ===== Liaison des lettres entre segments colorés =====
+ * Chaque mot est découpé en <span> de couleurs différentes. La plupart
+ * des navigateurs relient les lettres arabes à travers ces frontières,
+ * mais certains (vieux WebView Android, navigateurs alternatifs) les
+ * affichent détachées. On insère donc un liant invisible (ZWJ, U+200D)
+ * de part et d'autre de chaque frontière quand les lettres doivent se
+ * lier : chaque morceau prend alors sa forme liée même s'il est mis en
+ * forme séparément. */
+
+const ZWJ = "‍";
+
+// Signes (harakât, petits signes coraniques…) : à ignorer pour trouver
+// la lettre porteuse à la frontière.
+const MARQUE =
+  /[\u064B-\u065F\u0670\u06D6-\u06DC\u06DF-\u06E4\u06E7-\u06ED\u08D3-\u08FF]/;
+
+// Lettres qui ne se lient jamais à la lettre suivante (à leur gauche).
+const SANS_LIAISON_GAUCHE = new Set([
+  "ا", "أ", "إ", "آ", "ٱ", "د", "ذ", "ر", "ز", "و", "ؤ", "ة", "ء",
+]);
+
+const estLettreArabe = (c: string) => c >= "ء" && c <= "ۿ";
+
+const derniereLettre = (t: string) => {
+  for (let i = t.length - 1; i >= 0; i--) {
+    if (!MARQUE.test(t[i])) return t[i];
+  }
+  return "";
+};
+
+const premiereLettre = (t: string) => {
+  for (const c of t) {
+    if (!MARQUE.test(c)) return c;
+  }
+  return "";
+};
+
+/** La frontière entre ces deux textes doit-elle rester liée ? */
+const doitLier = (avant: string, apres: string) => {
+  const a = derniereLettre(avant);
+  const b = premiereLettre(apres);
+  return (
+    !!a &&
+    !!b &&
+    estLettreArabe(a) &&
+    estLettreArabe(b) &&
+    !SANS_LIAISON_GAUCHE.has(a) &&
+    b !== "ء"
+  );
+};
+
+/** Ajoute les liants invisibles aux frontières des segments d'un mot. */
+function lierSegments(segments: Segment[]): Segment[] {
+  return segments.map((s, i) => {
+    let t = s.t;
+    if (i > 0 && doitLier(segments[i - 1].t, s.t)) t = ZWJ + t;
+    if (i < segments.length - 1 && doitLier(s.t, segments[i + 1].t))
+      t = t + ZWJ;
+    return { t, r: s.r };
+  });
+}
+
 /** Signes seuls (pauses ۖ ۗ ۚ, hizb ۞, sajda ۩) : affichés avec le mot
  *  précédent chez Quran.com, ils comptent néanmoins dans la numérotation
  *  des fichiers audio mot à mot. */
@@ -84,7 +146,7 @@ function segmentsEnMots(segments: Segment[]): Word[] {
     numToken += 1;
     const texte = courant.map((s) => s.t).join("");
     if (!SIGNE_SEUL.test(texte)) {
-      mots.push({ segments: courant, audio: numToken });
+      mots.push({ segments: lierSegments(courant), audio: numToken });
     }
     courant = [];
   };
