@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePrefs } from "@/lib/prefs";
 import Personnalisation from "@/components/Personnalisation";
-import { Etincelles, Lune, Soleil } from "@/components/Icones";
+import { Lune, Pinceau, Soleil } from "@/components/Icones";
 
 export default function Entete() {
   const { prefs, maj } = usePrefs();
@@ -61,7 +61,7 @@ export default function Entete() {
             className="card rounded-xl p-2.5 transition hover:scale-105 active:scale-95"
             style={{ color: "var(--accent)" }}
           >
-            <Etincelles taille={20} />
+            <Pinceau taille={20} />
           </button>
           <button
             onClick={() => maj({ dark: !prefs.dark })}

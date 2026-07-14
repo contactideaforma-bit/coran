@@ -12,7 +12,7 @@ import {
   Calendrier as IconeCalendrier,
   Citation,
   Coeur,
-  Etincelles,
+  Pinceau,
   Horloge,
   Lettres,
   LivreOuvert,
@@ -166,7 +166,7 @@ export default function Accueil() {
         className="mt-8 flex items-center justify-center gap-1.5 text-center text-xs"
         style={{ color: "var(--muted)" }}
       >
-        <Etincelles taille={14} /> Personnalise ton appli (thème, couleurs,
+        <Pinceau taille={14} /> Personnalise ton appli (thème, couleurs,
         récitateur) — tes réglages restent sur ton appareil.
       </p>
     </div>

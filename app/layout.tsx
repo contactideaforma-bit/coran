@@ -8,6 +8,14 @@ export const metadata: Metadata = {
   description:
     "Coran avec tajwid en couleur, hadith du jour, horaires de prière, invocations, apprentissage Nourania et calendrier des événements religieux — en français.",
   manifest: "/manifest.webmanifest",
+  openGraph: {
+    title: "My Easy Muslim — Ton compagnon du quotidien",
+    description:
+      "Coran avec tajwid en couleur, hadith du jour, horaires de prière, invocations et apprentissage de la lecture — gratuit, en français.",
+    type: "website",
+    locale: "fr_FR",
+    images: [{ url: "/icone-512.png", width: 512, height: 512 }],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

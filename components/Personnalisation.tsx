@@ -10,7 +10,7 @@ import {
 } from "@/lib/prefs";
 import {
   Cadenas,
-  Etincelles,
+  Pinceau,
   Lune,
   Micro,
   Soleil,
@@ -43,7 +43,7 @@ export default function Personnalisation({
         >
           <h2 className="flex items-center gap-2 text-lg font-extrabold">
             <span style={{ color: "var(--accent)" }}>
-              <Etincelles taille={20} />
+              <Pinceau taille={20} />
             </span>
             Personnaliser mon appli
           </h2>
