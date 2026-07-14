@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePrefs } from "@/lib/prefs";
 import Personnalisation from "@/components/Personnalisation";
 import { Etincelles, Lune, Soleil } from "@/components/Icones";
@@ -9,10 +9,34 @@ import { Etincelles, Lune, Soleil } from "@/components/Icones";
 export default function Entete() {
   const { prefs, maj } = usePrefs();
   const [persoOuverte, setPersoOuverte] = useState(false);
+  const [cachee, setCachee] = useState(false);
+
+  // Masquer l'en-tête quand on descend, la réafficher quand on remonte
+  useEffect(() => {
+    let dernierY = window.scrollY;
+    const surScroll = () => {
+      const y = window.scrollY;
+      if (y < 60) {
+        setCachee(false);
+      } else if (y > dernierY + 6) {
+        setCachee(true);
+      } else if (y < dernierY - 6) {
+        setCachee(false);
+      }
+      dernierY = y;
+    };
+    window.addEventListener("scroll", surScroll, { passive: true });
+    return () => window.removeEventListener("scroll", surScroll);
+  }, []);
 
   return (
     <>
-      <header className="entete-verre sticky top-3 z-20 flex items-center justify-between rounded-2xl px-4 py-3 shadow-soft">
+      <header
+        className="entete-verre sticky top-3 z-20 flex items-center justify-between rounded-2xl px-4 py-3 shadow-soft transition-transform duration-300 ease-out"
+        style={{
+          transform: cachee ? "translateY(calc(-100% - 1rem))" : "translateY(0)",
+        }}
+      >
         <Link href="/" className="flex items-center gap-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img

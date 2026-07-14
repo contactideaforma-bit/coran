@@ -41,6 +41,12 @@ interface MotActif {
   v: number;
   w: number;
   word: Word;
+  /* Position de la bulle, relative au conteneur de la page */
+  x: number;
+  y: number;
+  dessous: boolean; // bulle affichée sous le mot (mot trop haut dans l'écran)
+  largeur: number;
+  fleche: number; // décalage horizontal de la flèche dans la bulle
 }
 
 export default function Lecteur({ n }: { n: number }) {
@@ -56,6 +62,7 @@ export default function Lecteur({ n }: { n: number }) {
   const [motsFrPrets, setMotsFrPrets] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const dataRef = useRef<SourateData | null>(null);
+  const conteneurRef = useRef<HTMLDivElement | null>(null);
 
   // Précharger les traductions mot à mot françaises (en arrière-plan)
   useEffect(() => {
@@ -122,6 +129,11 @@ export default function Lecteur({ n }: { n: number }) {
     };
   }, []);
 
+  // Fermer la bulle du mot quand on change de section (le mot n'est plus affiché)
+  useEffect(() => {
+    setMotActif(null);
+  }, [section]);
+
   const couleur = (r: TajwidRule) =>
     prefs.dark ? r.couleurSombre : r.couleur;
 
@@ -141,9 +153,28 @@ export default function Lecteur({ n }: { n: number }) {
     audio.play().catch(() => setLecture(null));
   };
 
-  const clicMot = (v: number, w: number, word: Word) => {
+  const clicMot = (
+    v: number,
+    w: number,
+    word: Word,
+    e?: { currentTarget: HTMLElement }
+  ) => {
     jouer(urlMot(n, v, word.audio), { type: "mot", v, w });
-    setMotActif({ v, w, word });
+    if (e && conteneurRef.current) {
+      // Positionner la bulle juste au-dessus (ou en dessous) du mot touché
+      const r = e.currentTarget.getBoundingClientRect();
+      const c = conteneurRef.current.getBoundingClientRect();
+      const largeur = Math.min(340, window.innerWidth - 24);
+      const demi = largeur / 2;
+      const ancre = r.left + r.width / 2 - c.left;
+      const x = Math.min(Math.max(ancre, demi + 4), c.width - demi - 4);
+      const dessous = r.top < 200; // pas assez de place au-dessus
+      const y = dessous ? r.bottom - c.top + 12 : r.top - c.top - 12;
+      const fleche = Math.min(Math.max(ancre - (x - demi), 18), largeur - 18);
+      setMotActif({ v, w, word, x, y, dessous, largeur, fleche });
+    } else {
+      setMotActif((prev) => (prev ? { ...prev, v, w, word } : prev));
+    }
   };
 
   const clicVerset = (v: number) => {
@@ -221,7 +252,7 @@ export default function Lecteur({ n }: { n: number }) {
   const suivante = SOURATES.find((s) => s.n === n + 1);
 
   return (
-    <div className="mx-auto max-w-3xl px-4 pb-36 pt-4">
+    <div ref={conteneurRef} className="relative mx-auto max-w-3xl px-4 pb-36 pt-4">
       <Entete />
 
       {/* ===== Titre + actions sourate ===== */}
@@ -426,7 +457,7 @@ export default function Lecteur({ n }: { n: number }) {
                   {v.words.map((word, wi) => (
                     <button
                       key={wi}
-                      onClick={() => clicMot(v.n, wi, word)}
+                      onClick={(e) => clicMot(v.n, wi, word, e)}
                       className="rounded-md transition hover:opacity-75 active:scale-95"
                       style={{
                         backgroundColor: motEnLecture(v.n, wi)
@@ -514,47 +545,87 @@ export default function Lecteur({ n }: { n: number }) {
       {/* ===== Bouton flottant légende ===== */}
       <button
         onClick={() => setLegendeOuverte(true)}
-        className={`fixed right-6 z-30 flex items-center gap-2 rounded-full px-5 py-3 font-bold text-white shadow-lg transition hover:scale-105 active:scale-95 ${
-          motActif ? "bottom-28" : "bottom-6"
-        }`}
+        className="fixed bottom-6 right-6 z-30 flex items-center gap-2 rounded-full px-5 py-3 font-bold text-white shadow-lg transition hover:scale-105 active:scale-95"
         style={{ backgroundColor: "var(--accent)" }}
       >
         <Goutte taille={18} className="text-white" /> Règles
       </button>
 
-      {/* ===== Barre mot actif ===== */}
+      {/* ===== Bulle mot actif (ancrée au mot touché) ===== */}
       {motActif && (
-        <div className="fixed inset-x-0 bottom-0 z-30 flex justify-center px-3 pb-3">
-          <div className="card pop flex w-full max-w-3xl items-center gap-3 rounded-2xl px-4 py-3 shadow-soft">
-            <button
-              onClick={() => clicMot(motActif.v, motActif.w, motActif.word)}
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition active:scale-95"
-              style={{ backgroundColor: "var(--accent)" }}
-              aria-label="Réécouter le mot"
-            >
-              <HautParleur taille={22} className="text-white" />
-            </button>
-            <span className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-0.5">
-              <span className={`arabic text-2xl ${police}`} dir="rtl">
-                {motActif.word.segments.map((s, si) =>
-                  s.r ? (
-                    <span key={si} style={{ color: couleur(RULE_BY_ID[s.r]) }}>
-                      {s.t}
-                    </span>
-                  ) : (
-                    <span key={si}>{s.t}</span>
-                  )
-                )}
-              </span>
-              <span
-                className="text-sm font-medium"
-                style={{ color: "var(--muted)" }}
+        <div
+          className="absolute z-30"
+          style={{
+            left: motActif.x,
+            top: motActif.y,
+            width: motActif.largeur,
+            transform: motActif.dessous
+              ? "translateX(-50%)"
+              : "translate(-50%, -100%)",
+          }}
+        >
+          <div
+            className="card pop relative rounded-2xl px-4 py-3 shadow-lg"
+            style={{
+              borderColor:
+                "color-mix(in srgb, var(--accent) 50%, var(--border))",
+            }}
+          >
+            {/* Flèche qui pointe vers le mot */}
+            <span
+              className="absolute h-3 w-3 rotate-45"
+              style={{
+                left: motActif.fleche - 6,
+                ...(motActif.dessous ? { top: -7 } : { bottom: -7 }),
+                background: "var(--card)",
+                borderStyle: "solid",
+                borderColor:
+                  "color-mix(in srgb, var(--accent) 50%, var(--border))",
+                borderWidth: motActif.dessous ? "1px 0 0 1px" : "0 1px 1px 0",
+              }}
+            />
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => clicMot(motActif.v, motActif.w, motActif.word)}
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition active:scale-95"
+                style={{ backgroundColor: "var(--accent)" }}
+                aria-label="Réécouter le mot"
               >
-                {motFr(n, motActif.v, motActif.w) ??
-                  (motsFrPrets ? "" : "traduction…")}
+                <HautParleur taille={20} className="text-white" />
+              </button>
+              <span className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                <span className={`arabic text-2xl ${police}`} dir="rtl">
+                  {motActif.word.segments.map((s, si) =>
+                    s.r ? (
+                      <span
+                        key={si}
+                        style={{ color: couleur(RULE_BY_ID[s.r]) }}
+                      >
+                        {s.t}
+                      </span>
+                    ) : (
+                      <span key={si}>{s.t}</span>
+                    )
+                  )}
+                </span>
+                <span
+                  className="text-sm font-medium"
+                  style={{ color: "var(--muted)" }}
+                >
+                  {motFr(n, motActif.v, motActif.w) ??
+                    (motsFrPrets ? "" : "traduction…")}
+                </span>
               </span>
-            </span>
-            <span className="flex flex-1 flex-wrap justify-end gap-1.5">
+              <button
+                onClick={() => setMotActif(null)}
+                className="self-start text-lg font-bold leading-none"
+                style={{ color: "var(--muted)" }}
+                aria-label="Fermer"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="mt-2 flex flex-wrap gap-1.5">
               {reglesDuMot(motActif.word).length === 0 ? (
                 <span className="text-xs" style={{ color: "var(--muted)" }}>
                   Pas de règle particulière
@@ -575,15 +646,7 @@ export default function Lecteur({ n }: { n: number }) {
                   </button>
                 ))
               )}
-            </span>
-            <button
-              onClick={() => setMotActif(null)}
-              className="text-lg font-bold"
-              style={{ color: "var(--muted)" }}
-              aria-label="Fermer"
-            >
-              ✕
-            </button>
+            </div>
           </div>
         </div>
       )}
