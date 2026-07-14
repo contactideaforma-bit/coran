@@ -36,6 +36,7 @@ export const TAILLES = [
 
 export const RECITATEURS = [
   { id: "Husary_128kbps", nom: "Mahmoud Khalil Al-Husary", detail: "Référence pour apprendre le tajwid, débit posé" },
+  { id: "Ayman_Sowaid_64kbps", nom: "Ayman Suwayd", detail: "Maître du tajwid, articulation très claire, idéal pour apprendre" },
   { id: "Abdul_Basit_Murattal_192kbps", nom: "Abdul Basit Abdus-Samad", detail: "Voix légendaire, récitation murattal" },
   { id: "Minshawy_Murattal_128kbps", nom: "Mohamed Siddiq El-Minshawi", detail: "Grand classique égyptien" },
   { id: "Abdurrahmaan_As-Sudais_192kbps", nom: "Abdurrahman As-Sudais", detail: "Imam de la Mecque" },
