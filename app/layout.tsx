@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { PrefsProvider } from "@/lib/prefs";
 import EnregistrerSW from "@/components/EnregistrerSW";
 import RappelPriere from "@/components/RappelPriere";
@@ -62,13 +63,12 @@ export default function RootLayout({
           rel="stylesheet"
         />
         <script dangerouslySetInnerHTML={{ __html: scriptTheme }} />
-        {/* Vercel Web Analytics (fréquentation, sans cookies) */}
-        <script defer src="/_vercel/insights/script.js" />
       </head>
       <body className="font-ui min-h-screen antialiased">
         <PrefsProvider>{children}</PrefsProvider>
         <EnregistrerSW />
         <RappelPriere />
+        <Analytics />
       </body>
     </html>
   );
