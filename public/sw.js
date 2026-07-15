@@ -66,30 +66,3 @@ self.addEventListener("fetch", (event) => {
     );
   }
 });
-
-/* ===== Notifications push (rappel de prière, appli fermée) ===== */
-self.addEventListener("push", (event) => {
-  let donnees = {};
-  try {
-    donnees = event.data ? event.data.json() : {};
-  } catch {}
-  event.waitUntil(
-    self.registration.showNotification(donnees.titre || "My Easy Muslim", {
-      body: donnees.corps || "",
-      icon: "/icone-192.png",
-      badge: "/icone-192.png",
-      tag: donnees.tag || "priere",
-    })
-  );
-});
-
-self.addEventListener("notificationclick", (event) => {
-  event.notification.close();
-  event.waitUntil(
-    clients.matchAll({ type: "window", includeUncontrolled: true }).then((fenetres) => {
-      const ouverte = fenetres.find((f) => "focus" in f);
-      if (ouverte) return ouverte.focus();
-      return clients.openWindow("/prieres");
-    })
-  );
-});

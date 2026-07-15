@@ -17,7 +17,6 @@ import {
   notifsActivees,
   notifsSupportees,
 } from "@/lib/notifications";
-import { abonnerPush, desabonnerPush, pushSupporte } from "@/lib/push";
 import Entete from "@/components/Entete";
 import {
   Alerte,
@@ -59,17 +58,6 @@ function ToggleNotifs() {
   const [actif, setActif] = useState(false);
   const [refuse, setRefuse] = useState(false);
   const [supporte, setSupporte] = useState(true);
-  const [push, setPush] = useState(false);
-
-  // Au chargement : le push est-il déjà abonné ?
-  useEffect(() => {
-    if (!pushSupporte() || !notifsActivees()) return;
-    navigator.serviceWorker
-      .getRegistration()
-      .then((reg) => reg?.pushManager.getSubscription())
-      .then((sub) => setPush(!!sub))
-      .catch(() => {});
-  }, []);
 
   useEffect(() => {
     setSupporte(notifsSupportees());
@@ -82,8 +70,6 @@ function ToggleNotifs() {
     if (actif) {
       ecrireNotifs(false);
       setActif(false);
-      setPush(false);
-      desabonnerPush();
       return;
     }
     const ok = await demanderPermission();
@@ -91,9 +77,6 @@ function ToggleNotifs() {
       ecrireNotifs(true);
       setActif(true);
       setRefuse(false);
-      // Abonnement push : notifications même appli fermée (si configuré)
-      const config = lireConfigPriere();
-      if (config) setPush(await abonnerPush(config));
     } else {
       setRefuse(true);
     }
@@ -108,11 +91,9 @@ function ToggleNotifs() {
         <span className="min-w-0 flex-1">
           <span className="block font-bold">Rappel à l&apos;heure de la prière</span>
           <span className="block text-xs" style={{ color: "var(--muted)" }}>
-            {!supporte
-              ? "Non pris en charge par ce navigateur (sur iPhone : installe d'abord l'appli sur l'écran d'accueil)"
-              : actif && push
-                ? "Notifications actives, même quand l'appli est fermée"
-                : "Une notification quand l'heure arrive, tant que l'appli est ouverte"}
+            {supporte
+              ? "Une notification quand l'heure arrive, tant que l'appli est ouverte"
+              : "Non pris en charge par ce navigateur (sur iPhone : installe d'abord l'appli sur l'écran d'accueil)"}
           </span>
         </span>
         {supporte && (
@@ -192,8 +173,6 @@ export default function Prieres() {
     ecrireConfigPriere(c);
     setConfig(c);
     setFormulaire(false);
-    // Rappel push actif ? Mettre à jour la ville côté serveur
-    if (notifsActivees()) abonnerPush(c).catch(() => {});
   };
 
   const suivante = horaires ? prochainePriere(horaires) : null;
