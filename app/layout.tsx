@@ -3,6 +3,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { PrefsProvider } from "@/lib/prefs";
 import EnregistrerSW from "@/components/EnregistrerSW";
 import RappelPriere from "@/components/RappelPriere";
+import BadgeHorsLigne from "@/components/BadgeHorsLigne";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -68,6 +69,7 @@ export default function RootLayout({
         <PrefsProvider>{children}</PrefsProvider>
         <EnregistrerSW />
         <RappelPriere />
+        <BadgeHorsLigne />
         <Analytics />
       </body>
     </html>

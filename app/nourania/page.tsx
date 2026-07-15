@@ -10,6 +10,7 @@ import {
   type Lettre,
 } from "@/data/nourania";
 import { usePrefs } from "@/lib/prefs";
+import { useEchap } from "@/lib/ui";
 import { urlMot } from "@/lib/audio";
 import Entete from "@/components/Entete";
 import { HautParleur, Lettres, Verifie } from "@/components/Icones";
@@ -345,12 +346,15 @@ function Fiche({
   children: React.ReactNode;
   fermer: () => void;
 }) {
+  useEchap(true, fermer);
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-6"
       onClick={fermer}
     >
       <div
+        role="dialog"
+        aria-modal="true"
         className="card pop w-full max-w-md rounded-3xl p-6 text-center"
         onClick={(e) => e.stopPropagation()}
       >

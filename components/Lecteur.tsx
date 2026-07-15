@@ -134,6 +134,18 @@ export default function Lecteur({ n }: { n: number }) {
     setMotActif(null);
   }, [section]);
 
+  // Échap : fermer la fenêtre la plus haute (fiche règle > légende > bulle)
+  useEffect(() => {
+    const surTouche = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      if (regleActive) setRegleActive(null);
+      else if (legendeOuverte) setLegendeOuverte(false);
+      else if (motActif) setMotActif(null);
+    };
+    window.addEventListener("keydown", surTouche);
+    return () => window.removeEventListener("keydown", surTouche);
+  }, [regleActive, legendeOuverte, motActif]);
+
   const couleur = (r: TajwidRule) =>
     prefs.dark ? r.couleurSombre : r.couleur;
 
@@ -658,6 +670,9 @@ export default function Lecteur({ n }: { n: number }) {
           onClick={() => setLegendeOuverte(false)}
         >
           <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Code couleur du tajwid"
             className="card pop max-h-[75vh] w-full max-w-3xl overflow-y-auto rounded-t-3xl p-5"
             onClick={(e) => e.stopPropagation()}
           >
@@ -712,6 +727,9 @@ export default function Lecteur({ n }: { n: number }) {
           onClick={() => setRegleActive(null)}
         >
           <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Fiche de la règle tajwid"
             className="card pop w-full max-w-md rounded-3xl p-6 text-center"
             onClick={(e) => e.stopPropagation()}
           >

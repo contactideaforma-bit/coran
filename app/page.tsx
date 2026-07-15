@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { hadithDuJour, type Hadith } from "@/data/hadiths";
 import { SOURATES } from "@/data/sourates";
 import { libelleHijri, versHijri } from "@/lib/hijri";
-import { lireMarquePage, type MarquePage } from "@/lib/marquePage";
+import { depuis, lireMarquePage, type MarquePage } from "@/lib/marquePage";
 import Entete from "@/components/Entete";
 import GuideInstallation from "@/components/GuideInstallation";
 import {
@@ -131,6 +131,7 @@ export default function Accueil() {
             <span className="block font-bold">Reprendre ma lecture</span>
             <span className="block text-sm" style={{ color: "var(--muted)" }}>
               {sourateMarquee.nom} — verset {marque.v}
+              {marque.t ? ` • ${depuis(marque.t)}` : ""}
             </span>
           </span>
           <span style={{ color: "var(--accent)" }}>→</span>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useEchap } from "@/lib/ui";
 
 /* ============================================================
    Guide d'installation de l'appli (PWA) sur l'écran d'accueil.
@@ -286,6 +287,7 @@ export default function GuideInstallation() {
     null
   );
   const [navigateurAlternatif, setNavigateurAlternatif] = useState(false);
+  useEchap(ouvert, () => setOuvert(false));
 
   useEffect(() => {
     // Déjà installée (mode standalone) : ne rien afficher
@@ -418,6 +420,9 @@ export default function GuideInstallation() {
           onClick={() => setOuvert(false)}
         >
           <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Installer l'appli"
             className="card pop max-h-[88vh] w-full max-w-3xl overflow-y-auto rounded-t-3xl p-5"
             onClick={(e) => e.stopPropagation()}
           >

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEchap } from "@/lib/ui";
 import {
   ACCENTS,
   FONDS,
@@ -24,6 +25,7 @@ export default function Personnalisation({
   fermer: () => void;
 }) {
   const { prefs, maj } = usePrefs();
+  useEchap(ouvert, fermer);
 
   if (!ouvert) return null;
 
@@ -33,6 +35,9 @@ export default function Personnalisation({
       onClick={fermer}
     >
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Personnaliser mon appli"
         className="card pop flex max-h-[85vh] w-full max-w-3xl flex-col rounded-t-3xl"
         onClick={(e) => e.stopPropagation()}
       >

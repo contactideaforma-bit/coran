@@ -447,6 +447,18 @@ function JeuNourania({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idx, questions, voixArabe]);
 
+  // Précharger l'audio de la question suivante (zéro latence au passage)
+  const prechargeRef = useRef<HTMLAudioElement | null>(null);
+  useEffect(() => {
+    const suivante = questions[idx + 1];
+    if (suivante?.audio) {
+      const [s, v, w] = suivante.audio;
+      const audio = new Audio(urlMot(s, v, w));
+      audio.preload = "auto";
+      prechargeRef.current = audio;
+    }
+  }, [idx, questions]);
+
   // Couper l'audio en quittant
   useEffect(() => {
     return () => {
