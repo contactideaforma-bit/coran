@@ -33,6 +33,7 @@ import {
 
 type Lecture =
   | { type: "mot"; v: number; w: number }
+  | { type: "paire"; v: number; w: number } // mot w + mot w+1 enchaînés
   | { type: "verset"; v: number }
   | { type: "sourate"; v: number }
   | null;
@@ -189,6 +190,29 @@ export default function Lecteur({ n }: { n: number }) {
     }
   };
 
+  /** Écouter deux mots consécutifs enchaînés (travail des liaisons). */
+  const jouerPaire = (v: number, w: number) => {
+    const verse = dataRef.current?.verses.find((x) => x.n === v);
+    const m1 = verse?.words[w];
+    const m2 = verse?.words[w + 1];
+    if (!m1 || !m2) return;
+    audioRef.current?.pause();
+    const audio1 = new Audio(urlMot(n, v, m1.audio));
+    const audio2 = new Audio(urlMot(n, v, m2.audio));
+    audio2.preload = "auto"; // précharger le 2e pour un enchaînement fluide
+    audioRef.current = audio1;
+    setLecture({ type: "paire", v, w });
+    const fin = () => setLecture(null);
+    audio1.onended = () => {
+      audioRef.current = audio2;
+      audio2.onended = fin;
+      audio2.onerror = fin;
+      audio2.play().catch(fin);
+    };
+    audio1.onerror = fin;
+    audio1.play().catch(fin);
+  };
+
   const clicVerset = (v: number) => {
     if (
       (lecture?.type === "verset" || lecture?.type === "sourate") &&
@@ -244,7 +268,10 @@ export default function Lecteur({ n }: { n: number }) {
   };
 
   const motEnLecture = (v: number, w: number) =>
-    lecture?.type === "mot" && lecture.v === v && lecture.w === w;
+    (lecture?.type === "mot" && lecture.v === v && lecture.w === w) ||
+    (lecture?.type === "paire" &&
+      lecture.v === v &&
+      (lecture.w === w || lecture.w + 1 === w));
 
   const versetEnLecture = (v: number) =>
     (lecture?.type === "verset" || lecture?.type === "sourate") &&
@@ -637,7 +664,33 @@ export default function Lecteur({ n }: { n: number }) {
                 ✕
               </button>
             </div>
-            <div className="mt-2 flex flex-wrap gap-1.5">
+            <div className="mt-2 flex flex-wrap items-center gap-1.5">
+              {dataRef.current?.verses.find((x) => x.n === motActif.v)?.words[
+                motActif.w + 1
+              ] && (
+                <button
+                  onClick={() => jouerPaire(motActif.v, motActif.w)}
+                  className="flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-bold transition active:scale-95"
+                  style={{
+                    borderColor: "var(--accent)",
+                    color:
+                      lecture?.type === "paire" &&
+                      lecture.v === motActif.v &&
+                      lecture.w === motActif.w
+                        ? "#fff"
+                        : "var(--accent)",
+                    backgroundColor:
+                      lecture?.type === "paire" &&
+                      lecture.v === motActif.v &&
+                      lecture.w === motActif.w
+                        ? "var(--accent)"
+                        : "transparent",
+                  }}
+                  title="Travailler la liaison entre les deux mots"
+                >
+                  <IconeLecture taille={11} /> Avec le mot suivant
+                </button>
+              )}
               {reglesDuMot(motActif.word).length === 0 ? (
                 <span className="text-xs" style={{ color: "var(--muted)" }}>
                   Pas de règle particulière
