@@ -87,6 +87,14 @@ export default function Nourania() {
   const lecon: Lecon | undefined = LECONS.find((l) => l.id === leconActive);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  // Couper l'audio et la synthèse vocale quand on quitte la page
+  useEffect(() => {
+    return () => {
+      audioRef.current?.pause();
+      if (typeof speechSynthesis !== "undefined") speechSynthesis.cancel();
+    };
+  }, []);
+
   /** Joue l'élément : vrai enregistrement du Coran si disponible, sinon synthèse. */
   const jouerElement = (e: ElementLecon) => {
     audioRef.current?.pause();

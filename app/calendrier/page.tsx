@@ -34,10 +34,15 @@ function calculerAgenda(): EvenementDate[] {
       continue;
     }
     if (evt.recurrent === "mensuel") {
-      // Jours blancs : prochaine occurrence du 13 du mois lunaire
+      // Jours blancs : les 13, 14 et 15 du mois lunaire
       const h = versHijri(auj);
-      const mois = h.jour <= 15 ? h.mois : (h.mois % 12) + 1;
-      const date = prochaineDateHijri(mois, 13, auj);
+      let date: Date;
+      if (h.jour >= 13 && h.jour <= 15) {
+        date = new Date(auj); // en cours
+      } else {
+        const mois = h.jour < 13 ? h.mois : (h.mois % 12) + 1;
+        date = prochaineDateHijri(mois, 13, auj);
+      }
       liste.push({ evt, date, jours: joursRestants(date) });
       continue;
     }

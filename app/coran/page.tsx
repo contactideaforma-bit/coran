@@ -87,6 +87,7 @@ export default function Coran() {
           value={recherche}
           onChange={(e) => setRecherche(e.target.value)}
           placeholder="Chercher une sourate (nom ou numéro)…"
+          aria-label="Chercher une sourate"
           className="w-full bg-transparent outline-none"
           style={{ color: "var(--text)" }}
         />

@@ -64,7 +64,7 @@ export const EVENEMENTS: Evenement[] = [
     id: "dix-dernieres-nuits",
     nom: "Les 10 dernières nuits de Ramadan",
     icone: "etincelles",
-    hijri: { mois: 9, jour: 21, duree: 9 },
+    hijri: { mois: 9, jour: 21, duree: 10 },
     description:
       "Les nuits les plus précieuses de l'année : l'une d'elles est Laylat al-Qadr, « meilleure que mille mois » (Coran 97:3), à rechercher surtout les nuits impaires.",
     conseils: [

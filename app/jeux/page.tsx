@@ -408,22 +408,36 @@ function JeuNourania({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(nouvellePartie, [niveau]);
 
+  const prononcer = (texte: string) => {
+    if (typeof speechSynthesis === "undefined") return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(texte);
+    if (voixRef.current) u.voice = voixRef.current;
+    u.lang = "ar-SA";
+    u.rate = 0.7;
+    speechSynthesis.speak(u);
+  };
+
   const ecouter = (q: Question) => {
     audioRef.current?.pause();
     if (q.audio) {
       const [s, v, w] = q.audio;
       const audio = new Audio(urlMot(s, v, w));
       audioRef.current = audio;
-      audio.play().catch(() => {});
+      // Si l'enregistrement ne charge pas (hors-ligne…), replier sur la
+      // synthèse vocale pour que la question reste jouable.
+      let replie = false;
+      const replier = () => {
+        if (!replie) {
+          replie = true;
+          prononcer(q.vocal);
+        }
+      };
+      audio.onerror = replier;
+      audio.play().catch(replier);
       return;
     }
-    if (typeof speechSynthesis === "undefined") return;
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(q.vocal);
-    if (voixRef.current) u.voice = voixRef.current;
-    u.lang = "ar-SA";
-    u.rate = 0.7;
-    speechSynthesis.speak(u);
+    prononcer(q.vocal);
   };
 
   // Jouer automatiquement à chaque nouvelle question

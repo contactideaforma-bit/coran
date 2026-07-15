@@ -49,6 +49,7 @@ export default function Personnalisation({
           </h2>
           <button
             onClick={fermer}
+            aria-label="Fermer la personnalisation"
             className="card rounded-full px-3 py-1 font-bold"
           >
             ✕
