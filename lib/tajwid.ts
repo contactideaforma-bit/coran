@@ -43,12 +43,12 @@ export const TAJWID_RULES: TajwidRule[] = [
   },
   {
     id: "madd46",
-    nom: "Madd obligatoire (4-5 temps)",
+    nom: "Madd prolongé (4-5 temps)",
     couleur: "#dc2626",
     couleurSombre: "#f87171",
     resume: "Prolongation de 4 à 5 temps",
     detail:
-      "Quand une lettre de prolongation est suivie d'une hamza dans le même mot (madd muttasil), on allonge 4 à 5 temps.",
+      "Quand une lettre de prolongation est suivie d'une hamza dans le même mot (madd muttasil, obligatoire) ou au début du mot suivant (madd munfasil, permis), on allonge 4 à 5 temps.",
     exemple: "جَاءَ • السَّمَاءِ",
   },
   {

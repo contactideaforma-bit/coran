@@ -74,12 +74,21 @@ function parserTajweed(html: string): Segment[] {
  * affichent détachées. On insère donc un liant invisible (ZWJ, U+200D)
  * de part et d'autre de chaque frontière quand les lettres doivent se
  * lier : chaque morceau prend alors sa forme liée même s'il est mis en
- * forme séparément. */
+ * forme séparément.
+ *
+ * ATTENTION : le balisage de Quran.com coupe souvent AU MILIEU d'un
+ * groupe lettre + signes (ex. « ل + َّمْ » : le segment suivant commence
+ * par la shadda). Insérer un ZWJ à une telle frontière l'intercale
+ * entre la lettre et sa voyelle : le signe se détache de sa lettre
+ * porteuse (voyelle décalée ou illisible, chevauchements — visibles
+ * par ex. sur لَّمْ, تَفْعَلُوا, ٱلنَّارَ et لِلْكَـٰفِرِينَ en 2:24).
+ * On ne lie donc que si les deux caractères immédiatement au bord de
+ * la frontière sont de vraies lettres — jamais des signes. */
 
 const ZWJ = "‍";
 
-// Signes (harakât, petits signes coraniques…) : à ignorer pour trouver
-// la lettre porteuse à la frontière.
+// Signes (harakât, petits signes coraniques…) : ne portent jamais de
+// liant, ils doivent rester collés à leur lettre porteuse.
 const MARQUE =
   /[\u064B-\u065F\u0670\u06D6-\u06DC\u06DF-\u06E4\u06E7-\u06ED\u08D3-\u08FF]/;
 
@@ -90,29 +99,17 @@ const SANS_LIAISON_GAUCHE = new Set([
 
 const estLettreArabe = (c: string) => c >= "ء" && c <= "ۿ";
 
-const derniereLettre = (t: string) => {
-  for (let i = t.length - 1; i >= 0; i--) {
-    if (!MARQUE.test(t[i])) return t[i];
-  }
-  return "";
-};
-
-const premiereLettre = (t: string) => {
-  for (const c of t) {
-    if (!MARQUE.test(c)) return c;
-  }
-  return "";
-};
-
-/** La frontière entre ces deux textes doit-elle rester liée ? */
+/** La frontière entre ces deux textes doit-elle recevoir un liant ?
+ *  Uniquement si les caractères de part et d'autre de la frontière
+ *  sont des lettres qui se lient (jamais un signe au bord). */
 const doitLier = (avant: string, apres: string) => {
-  const a = derniereLettre(avant);
-  const b = premiereLettre(apres);
+  const a = avant[avant.length - 1] ?? "";
+  const b = apres[0] ?? "";
   return (
-    !!a &&
-    !!b &&
     estLettreArabe(a) &&
     estLettreArabe(b) &&
+    !MARQUE.test(a) &&
+    !MARQUE.test(b) &&
     !SANS_LIAISON_GAUCHE.has(a) &&
     b !== "ء"
   );

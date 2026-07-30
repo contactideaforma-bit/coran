@@ -4,12 +4,14 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
   METHODES,
+  chargerCalendrierMois,
   chargerHoraires,
   ecrireConfigPriere,
   lireConfigPriere,
   prochainePriere,
   type ConfigPriere,
   type HorairesJour,
+  type JourCalendrier,
 } from "@/lib/prieres";
 import {
   demanderPermission,
@@ -134,6 +136,13 @@ export default function Prieres() {
   const [pays, setPays] = useState("France");
   const [methode, setMethode] = useState(12);
   const [maintenant, setMaintenant] = useState<Date | null>(null);
+  const [vue, setVue] = useState<"jour" | "mois">("jour");
+  const [moisAffiche, setMoisAffiche] = useState(() => {
+    const d = new Date();
+    return { annee: d.getFullYear(), mois: d.getMonth() + 1 };
+  });
+  const [calendrier, setCalendrier] = useState<JourCalendrier[] | null>(null);
+  const [erreurMois, setErreurMois] = useState(false);
 
   // Horloge : rafraîchir le temps restant chaque minute
   useEffect(() => {
@@ -165,6 +174,41 @@ export default function Prieres() {
         )
       );
   }, [config]);
+
+  // Charger le calendrier du mois affiché (vue « Mois »)
+  useEffect(() => {
+    if (!config || vue !== "mois") return;
+    let annule = false;
+    setCalendrier(null);
+    setErreurMois(false);
+    chargerCalendrierMois(config, moisAffiche.annee, moisAffiche.mois)
+      .then((j) => {
+        if (!annule) setCalendrier(j);
+      })
+      .catch(() => {
+        if (!annule) setErreurMois(true);
+      });
+    return () => {
+      annule = true;
+    };
+  }, [config, vue, moisAffiche]);
+
+  const changerMois = (delta: number) =>
+    setMoisAffiche(({ annee, mois }) => {
+      const d = new Date(annee, mois - 1 + delta, 1);
+      return { annee: d.getFullYear(), mois: d.getMonth() + 1 };
+    });
+
+  const estMoisCourant =
+    maintenant !== null &&
+    moisAffiche.annee === maintenant.getFullYear() &&
+    moisAffiche.mois === maintenant.getMonth() + 1;
+
+  const libelleMois = new Date(
+    moisAffiche.annee,
+    moisAffiche.mois - 1,
+    1
+  ).toLocaleDateString("fr-FR", { month: "long", year: "numeric" });
 
   const valider = (e: React.FormEvent) => {
     e.preventDefault();
@@ -313,7 +357,31 @@ export default function Prieres() {
             </button>
           </div>
 
-          {erreur && (
+          {/* Vue : aujourd'hui ou mois entier */}
+          <div className="flex gap-2">
+            {(
+              [
+                { id: "jour", nom: "Aujourd'hui" },
+                { id: "mois", nom: "Mois entier" },
+              ] as const
+            ).map((v) => (
+              <button
+                key={v.id}
+                onClick={() => setVue(v.id)}
+                className="flex-1 rounded-full border px-4 py-2 text-sm font-bold transition active:scale-95"
+                style={{
+                  borderColor: vue === v.id ? "var(--accent)" : "var(--border)",
+                  backgroundColor:
+                    vue === v.id ? "var(--accent)" : "var(--card)",
+                  color: vue === v.id ? "#fff" : "var(--text)",
+                }}
+              >
+                {v.nom}
+              </button>
+            ))}
+          </div>
+
+          {vue === "jour" && erreur && (
             <div className="card rounded-2xl p-6 text-center shadow-soft">
               <p
                 className="flex justify-center"
@@ -332,7 +400,7 @@ export default function Prieres() {
             </div>
           )}
 
-          {!horaires && !erreur && (
+          {vue === "jour" && !horaires && !erreur && (
             <div className="card rounded-2xl p-8 text-center shadow-soft">
               <p
                 className="flex animate-pulse justify-center"
@@ -344,7 +412,7 @@ export default function Prieres() {
             </div>
           )}
 
-          {horaires && (
+          {vue === "jour" && horaires && (
             <ul className="space-y-2">
               {LIGNES.map((l) => {
                 const estSuivante = suivante === l.id;
@@ -385,6 +453,149 @@ export default function Prieres() {
                 );
               })}
             </ul>
+          )}
+
+          {/* ===== Vue mois : calendrier navigable ===== */}
+          {vue === "mois" && (
+            <div className="card overflow-hidden rounded-2xl shadow-soft">
+              <div
+                className="flex items-center justify-between gap-2 border-b p-3"
+                style={{ borderColor: "var(--border)" }}
+              >
+                <button
+                  onClick={() => changerMois(-1)}
+                  aria-label="Mois précédent"
+                  className="card rounded-full px-4 py-1.5 text-lg font-bold transition hover:scale-105 active:scale-95"
+                >
+                  ←
+                </button>
+                <div className="min-w-0 text-center">
+                  <p className="font-extrabold capitalize">{libelleMois}</p>
+                  {calendrier && (
+                    <p className="text-xs" style={{ color: "var(--muted)" }}>
+                      {calendrier[0].hijri} —{" "}
+                      {calendrier[calendrier.length - 1].hijri} H
+                    </p>
+                  )}
+                  {!estMoisCourant && (
+                    <button
+                      onClick={() => {
+                        const d = new Date();
+                        setMoisAffiche({
+                          annee: d.getFullYear(),
+                          mois: d.getMonth() + 1,
+                        });
+                      }}
+                      className="text-xs font-bold underline"
+                      style={{ color: "var(--accent)" }}
+                    >
+                      Revenir à aujourd&apos;hui
+                    </button>
+                  )}
+                </div>
+                <button
+                  onClick={() => changerMois(1)}
+                  aria-label="Mois suivant"
+                  className="card rounded-full px-4 py-1.5 text-lg font-bold transition hover:scale-105 active:scale-95"
+                >
+                  →
+                </button>
+              </div>
+
+              {erreurMois && (
+                <div className="p-6 text-center">
+                  <p
+                    className="flex justify-center"
+                    style={{ color: "var(--accent)" }}
+                  >
+                    <Alerte taille={28} />
+                  </p>
+                  <p className="mt-2 text-sm">
+                    Impossible de charger ce mois. Vérifie ta connexion, puis
+                    réessaie.
+                  </p>
+                </div>
+              )}
+
+              {!calendrier && !erreurMois && (
+                <div className="p-8 text-center">
+                  <p
+                    className="flex animate-pulse justify-center"
+                    style={{ color: "var(--accent)" }}
+                  >
+                    <Horloge taille={32} />
+                  </p>
+                  <p className="mt-2 text-sm font-bold">
+                    Chargement du mois…
+                  </p>
+                </div>
+              )}
+
+              {calendrier && (
+                <table className="w-full text-center text-xs tabular-nums sm:text-sm">
+                  <thead>
+                    <tr style={{ color: "var(--muted)" }}>
+                      <th className="py-2.5 pl-3 text-left font-bold">Jour</th>
+                      <th className="py-2.5 font-bold">Fajr</th>
+                      <th className="hidden py-2.5 font-bold sm:table-cell">
+                        Lever
+                      </th>
+                      <th className="py-2.5 font-bold">Dhuhr</th>
+                      <th className="py-2.5 font-bold">Asr</th>
+                      <th className="py-2.5 font-bold">Maghrib</th>
+                      <th className="py-2.5 pr-3 font-bold">Isha</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {calendrier.map((j) => {
+                      const estAujourdhui =
+                        estMoisCourant &&
+                        maintenant !== null &&
+                        j.jour === maintenant.getDate();
+                      const jourSemaine = new Date(
+                        moisAffiche.annee,
+                        moisAffiche.mois - 1,
+                        j.jour
+                      ).toLocaleDateString("fr-FR", { weekday: "short" });
+                      return (
+                        <tr
+                          key={j.jour}
+                          className="border-t"
+                          style={{
+                            borderColor: "var(--border)",
+                            ...(estAujourdhui
+                              ? {
+                                  backgroundColor:
+                                    "color-mix(in srgb, var(--accent) 14%, transparent)",
+                                  color: "var(--accent)",
+                                  fontWeight: 800,
+                                }
+                              : {}),
+                          }}
+                        >
+                          <td className="py-2 pl-3 text-left font-bold capitalize">
+                            {jourSemaine} {j.jour}
+                            {estAujourdhui && (
+                              <span className="ml-1 hidden text-[10px] sm:inline">
+                                • auj.
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-2">{j.fajr}</td>
+                          <td className="hidden py-2 sm:table-cell">
+                            {j.lever}
+                          </td>
+                          <td className="py-2">{j.dhuhr}</td>
+                          <td className="py-2">{j.asr}</td>
+                          <td className="py-2">{j.maghrib}</td>
+                          <td className="py-2 pr-3">{j.isha}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              )}
+            </div>
           )}
 
           <ToggleNotifs />

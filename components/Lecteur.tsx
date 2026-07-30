@@ -64,6 +64,7 @@ export default function Lecteur({ n }: { n: number }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const dataRef = useRef<SourateData | null>(null);
   const conteneurRef = useRef<HTMLDivElement | null>(null);
+  const bulleRef = useRef<HTMLDivElement | null>(null);
 
   // Précharger les traductions mot à mot françaises (en arrière-plan)
   useEffect(() => {
@@ -134,6 +135,20 @@ export default function Lecteur({ n }: { n: number }) {
   useEffect(() => {
     setMotActif(null);
   }, [section]);
+
+  // Fermer la bulle en touchant n'importe où en dehors d'elle.
+  // (Toucher un autre mot ferme puis rouvre la bulle sur ce mot :
+  // le pointerdown ferme, le click du mot la repositionne ensuite.)
+  useEffect(() => {
+    if (!motActif) return;
+    const fermerSiDehors = (e: PointerEvent) => {
+      const cible = e.target as Node | null;
+      if (cible && bulleRef.current?.contains(cible)) return;
+      setMotActif(null);
+    };
+    document.addEventListener("pointerdown", fermerSiDehors);
+    return () => document.removeEventListener("pointerdown", fermerSiDehors);
+  }, [motActif]);
 
   // Échap : fermer la fenêtre la plus haute (fiche règle > légende > bulle)
   useEffect(() => {
@@ -593,6 +608,7 @@ export default function Lecteur({ n }: { n: number }) {
       {/* ===== Bulle mot actif (ancrée au mot touché) ===== */}
       {motActif && (
         <div
+          ref={bulleRef}
           className="absolute z-30"
           style={{
             left: motActif.x,

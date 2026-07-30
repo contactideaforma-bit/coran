@@ -51,14 +51,74 @@ export async function chargerHoraires(c: ConfigPriere): Promise<HorairesJour> {
   const t = json.data.timings;
   const h = json.data.date.hijri;
   return {
-    fajr: t.Fajr,
-    lever: t.Sunrise,
-    dhuhr: t.Dhuhr,
-    asr: t.Asr,
-    maghrib: t.Maghrib,
-    isha: t.Isha,
+    fajr: nettoyerHeure(t.Fajr),
+    lever: nettoyerHeure(t.Sunrise),
+    dhuhr: nettoyerHeure(t.Dhuhr),
+    asr: nettoyerHeure(t.Asr),
+    maghrib: nettoyerHeure(t.Maghrib),
+    isha: nettoyerHeure(t.Isha),
     hijri: `${Number(h.day)} ${h.month.en} ${h.year}`,
   };
+}
+
+/* ===== Calendrier mensuel ===== */
+
+export interface JourCalendrier {
+  jour: number; // jour du mois grégorien (1-31)
+  fajr: string;
+  lever: string;
+  dhuhr: string;
+  asr: string;
+  maghrib: string;
+  isha: string;
+  hijri: string; // ex. "12 Muharram"
+}
+
+interface JourAladhan {
+  timings: Record<string, string>;
+  date: {
+    gregorian: { day: string };
+    hijri: { day: string; month: { en: string } };
+  };
+}
+
+/** L'API renvoie parfois "05:23 (CEST)" : on ne garde que l'heure. */
+const nettoyerHeure = (h: string) => h.split(" ")[0];
+
+const cacheMois = new Map<string, JourCalendrier[]>();
+
+/** Horaires de tout un mois grégorien (mois : 1-12). */
+export async function chargerCalendrierMois(
+  c: ConfigPriere,
+  annee: number,
+  mois: number
+): Promise<JourCalendrier[]> {
+  const cle = `${c.ville}|${c.pays}|${c.methode}|${annee}-${mois}`;
+  const enCache = cacheMois.get(cle);
+  if (enCache) return enCache;
+
+  const url = `https://api.aladhan.com/v1/calendarByCity?city=${encodeURIComponent(
+    c.ville
+  )}&country=${encodeURIComponent(c.pays)}&method=${c.methode}&month=${mois}&year=${annee}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("Calendrier indisponible");
+  const json = await res.json();
+  if (json.code !== 200 || !Array.isArray(json.data)) {
+    throw new Error("Ville introuvable");
+  }
+
+  const jours: JourCalendrier[] = (json.data as JourAladhan[]).map((j) => ({
+    jour: Number(j.date.gregorian.day),
+    fajr: nettoyerHeure(j.timings.Fajr),
+    lever: nettoyerHeure(j.timings.Sunrise),
+    dhuhr: nettoyerHeure(j.timings.Dhuhr),
+    asr: nettoyerHeure(j.timings.Asr),
+    maghrib: nettoyerHeure(j.timings.Maghrib),
+    isha: nettoyerHeure(j.timings.Isha),
+    hijri: `${Number(j.date.hijri.day)} ${j.date.hijri.month.en}`,
+  }));
+  cacheMois.set(cle, jours);
+  return jours;
 }
 
 /** Identifie la prochaine prière du jour ("fajr"… ; null si toutes passées). */
