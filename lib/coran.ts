@@ -51,6 +51,16 @@ const CLASSE_VERS_REGLE: Record<string, TajwidRuleId | undefined> = {
 /* ===== Parseur du balisage tajwid ===== */
 
 function parserTajweed(html: string): Segment[] {
+  // Signes de pause (ۖ ۗ ۚ…) : Quran.com les rattache au mot par un
+  // liant sans largeur (ZWNJ), si bien qu'ils s'empilent sur la voyelle
+  // de la dernière lettre (ex. la damma de وَٱلْحِجَارَةُ‌ۖ). On les pose
+  // sur une espace insécable : le signe retrouve sa place « après le
+  // mot », comme dans les mushafs imprimés, tout en restant dans le
+  // même mot (numérotation audio inchangée).
+  html = html
+    .replace(/\u200C(?=[\u06D6-\u06DC])/g, "\u00A0")
+    .replace(/([\u064B-\u0652\u0670])([\u06D6-\u06DC])/g, "$1\u00A0$2");
+
   const segments: Segment[] = [];
   const re =
     /<tajweed class="?([\w-]+)"?>([\s\S]*?)<\/tajweed>|<span class="?end"?>[\s\S]*?<\/span>|([^<]+)/g;
@@ -149,7 +159,9 @@ function segmentsEnMots(segments: Segment[]): Word[] {
   };
 
   for (const s of segments) {
-    const parties = s.t.split(/\s+/);
+    // Seules les espaces ordinaires séparent les mots : l'espace
+    // insécable (U+00A0) porte un signe de pause et reste dans le mot.
+    const parties = s.t.split(/ +/);
     parties.forEach((p, i) => {
       if (i > 0) fermerToken();
       if (p) courant.push({ t: p, r: s.r });
