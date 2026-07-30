@@ -2,7 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { chargerSourate, type SourateData, type Verse } from "@/lib/coran";
+import {
+  chargerPhonetique,
+  chargerSourate,
+  type SourateData,
+  type Verse,
+} from "@/lib/coran";
 import { SOURATES } from "@/data/sourates";
 import { sectionsJuz } from "@/data/juz";
 import { RULE_BY_ID, type TajwidRule } from "@/lib/tajwid";
@@ -29,10 +34,11 @@ interface Etape {
 const REPETITIONS = [1, 2, 3, 5, 7, 10];
 
 export default function Apprentissage() {
-  const { prefs } = usePrefs();
+  const { prefs, maj } = usePrefs();
   const [n, setN] = useState(1);
   const [data, setData] = useState<SourateData | null>(null);
   const [erreur, setErreur] = useState(false);
+  const [phonetiques, setPhonetiques] = useState<string[] | null>(null);
   const [section, setSection] = useState(0);
   const [mode, setMode] = useState<"versets" | "passage">("versets");
   const [reps, setReps] = useState(3);
@@ -74,6 +80,7 @@ export default function Apprentissage() {
     setData(null);
     setErreur(false);
     setSection(0);
+    setPhonetiques(null);
     setCoches(new Set());
     setVPassage(null);
     setMotDebut(null);
@@ -97,6 +104,20 @@ export default function Apprentissage() {
       audioRef.current?.pause();
     };
   }, []);
+
+  // Charger la phonétique quand l'option est activée
+  useEffect(() => {
+    if (!prefs.phonetique) return;
+    let annule = false;
+    chargerPhonetique(n)
+      .then((p) => {
+        if (!annule) setPhonetiques(p);
+      })
+      .catch(() => {});
+    return () => {
+      annule = true;
+    };
+  }, [n, prefs.phonetique]);
 
   // Nouvelle sélection de mots quand on change de verset cible
   useEffect(() => {
@@ -320,6 +341,29 @@ export default function Apprentissage() {
         ))}
       </div>
 
+      <button
+        onClick={() => maj({ phonetique: !prefs.phonetique })}
+        role="switch"
+        aria-checked={prefs.phonetique}
+        className="card mt-3 flex w-full items-center justify-between gap-3 rounded-2xl px-4 py-2.5 text-sm font-bold shadow-soft transition active:scale-[0.99]"
+        style={prefs.phonetique ? { borderColor: "var(--accent)" } : undefined}
+      >
+        <span>Phonétique (prononciation en lettres latines)</span>
+        <span
+          className="relative h-6 w-11 shrink-0 rounded-full transition"
+          style={{
+            backgroundColor: prefs.phonetique
+              ? "var(--accent)"
+              : "var(--border)",
+          }}
+        >
+          <span
+            className="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all"
+            style={{ left: prefs.phonetique ? "1.375rem" : "0.125rem" }}
+          />
+        </span>
+      </button>
+
       <p className="mt-3 text-center text-sm" style={{ color: "var(--muted)" }}>
         {mode === "versets"
           ? "Coche les versets à mémoriser : chacun sera répété avant de passer au suivant."
@@ -484,6 +528,16 @@ export default function Apprentissage() {
                     dir="rtl"
                   >
                     {texteArabe(v)}
+                  </p>
+                )}
+
+                {/* Phonétique (option) */}
+                {prefs.phonetique && phonetiques?.[v.n - 1] && (
+                  <p
+                    className={`mt-2 italic ${TAILLES[taille].trad}`}
+                    style={{ color: "var(--accent)" }}
+                  >
+                    {phonetiques[v.n - 1]}
                   </p>
                 )}
 

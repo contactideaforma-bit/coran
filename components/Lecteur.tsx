@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   BASMALA,
   chargerMotsFr,
+  chargerPhonetique,
   chargerSourate,
   motFr,
   type SourateData,
@@ -52,9 +53,10 @@ interface MotActif {
 }
 
 export default function Lecteur({ n }: { n: number }) {
-  const { prefs } = usePrefs();
+  const { prefs, maj } = usePrefs();
   const [data, setData] = useState<SourateData | null>(null);
   const [erreur, setErreur] = useState(false);
+  const [phonetiques, setPhonetiques] = useState<string[] | null>(null);
   const [section, setSection] = useState(0);
   const [marque, setMarque] = useState<MarquePage | null>(null);
   const [legendeOuverte, setLegendeOuverte] = useState(false);
@@ -95,6 +97,7 @@ export default function Lecteur({ n }: { n: number }) {
     setErreur(false);
     setMotActif(null);
     setSection(0);
+    setPhonetiques(null);
     setMarque(lireMarquePage());
     chargerSourate(n)
       .then((d) => {
@@ -131,6 +134,20 @@ export default function Lecteur({ n }: { n: number }) {
       audioRef.current?.pause();
     };
   }, []);
+
+  // Charger la phonétique quand l'option est activée
+  useEffect(() => {
+    if (!prefs.phonetique) return;
+    let annule = false;
+    chargerPhonetique(n)
+      .then((p) => {
+        if (!annule) setPhonetiques(p);
+      })
+      .catch(() => {});
+    return () => {
+      annule = true;
+    };
+  }, [n, prefs.phonetique]);
 
   // Fermer la bulle du mot quand on change de section (le mot n'est plus affiché)
   useEffect(() => {
@@ -364,6 +381,33 @@ export default function Lecteur({ n }: { n: number }) {
           </Link>
         )}
 
+        {data && (
+          <button
+            onClick={() => maj({ phonetique: !prefs.phonetique })}
+            role="switch"
+            aria-checked={prefs.phonetique}
+            className="card flex w-full items-center justify-between gap-3 rounded-2xl px-4 py-2.5 text-sm font-bold shadow-soft transition active:scale-[0.99]"
+            style={
+              prefs.phonetique ? { borderColor: "var(--accent)" } : undefined
+            }
+          >
+            <span>Phonétique (prononciation en lettres latines)</span>
+            <span
+              className="relative h-6 w-11 shrink-0 rounded-full transition"
+              style={{
+                backgroundColor: prefs.phonetique
+                  ? "var(--accent)"
+                  : "var(--border)",
+              }}
+            >
+              <span
+                className="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all"
+                style={{ left: prefs.phonetique ? "1.375rem" : "0.125rem" }}
+              />
+            </span>
+          </button>
+        )}
+
         {/* Pagination par juz' pour les longues sourates */}
         {sections.length > 1 && (
           <div className="flex gap-2 overflow-x-auto pb-1">
@@ -547,6 +591,16 @@ export default function Lecteur({ n }: { n: number }) {
                     </button>
                   ))}
                 </div>
+
+                {/* Phonétique (option) */}
+                {prefs.phonetique && phonetiques?.[v.n - 1] && (
+                  <p
+                    className={`mt-3 italic ${TAILLES[taille].trad}`}
+                    style={{ color: "var(--accent)" }}
+                  >
+                    {phonetiques[v.n - 1]}
+                  </p>
+                )}
 
                 {/* Traduction : toujours sur sa propre ligne */}
                 <p

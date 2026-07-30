@@ -216,6 +216,29 @@ export async function chargerSourate(n: number): Promise<SourateData> {
   return data;
 }
 
+/* ===== Phonétique (translittération latine, verset par verset) =====
+ * Ressource 57 de Quran.com. Chargée uniquement quand l'option
+ * « phonétique » est activée, puis gardée en cache. */
+
+const PHONETIQUE_ID = 57;
+const cachePhonetique = new Map<number, string[]>();
+
+/** Phonétique de chaque verset de la sourate `n` (index 0 = verset 1). */
+export async function chargerPhonetique(n: number): Promise<string[]> {
+  const enCache = cachePhonetique.get(n);
+  if (enCache) return enCache;
+  const res = await fetch(
+    `${API}/quran/translations/${PHONETIQUE_ID}?chapter_number=${n}`
+  );
+  if (!res.ok) throw new Error("Phonétique indisponible");
+  const json = await res.json();
+  const liste: string[] = (json.translations ?? []).map(
+    (t: { text?: string }) => nettoyerTraduction(t.text ?? "")
+  );
+  cachePhonetique.set(n, liste);
+  return liste;
+}
+
 export const BASMALA = "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ";
 
 /* ===== Traduction française mot à mot =====

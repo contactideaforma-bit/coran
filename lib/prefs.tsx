@@ -59,6 +59,7 @@ export interface Prefs {
   fond: string; // id dans FONDS
   accent: string; // id dans ACCENTS
   recitateur: string; // id dans RECITATEURS (dossier everyayah.com)
+  phonetique: boolean; // afficher la prononciation en lettres latines
 }
 
 const DEFAUTS: Prefs = {
@@ -68,6 +69,7 @@ const DEFAUTS: Prefs = {
   fond: "creme",
   accent: "or",
   recitateur: "Husary_128kbps",
+  phonetique: false,
 };
 
 const CLE = "coran-prefs";
