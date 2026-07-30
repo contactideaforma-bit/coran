@@ -18,6 +18,7 @@ import {
   LivreOuvert,
   Manette,
   MarquePageIcone,
+  Repeter,
 } from "@/components/Icones";
 
 const MODULES = [
@@ -26,6 +27,12 @@ const MODULES = [
     icone: LivreOuvert,
     nom: "Coran",
     description: "Lire avec le tajwid en couleur, écouter mot à mot",
+  },
+  {
+    href: "/apprentissage",
+    icone: Repeter,
+    nom: "Apprentissage",
+    description: "Mémoriser en répétant : versets entiers ou mot à mot",
   },
   {
     href: "/nourania",

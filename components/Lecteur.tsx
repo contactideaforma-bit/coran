@@ -29,6 +29,7 @@ import {
   LivreOuvert,
   MarquePageIcone,
   Pause,
+  Repeter,
 } from "@/components/Icones";
 
 type Lecture =
@@ -350,6 +351,17 @@ export default function Lecteur({ n }: { n: number }) {
               </>
             )}
           </button>
+        )}
+
+        {data && (
+          <Link
+            href={`/apprentissage?s=${n}`}
+            className="card flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-bold shadow-soft transition hover:scale-[1.01] active:scale-[0.99]"
+            style={{ color: "var(--accent)" }}
+          >
+            <Repeter taille={15} /> Mode apprentissage : répéter des versets ou
+            des mots
+          </Link>
         )}
 
         {/* Pagination par juz' pour les longues sourates */}
