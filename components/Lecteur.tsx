@@ -61,6 +61,7 @@ export default function Lecteur({ n }: { n: number }) {
   const [marque, setMarque] = useState<MarquePage | null>(null);
   const [legendeOuverte, setLegendeOuverte] = useState(false);
   const [regleActive, setRegleActive] = useState<TajwidRule | null>(null);
+  const [bulleReglesVisible, setBulleReglesVisible] = useState(true);
   const [lecture, setLecture] = useState<Lecture>(null);
   const [motActif, setMotActif] = useState<MotActif | null>(null);
   const [motsFrPrets, setMotsFrPrets] = useState(false);
@@ -153,6 +154,23 @@ export default function Lecteur({ n }: { n: number }) {
   useEffect(() => {
     setMotActif(null);
   }, [section]);
+
+  // Le bouton flottant « Règles » recouvre la traduction du verset qui passe
+  // dessous : on l'escamote pendant la descente et on le ramène dès que
+  // l'utilisateur remonte (ou arrive en bas de page).
+  useEffect(() => {
+    let dernier = window.scrollY;
+    const surDefilement = () => {
+      const y = window.scrollY;
+      if (Math.abs(y - dernier) < 10) return;
+      const enBas =
+        y + window.innerHeight >= document.body.scrollHeight - 120;
+      setBulleReglesVisible(y < dernier || y < 80 || enBas);
+      dernier = y;
+    };
+    window.addEventListener("scroll", surDefilement, { passive: true });
+    return () => window.removeEventListener("scroll", surDefilement);
+  }, []);
 
   // Fermer la bulle en touchant n'importe où en dehors d'elle.
   // (Toucher un autre mot ferme puis rouvre la bulle sur ce mot :
@@ -665,8 +683,17 @@ export default function Lecteur({ n }: { n: number }) {
       {/* ===== Bouton flottant légende ===== */}
       <button
         onClick={() => setLegendeOuverte(true)}
-        className="fixed bottom-6 right-6 z-30 flex items-center gap-2 rounded-full px-5 py-3 font-bold text-white shadow-lg transition hover:scale-105 active:scale-95"
-        style={{ backgroundColor: "var(--accent)" }}
+        aria-hidden={!bulleReglesVisible}
+        className="fixed right-6 z-30 flex items-center gap-2 rounded-full px-5 py-3 font-bold text-white shadow-lg transition-all duration-300 hover:scale-105 active:scale-95"
+        style={{
+          backgroundColor: "var(--accent)",
+          bottom: "calc(1.5rem + env(safe-area-inset-bottom))",
+          opacity: bulleReglesVisible ? 1 : 0,
+          transform: bulleReglesVisible
+            ? "translateY(0)"
+            : "translateY(150%)",
+          pointerEvents: bulleReglesVisible ? "auto" : "none",
+        }}
       >
         <Goutte taille={18} className="text-white" /> Règles
       </button>

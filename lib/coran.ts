@@ -77,49 +77,101 @@ function parserTajweed(html: string): Segment[] {
   return segments;
 }
 
-/* ===== Liaison des lettres entre segments colorés =====
- * Chaque mot est découpé en <span> de couleurs différentes. La plupart
- * des navigateurs relient les lettres arabes à travers ces frontières,
- * mais certains (vieux WebView Android, navigateurs alternatifs) les
- * affichent détachées. On insère donc un liant invisible (ZWJ, U+200D)
- * de part et d'autre de chaque frontière quand les lettres doivent se
- * lier : chaque morceau prend alors sa forme liée même s'il est mis en
- * forme séparément.
+/* ===== Recollage des signes et liaison des lettres =====
  *
- * ATTENTION : le balisage de Quran.com coupe souvent AU MILIEU d'un
- * groupe lettre + signes (ex. « ل + َّمْ » : le segment suivant commence
- * par la shadda). Insérer un ZWJ à une telle frontière l'intercale
- * entre la lettre et sa voyelle : le signe se détache de sa lettre
- * porteuse (voyelle décalée ou illisible, chevauchements — visibles
- * par ex. sur لَّمْ, تَفْعَلُوا, ٱلنَّارَ et لِلْكَـٰفِرِينَ en 2:24).
- * On ne lie donc que si les deux caractères immédiatement au bord de
- * la frontière sont de vraies lettres — jamais des signes. */
+ * Le balisage tajwid de Quran.com ne coupe PAS aux frontières de lettres :
+ * il coupe au milieu des groupes « lettre + signes ». Exemples réels :
+ *   50:21   س<tajweed>َا</tajweed>ٓئِ…   le segment coloré COMMENCE par la fatha
+ *   50:21   …<tajweed>د</tajweed>ٌ       le tanwin est SEUL dans son segment
+ *   2:24    <tajweed>ل</tajweed>َّمْ     la shadda est dans le segment suivant
+ *
+ * Chaque segment devenant un <span> de couleur différente, un signe placé
+ * en tête de segment se retrouve dans une autre boîte que sa lettre
+ * porteuse : il s'affiche détaché, décalé, ou flottant tout seul.
+ *
+ * Correction en deux temps :
+ *   1) recollerSignes : tout signe en tête de segment repart sur la lettre
+ *      qui le porte, dans le segment précédent. Un segment ne commence donc
+ *      plus jamais par un signe, et les segments réduits à un signe seul
+ *      disparaissent. La couleur suit la lettre, comme dans les mushafs.
+ *   2) lierSegments : les frontières restantes tombent alors entre deux
+ *      vraies lettres. On y pose un liant invisible (ZWJ, U+200D) de part
+ *      et d'autre, car beaucoup de navigateurs (Safari iOS en tête) ne
+ *      relient pas les lettres arabes à travers une frontière d'élément :
+ *      sans lui, نَفْ|سٍ s'affiche « نَفْ سٍ », le mot coupé en deux.
+ *
+ * L'ordre compte : lier AVANT de recoller remettrait un ZWJ entre une
+ * lettre et sa voyelle — c'est le défaut d'affichage corrigé ici. */
 
 const ZWJ = "‍";
 
-// Signes (harakât, petits signes coraniques…) : ne portent jamais de
-// liant, ils doivent rester collés à leur lettre porteuse.
-const MARQUE =
-  /[\u064B-\u065F\u0670\u06D6-\u06DC\u06DF-\u06E4\u06E7-\u06ED\u08D3-\u08FF]/;
+/** Signes indissociables de leur lettre porteuse : harakât, shadda,
+ *  soukoun, alif suscrit, petits signes coraniques.
+ *  Volontairement EXCLUS : les signes de pause ۖ ۗ ۘ ۙ ۚ ۛ (U+06D6-06DC),
+ *  le ۝ (U+06DD), le ۞ (U+06DE) et le ۩ (U+06E9) — ce sont des symboles
+ *  autonomes posés après le mot, pas des marques de voyelle. */
+const SIGNE_COLLE =
+  /[\u064B-\u065F\u0670\u06DF-\u06E8\u06EA-\u06ED\u08D3-\u08FF]/;
+
+/** Signes de pause : posés après le mot, jamais collés à la lettre. */
+const SIGNE_PAUSE = /[\u06D6-\u06DC]/;
+
+/** Vraies lettres arabes — à l'exclusion des chiffres, des signes de pause
+ *  et des symboles ۝ ۞ ۩ qui vivent dans le même bloc Unicode. */
+const LETTRE =
+  /[\u0621-\u064A\u066E\u066F\u0671-\u06D3\u06D5\u06EE\u06EF\u06FA-\u06FF]/;
 
 // Lettres qui ne se lient jamais à la lettre suivante (à leur gauche).
 const SANS_LIAISON_GAUCHE = new Set([
   "ا", "أ", "إ", "آ", "ٱ", "د", "ذ", "ر", "ز", "و", "ؤ", "ة", "ء",
 ]);
 
-const estLettreArabe = (c: string) => c >= "ء" && c <= "ۿ";
+/** Dernier caractère porteur d'un texte : on remonte par-dessus les signes,
+ *  transparents pour la liaison arabe. */
+const derniereLettre = (t: string) => {
+  for (let i = t.length - 1; i >= 0; i--) {
+    if (!SIGNE_COLLE.test(t[i])) return t[i];
+  }
+  return "";
+};
+
+/** Ramène sur leur lettre porteuse les signes orphelins en tête de segment. */
+function recollerSignes(segments: Segment[]): Segment[] {
+  const sortie: Segment[] = [];
+  for (const s of segments) {
+    let t = s.t;
+    const prec = sortie[sortie.length - 1];
+    if (prec) {
+      const fin = prec.t[prec.t.length - 1] ?? "";
+      // On ne recolle jamais par-dessus une espace ni par-dessus un signe
+      // de pause : ceux-là clôturent déjà le groupe.
+      if (!/[\s\u00A0]/.test(fin) && !SIGNE_PAUSE.test(fin)) {
+        let i = 0;
+        while (i < t.length && SIGNE_COLLE.test(t[i])) i++;
+        if (i > 0) {
+          prec.t += t.slice(0, i);
+          t = t.slice(i);
+        }
+      }
+      // Un signe de pause en tête de segment garde son espace insécable,
+      // sinon il s'empile sur la voyelle de la lettre précédente.
+      if (t && SIGNE_PAUSE.test(t[0]) && !/[\s\u00A0]/.test(prec.t.slice(-1))) {
+        t = "\u00A0" + t;
+      }
+    }
+    if (t) sortie.push({ t, r: s.r });
+  }
+  return sortie;
+}
 
 /** La frontière entre ces deux textes doit-elle recevoir un liant ?
- *  Uniquement si les caractères de part et d'autre de la frontière
- *  sont des lettres qui se lient (jamais un signe au bord). */
+ *  Uniquement entre deux vraies lettres qui se lient. */
 const doitLier = (avant: string, apres: string) => {
-  const a = avant[avant.length - 1] ?? "";
+  const a = derniereLettre(avant);
   const b = apres[0] ?? "";
   return (
-    estLettreArabe(a) &&
-    estLettreArabe(b) &&
-    !MARQUE.test(a) &&
-    !MARQUE.test(b) &&
+    LETTRE.test(a) &&
+    LETTRE.test(b) &&
     !SANS_LIAISON_GAUCHE.has(a) &&
     b !== "ء"
   );
@@ -136,31 +188,23 @@ function lierSegments(segments: Segment[]): Segment[] {
   });
 }
 
-/** Signes seuls (pauses ۖ ۗ ۚ, hizb ۞, sajda ۩) : affichés avec le mot
- *  précédent chez Quran.com, ils comptent néanmoins dans la numérotation
- *  des fichiers audio mot à mot. */
-const SIGNE_SEUL = /^[ۖ-۞۩]+$/;
+/** Prépare un mot pour l'affichage : signes recollés, puis lettres liées. */
+const finaliserMot = (segments: Segment[]): Segment[] =>
+  lierSegments(recollerSignes(segments));
 
 /** Découpe les segments en mots (les espaces marquent les frontières,
  *  y compris à l'intérieur d'un segment coloré, ex. ikhfa entre deux mots). */
 function segmentsEnMots(segments: Segment[]): Word[] {
-  const mots: Word[] = [];
+  // 1) Découpage en tokens. Seules les espaces ORDINAIRES séparent les
+  //    mots : l'espace insécable (U+00A0) porte un signe de pause et
+  //    reste dans le mot.
+  const tokens: Segment[][] = [];
   let courant: Segment[] = [];
-  let numToken = 0;
-
   const fermerToken = () => {
-    if (!courant.length) return;
-    numToken += 1;
-    const texte = courant.map((s) => s.t).join("");
-    if (!SIGNE_SEUL.test(texte)) {
-      mots.push({ segments: lierSegments(courant), audio: numToken });
-    }
+    if (courant.length) tokens.push(courant);
     courant = [];
   };
-
   for (const s of segments) {
-    // Seules les espaces ordinaires séparent les mots : l'espace
-    // insécable (U+00A0) porte un signe de pause et reste dans le mot.
     const parties = s.t.split(/ +/);
     parties.forEach((p, i) => {
       if (i > 0) fermerToken();
@@ -168,7 +212,30 @@ function segmentsEnMots(segments: Segment[]): Word[] {
     });
   }
   fermerToken();
-  return mots;
+
+  // 2) Les symboles autonomes isolés par une espace (۞ en début de verset,
+  //    ۩ en fin) ne sont PAS des mots pour Quran.com : le mot 1 de 2:60 est
+  //    « ۞ وَإِذِ » et le dernier mot de 7:206 est « يَسْجُدُونَ ۩ ». Les compter
+  //    décalerait d'un cran tous les audios mot à mot du verset. On les
+  //    rattache donc au mot voisin, comme le fait le mushaf.
+  const mots: Segment[][] = [];
+  let prefixe: Segment[] = [];
+  for (const tok of tokens) {
+    const texte = tok.map((s) => s.t).join("");
+    if (!LETTRE.test(texte)) {
+      if (mots.length) mots[mots.length - 1].push({ t: "\u00A0" }, ...tok);
+      else prefixe.push(...tok, { t: "\u00A0" });
+      continue;
+    }
+    mots.push([...prefixe, ...tok]);
+    prefixe = [];
+  }
+  if (prefixe.length) mots.push(prefixe);
+
+  return mots.map((segs, i) => ({
+    segments: finaliserMot(segs),
+    audio: i + 1,
+  }));
 }
 
 /** Retire les balises HTML de la traduction, y compris les appels de notes
