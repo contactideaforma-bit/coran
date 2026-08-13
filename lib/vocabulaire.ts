@@ -181,15 +181,6 @@ export function statsGlobales(progression: Progression): StatsGlobales {
   };
 }
 
-/** Un pack est ouvert si le précédent est mémorisé à moitié au moins. */
-export function packOuvert(pack: PackVocabulaire, progression: Progression): boolean {
-  if (pack.ordre <= 1) return true;
-  const precedent = PACKS.find((p) => p.ordre === pack.ordre - 1);
-  if (!precedent) return true;
-  const s = statsPack(precedent, progression);
-  return s.memorises >= Math.ceil(s.total / 2);
-}
-
 /* ====================================================== Choix des mots ==== */
 
 function melanger<T>(liste: T[]): T[] {

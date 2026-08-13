@@ -5,13 +5,12 @@ import { useEffect, useState } from "react";
 import { PACKS } from "@/data/vocabulaire";
 import {
   lireProgression,
-  packOuvert,
   statsGlobales,
   statsPack,
   type Progression,
 } from "@/lib/vocabulaire";
 import Entete from "@/components/Entete";
-import { Cadenas, Cube, Etincelles, Repeter, Trophee, Verifie } from "@/components/Icones";
+import { Cube, Etincelles, Repeter, Trophee, Verifie } from "@/components/Icones";
 
 export default function Vocabulaire() {
   const [progression, setProgression] = useState<Progression | null>(null);
@@ -94,20 +93,17 @@ export default function Vocabulaire() {
       <main className="mt-6 grid gap-3">
         {PACKS.map((pack) => {
           const s = statsPack(pack, p);
-          const ouvert = packOuvert(pack, p);
           const fini = s.memorises === s.total;
           const pourcent = (s.memorises / s.total) * 100;
 
-          const contenu = (
-            <>
+          return (
+            <Link
+              key={pack.id}
+              href={`/vocabulaire/${pack.id}`}
+              className="card flex items-center gap-4 rounded-2xl p-5 shadow-soft transition hover:scale-[1.01] active:scale-[0.99]"
+            >
               <span className="tuile-icone shrink-0">
-                {fini ? (
-                  <Verifie taille={22} />
-                ) : ouvert ? (
-                  <Cube taille={22} />
-                ) : (
-                  <Cadenas taille={22} />
-                )}
+                {fini ? <Verifie taille={22} /> : <Cube taille={22} />}
               </span>
 
               <span className="min-w-0 flex-1">
@@ -119,55 +115,34 @@ export default function Vocabulaire() {
                 </span>
 
                 <span className="mt-0.5 block text-sm" style={{ color: "var(--muted)" }}>
-                  {ouvert ? pack.description : "Termine la moitié du pack précédent pour ouvrir celui-ci"}
+                  {pack.description}
                 </span>
 
-                {ouvert && (
-                  <>
-                    <span
-                      className="mt-2 block h-1.5 w-full overflow-hidden rounded-full"
-                      style={{ background: "var(--border)" }}
-                    >
-                      <span
-                        className="block h-full rounded-full transition-all"
-                        style={{ width: `${pourcent}%`, background: "var(--accent)" }}
-                      />
-                    </span>
+                <span
+                  className="mt-2 block h-1.5 w-full overflow-hidden rounded-full"
+                  style={{ background: "var(--border)" }}
+                >
+                  <span
+                    className="block h-full rounded-full transition-all"
+                    style={{ width: `${pourcent}%`, background: "var(--accent)" }}
+                  />
+                </span>
 
-                    <span
-                      className="mt-1.5 flex flex-wrap items-center gap-x-3 text-xs"
-                      style={{ color: "var(--muted)" }}
-                    >
-                      <span>
-                        {s.memorises}/{s.total} mémorisés
-                      </span>
-                      {s.dus > 0 && (
-                        <span style={{ color: "var(--accent)" }}>{s.dus} à revoir</span>
-                      )}
-                    </span>
-                  </>
-                )}
+                <span
+                  className="mt-1.5 flex flex-wrap items-center gap-x-3 text-xs"
+                  style={{ color: "var(--muted)" }}
+                >
+                  <span>
+                    {s.memorises}/{s.total} mémorisés
+                  </span>
+                  {s.dus > 0 && (
+                    <span style={{ color: "var(--accent)" }}>{s.dus} à revoir</span>
+                  )}
+                </span>
               </span>
 
-              {ouvert && <span style={{ color: "var(--accent)" }}>→</span>}
-            </>
-          );
-
-          return ouvert ? (
-            <Link
-              key={pack.id}
-              href={`/vocabulaire/${pack.id}`}
-              className="card flex items-center gap-4 rounded-2xl p-5 shadow-soft transition hover:scale-[1.01] active:scale-[0.99]"
-            >
-              {contenu}
+              <span style={{ color: "var(--accent)" }}>→</span>
             </Link>
-          ) : (
-            <div
-              key={pack.id}
-              className="card flex items-center gap-4 rounded-2xl p-5 opacity-55"
-            >
-              {contenu}
-            </div>
           );
         })}
       </main>
