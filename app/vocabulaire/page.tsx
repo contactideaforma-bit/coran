@@ -9,10 +9,12 @@ import {
   statsPack,
   type Progression,
 } from "@/lib/vocabulaire";
+import { usePrefs } from "@/lib/prefs";
 import Entete from "@/components/Entete";
 import { Cube, Etincelles, Repeter, Trophee, Verifie } from "@/components/Icones";
 
 export default function Vocabulaire() {
+  const { prefs, maj } = usePrefs();
   const [progression, setProgression] = useState<Progression | null>(null);
 
   useEffect(() => {
@@ -88,6 +90,33 @@ export default function Vocabulaire() {
           <span style={{ color: "var(--accent)" }}>→</span>
         </Link>
       )}
+
+      {/* Phonétique — même réglage que dans le lecteur */}
+      <button
+        onClick={() => maj({ phonetique: !prefs.phonetique })}
+        role="switch"
+        aria-checked={prefs.phonetique}
+        className="card mt-4 flex w-full items-center justify-between gap-3 rounded-2xl px-4 py-2.5 text-sm font-bold shadow-soft transition active:scale-[0.99]"
+        style={prefs.phonetique ? { borderColor: "var(--accent)" } : undefined}
+      >
+        <span className="text-left">
+          Phonétique dans les exercices
+          <span className="mt-0.5 block text-xs font-normal" style={{ color: "var(--muted)" }}>
+            Utile tant que la lecture de l'arabe n'est pas acquise
+          </span>
+        </span>
+        <span
+          className="relative h-6 w-11 shrink-0 rounded-full transition"
+          style={{
+            backgroundColor: prefs.phonetique ? "var(--accent)" : "var(--border)",
+          }}
+        >
+          <span
+            className="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all"
+            style={{ left: prefs.phonetique ? "1.375rem" : "0.125rem" }}
+          />
+        </span>
+      </button>
 
       {/* Packs */}
       <main className="mt-6 grid gap-3">

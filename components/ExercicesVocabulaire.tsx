@@ -12,6 +12,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Mot } from "@/data/vocabulaire";
 import { leurres, trouverMotDansVerset } from "@/lib/vocabulaire";
 import { chargerSourate } from "@/lib/coran";
+import { usePrefs } from "@/lib/prefs";
 import { SOURATES } from "@/data/sourates";
 import { Alerte, HautParleur, Verifie } from "@/components/Icones";
 
@@ -92,6 +93,12 @@ function Correction({
   );
 }
 
+/** Une option de QCM : la valeur comparée, et sa phonétique éventuelle. */
+interface Option {
+  valeur: string;
+  sous?: string;
+}
+
 function Choix({
   options,
   bonne,
@@ -99,7 +106,7 @@ function Choix({
   choisi,
   onChoisir,
 }: {
-  options: string[];
+  options: Option[];
   bonne: string;
   arabe?: boolean;
   choisi: string | null;
@@ -109,8 +116,8 @@ function Choix({
     <div className="mt-6 grid gap-2.5">
       {options.map((option) => {
         const actif = choisi !== null;
-        const estBonne = option === bonne;
-        const estChoisie = option === choisi;
+        const estBonne = option.valeur === bonne;
+        const estChoisie = option.valeur === choisi;
 
         let style: React.CSSProperties = { borderColor: "var(--border)" };
         if (actif && estBonne) {
@@ -121,15 +128,29 @@ function Choix({
 
         return (
           <button
-            key={option}
+            key={option.valeur}
             disabled={actif}
-            onClick={() => onChoisir(option)}
+            onClick={() => onChoisir(option.valeur)}
             style={style}
-            className={`card rounded-2xl border-2 px-4 py-3.5 text-left transition active:scale-[0.98] disabled:cursor-default ${
-              arabe ? "arabic font-amiri text-2xl text-right" : "font-bold"
+            className={`card rounded-2xl border-2 px-4 py-3.5 transition active:scale-[0.98] disabled:cursor-default ${
+              arabe ? "text-right" : "text-left"
             }`}
           >
-            {option}
+            <span
+              className={
+                arabe ? "arabic font-amiri block text-2xl" : "block font-bold"
+              }
+            >
+              {option.valeur}
+            </span>
+            {option.sous && (
+              <span
+                className="mt-0.5 block text-xs italic"
+                style={{ color: "var(--muted)" }}
+              >
+                {option.sous}
+              </span>
+            )}
           </button>
         );
       })}
@@ -207,8 +228,9 @@ function QcmArFr({
   onReponse: (juste: boolean) => void;
   audio?: boolean;
 }) {
+  const { prefs } = usePrefs();
   const options = useMemo(
-    () => melanger([mot.sens, ...leurres(mot).map((m) => m.sens)]),
+    () => melanger([mot.sens, ...leurres(mot).map((m) => m.sens)]).map((sens) => ({ valeur: sens })),
     [mot]
   );
   const [choisi, setChoisi] = useState<string | null>(null);
@@ -233,12 +255,21 @@ function QcmArFr({
           <HautParleur taille={40} />
         </button>
       ) : (
-        <p
-          className="arabic font-amiri mt-6 text-center text-6xl"
-          style={{ color: "var(--accent)" }}
-        >
-          {mot.arabe}
-        </p>
+        <>
+          <p
+            className="arabic font-amiri mt-6 text-center text-6xl"
+            style={{ color: "var(--accent)" }}
+          >
+            {mot.arabe}
+          </p>
+          {/* La phonétique n'est jamais montrée dans l'exercice d'écoute :
+              elle y donnerait la réponse. */}
+          {prefs.phonetique && (
+            <p className="mt-2 text-center text-lg italic" style={{ color: "var(--muted)" }}>
+              {mot.translit}
+            </p>
+          )}
+        </>
       )}
 
       <Choix
@@ -262,9 +293,14 @@ function QcmArFr({
 /* ========================================================= QCM fr → arabe = */
 
 function QcmFrAr({ mot, onReponse }: { mot: Mot; onReponse: (juste: boolean) => void }) {
+  const { prefs } = usePrefs();
   const options = useMemo(
-    () => melanger([mot.arabe, ...leurres(mot).map((m) => m.arabe)]),
-    [mot]
+    () =>
+      melanger([mot, ...leurres(mot)]).map((m) => ({
+        valeur: m.arabe,
+        sous: prefs.phonetique ? m.translit : undefined,
+      })),
+    [mot, prefs.phonetique]
   );
   const [choisi, setChoisi] = useState<string | null>(null);
 
@@ -418,6 +454,7 @@ export function Appariement({
   mots: Mot[];
   onTermine: (justes: string[], rates: string[]) => void;
 }) {
+  const { prefs } = usePrefs();
   const gauche = useMemo(() => melanger(mots), [mots]);
   const droite = useMemo(() => melanger(mots), [mots]);
 
@@ -472,9 +509,17 @@ export function Appariement({
                   borderColor: selection === m.id ? "var(--accent)" : "var(--border)",
                   opacity: fait ? 0.35 : 1,
                 }}
-                className="arabic font-amiri card rounded-2xl border-2 px-3 py-3 text-2xl transition active:scale-[0.98]"
+                className="card rounded-2xl border-2 px-3 py-3 transition active:scale-[0.98]"
               >
-                {m.arabe}
+                <span className="arabic font-amiri block text-2xl">{m.arabe}</span>
+                {prefs.phonetique && (
+                  <span
+                    className="mt-0.5 block text-xs italic"
+                    style={{ color: "var(--muted)" }}
+                  >
+                    {m.translit}
+                  </span>
+                )}
               </button>
             );
           })}
