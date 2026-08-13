@@ -60,6 +60,7 @@ export interface Prefs {
   accent: string; // id dans ACCENTS
   recitateur: string; // id dans RECITATEURS (dossier everyayah.com)
   phonetique: boolean; // afficher la prononciation en lettres latines
+  vocabulaire: boolean; // souligner les mots déjà mémorisés
 }
 
 const DEFAUTS: Prefs = {
@@ -70,6 +71,7 @@ const DEFAUTS: Prefs = {
   accent: "or",
   recitateur: "Husary_128kbps",
   phonetique: false,
+  vocabulaire: true,
 };
 
 const CLE = "coran-prefs";

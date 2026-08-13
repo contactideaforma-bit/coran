@@ -21,6 +21,13 @@ import {
 import { TAJWID_RULES, RULE_BY_ID, type TajwidRule } from "@/lib/tajwid";
 import { urlMot, urlVerset } from "@/lib/audio";
 import { RECITATEURS, TAILLES, usePrefs } from "@/lib/prefs";
+import {
+  indexMemorises,
+  lireProgression,
+  reconnaitre,
+  type IndexVocabulaire,
+} from "@/lib/vocabulaire";
+import { packDuMot } from "@/data/vocabulaire";
 import Entete from "@/components/Entete";
 import {
   Alerte,
@@ -31,7 +38,13 @@ import {
   MarquePageIcone,
   Pause,
   Repeter,
+  Verifie,
 } from "@/components/Icones";
+
+/** Texte brut d'un mot, segments de tajwid recollés. */
+function formeDuMot(word: Word): string {
+  return word.segments.map((s) => s.t).join("");
+}
 
 type Lecture =
   | { type: "mot"; v: number; w: number }
@@ -65,10 +78,16 @@ export default function Lecteur({ n }: { n: number }) {
   const [lecture, setLecture] = useState<Lecture>(null);
   const [motActif, setMotActif] = useState<MotActif | null>(null);
   const [motsFrPrets, setMotsFrPrets] = useState(false);
+  const [vocab, setVocab] = useState<IndexVocabulaire | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const dataRef = useRef<SourateData | null>(null);
   const conteneurRef = useRef<HTMLDivElement | null>(null);
   const bulleRef = useRef<HTMLDivElement | null>(null);
+
+  // Mots de vocabulaire déjà mémorisés, pour les signaler dans le texte
+  useEffect(() => {
+    setVocab(indexMemorises(lireProgression()));
+  }, []);
 
   // Précharger les traductions mot à mot françaises (en arrière-plan)
   useEffect(() => {
@@ -426,6 +445,33 @@ export default function Lecteur({ n }: { n: number }) {
           </button>
         )}
 
+        {data && (
+          <button
+            onClick={() => maj({ vocabulaire: !prefs.vocabulaire })}
+            role="switch"
+            aria-checked={prefs.vocabulaire}
+            className="card mt-2 flex w-full items-center justify-between gap-3 rounded-2xl px-4 py-2.5 text-sm font-bold shadow-soft transition active:scale-[0.99]"
+            style={
+              prefs.vocabulaire ? { borderColor: "var(--accent)" } : undefined
+            }
+          >
+            <span>Souligner les mots que j'ai mémorisés</span>
+            <span
+              className="relative h-6 w-11 shrink-0 rounded-full transition"
+              style={{
+                backgroundColor: prefs.vocabulaire
+                  ? "var(--accent)"
+                  : "var(--border)",
+              }}
+            >
+              <span
+                className="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all"
+                style={{ left: prefs.vocabulaire ? "1.375rem" : "0.125rem" }}
+              />
+            </span>
+          </button>
+        )}
+
         {/* Pagination par juz' pour les longues sourates */}
         {sections.length > 1 && (
           <div className="flex gap-2 overflow-x-auto pb-1">
@@ -582,7 +628,12 @@ export default function Lecteur({ n }: { n: number }) {
                   className={`arabic verset-mots ${police} ${TAILLES[taille].arabe}`}
                   dir="rtl"
                 >
-                  {v.words.map((word, wi) => (
+                  {v.words.map((word, wi) => {
+                    const connu = prefs.vocabulaire
+                      ? reconnaitre(formeDuMot(word), vocab)
+                      : null;
+
+                    return (
                     <button
                       key={wi}
                       onClick={(e) => clicMot(v.n, wi, word, e)}
@@ -591,8 +642,11 @@ export default function Lecteur({ n }: { n: number }) {
                         backgroundColor: motEnLecture(v.n, wi)
                           ? "color-mix(in srgb, var(--accent) 25%, transparent)"
                           : undefined,
+                        borderBottom: connu
+                          ? "2px dotted color-mix(in srgb, var(--accent) 60%, transparent)"
+                          : undefined,
                       }}
-                      title="Écouter ce mot"
+                      title={connu ? `${connu.sens} — mot mémorisé` : "Écouter ce mot"}
                     >
                       {word.segments.map((s, si) =>
                         s.r ? (
@@ -607,7 +661,8 @@ export default function Lecteur({ n }: { n: number }) {
                         )
                       )}
                     </button>
-                  ))}
+                    );
+                  })}
                 </div>
 
                 {/* Phonétique (option) */}
@@ -773,6 +828,41 @@ export default function Lecteur({ n }: { n: number }) {
                 ✕
               </button>
             </div>
+
+            {/* Mot déjà mémorisé dans l'onglet vocabulaire */}
+            {prefs.vocabulaire &&
+              (() => {
+                const connu = reconnaitre(formeDuMot(motActif.word), vocab);
+                if (!connu) return null;
+                const pack = packDuMot(connu.id);
+                return (
+                  <div
+                    className="mt-2 flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-xs"
+                    style={{
+                      background:
+                        "color-mix(in srgb, var(--accent) 12%, transparent)",
+                    }}
+                  >
+                    <span style={{ color: "var(--accent)" }}>
+                      <Verifie taille={13} />
+                    </span>
+                    <span className="font-bold" style={{ color: "var(--accent)" }}>
+                      {connu.sens}
+                    </span>
+                    <span style={{ color: "var(--muted)" }}>· mot mémorisé</span>
+                    {pack && (
+                      <Link
+                        href={`/vocabulaire/${pack.id}`}
+                        className="ml-auto shrink-0 font-bold underline"
+                        style={{ color: "var(--accent)" }}
+                      >
+                        réviser
+                      </Link>
+                    )}
+                  </div>
+                );
+              })()}
+
             <div className="mt-2 flex flex-wrap items-center gap-1.5">
               {dataRef.current?.verses.find((x) => x.n === motActif.v)?.words[
                 motActif.w + 1

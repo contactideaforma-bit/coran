@@ -257,12 +257,19 @@ export function leurres(mot: Mot, nombre = 3): Mot[] {
 
 /* ================================================== Recherche dans un verset */
 
-const DIACRITIQUES = /[ً-ْٰـۖ-ۭ]/g;
+const DIACRITIQUES = /[ً-ْـۖ-ۭ]/g;
 
-/** Squelette comparable d'un mot arabe : sans voyelles, hamzas fusionnées. */
+/**
+ * Squelette comparable d'un mot arabe : sans voyelles, hamzas fusionnées.
+ *
+ * L'alif suscrit (ٰ) du mushaf est d'abord ramené à un alif ordinaire : sans
+ * cela « ٱلْكِتَٰبَ » se réduirait à كتب et serait pris pour le verbe « écrire »
+ * au lieu du nom « Livre ».
+ */
 export function cleArabe(texte: string): string {
   return texte
     .replace(/\s/g, "")
+    .replace(/ٰ/g, "ا")
     .replace(DIACRITIQUES, "")
     .replace(/[أإآٱاءؤئ]/g, "ء")
     .replace(/ى/g, "ي")
@@ -283,4 +290,115 @@ export function trouverMotDansVerset(mot: Mot, motsDuVerset: string[]): number |
     if (candidat.includes(cible)) return i;
   }
   return null;
+}
+
+/* ============================================ Reconnaissance à la lecture = */
+
+/**
+ * Index des mots déjà mémorisés, pour les signaler dans le lecteur.
+ * Construit une fois par page ; `reconnaitre` garde en mémoire le résultat
+ * de chaque forme rencontrée, car les mêmes reviennent sans cesse.
+ */
+export interface IndexVocabulaire {
+  /** Clé normalisée → mot mémorisé. */
+  parCle: Map<string, Mot>;
+  /** Clés d'au moins 4 lettres, pour la recherche par inclusion. */
+  longues: [string, Mot][];
+  /** Mémoïsation forme rencontrée → mot reconnu (ou absence). */
+  cache: Map<string, Mot | null>;
+}
+
+const PREFIXES = ["و", "ف", "ب", "ك", "ل", "س"];
+const SUFFIXES = ["هما", "كما", "ها", "هم", "هن", "كم", "كن", "نا", "ه", "ك", "ي"];
+
+export function indexMemorises(progression: Progression): IndexVocabulaire {
+  const parCle = new Map<string, Mot>();
+
+  for (const mot of TOUS_LES_MOTS) {
+    if (!estMemorise(etat(progression, mot.id))) continue;
+    const k = cleArabe(mot.arabe);
+    if (k.length < 2) continue;
+    if (!parCle.has(k)) parCle.set(k, mot);
+    // On indexe aussi la forme sans article : الحمد → حمد.
+    const sansArticle = k.replace(/^ءل/, "");
+    if (sansArticle.length >= 2 && !parCle.has(sansArticle)) {
+      parCle.set(sansArticle, mot);
+    }
+  }
+
+  const longues = Array.from(parCle.entries())
+    .filter((entree) => entree[0].length >= 4)
+    .sort((a, b) => b[0].length - a[0].length);
+
+  return { parCle, longues, cache: new Map() };
+}
+
+/** Toutes les formes possibles d'un mot une fois ses affixes retirés. */
+function variantes(k: string): string[] {
+  const sortie: string[] = [k];
+  const ajouter = (forme: string) => {
+    if (forme.length >= 2 && sortie.indexOf(forme) === -1) sortie.push(forme);
+  };
+
+  for (const forme of sortie.slice()) {
+    if (PREFIXES.indexOf(forme[0]) !== -1 && forme.length > 2) ajouter(forme.slice(1));
+  }
+  for (const forme of sortie.slice()) {
+    if (forme.indexOf("ءل") === 0 && forme.length > 3) ajouter(forme.slice(2));
+  }
+  for (const forme of sortie.slice()) {
+    for (const suffixe of SUFFIXES) {
+      // Un suffixe d'une seule lettre (ـه ـك ـي) est aussi une lettre de
+      // racine courante : on ne le retire que s'il reste un mot d'au moins
+      // trois lettres, sinon « annā » finirait reconnu comme « in ».
+      const minimum = suffixe.length === 1 ? 3 : 2;
+      if (
+        forme.length - suffixe.length >= minimum &&
+        forme.slice(-suffixe.length) === suffixe
+      ) {
+        ajouter(forme.slice(0, -suffixe.length));
+      }
+    }
+  }
+  return sortie;
+}
+
+/**
+ * Un mot du texte correspond-il à un mot mémorisé ?
+ *
+ * On exige une correspondance exacte après retrait des affixes ; l'inclusion
+ * n'est tentée que pour les mots d'au moins quatre lettres, sans quoi une
+ * particule comme « min » se retrouverait signalée à l'intérieur de dizaines
+ * de mots sans rapport. Les verbes conjugués échappent à la reconnaissance :
+ * mieux vaut ne rien signaler qu'induire l'utilisateur en erreur.
+ */
+export function reconnaitre(forme: string, index: IndexVocabulaire | null): Mot | null {
+  if (!index) return null;
+
+  const k = cleArabe(forme);
+  if (k.length < 2) return null;
+
+  const enCache = index.cache.get(k);
+  if (enCache !== undefined) return enCache;
+
+  let trouve: Mot | null = null;
+  for (const variante of variantes(k)) {
+    const mot = index.parCle.get(variante);
+    if (mot) {
+      trouve = mot;
+      break;
+    }
+  }
+
+  if (!trouve && k.length >= 5) {
+    for (const [cle, mot] of index.longues) {
+      if (k.includes(cle)) {
+        trouve = mot;
+        break;
+      }
+    }
+  }
+
+  index.cache.set(k, trouve);
+  return trouve;
 }
