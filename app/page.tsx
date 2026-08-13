@@ -12,6 +12,7 @@ import {
   Calendrier as IconeCalendrier,
   Citation,
   Coeur,
+  Cube,
   Pinceau,
   Horloge,
   Lettres,
@@ -33,6 +34,12 @@ const MODULES = [
     icone: Repeter,
     nom: "Apprentissage",
     description: "Mémoriser en répétant : versets entiers ou mot à mot",
+  },
+  {
+    href: "/vocabulaire",
+    icone: Cube,
+    nom: "Vocabulaire",
+    description: "Les mots les plus fréquents du Coran, par packs thématiques",
   },
   {
     href: "/nourania",
