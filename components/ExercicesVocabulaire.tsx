@@ -12,6 +12,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Mot } from "@/data/vocabulaire";
 import { leurres, trouverMotDansVerset } from "@/lib/vocabulaire";
 import { chargerSourate } from "@/lib/coran";
+import { jouerOuSecours, urlMot, urlVocabulaire } from "@/lib/audio";
 import { usePrefs } from "@/lib/prefs";
 import { SOURATES } from "@/data/sourates";
 import { Alerte, HautParleur, Verifie } from "@/components/Icones";
@@ -29,7 +30,18 @@ function melanger<T>(liste: T[]): T[] {
   return t;
 }
 
-/** Prononce un mot arabe avec la synthèse vocale du navigateur. */
+/** Prononce un mot de vocabulaire : mp3 pré-généré (voix neuronale),
+ *  synthèse du navigateur en secours. */
+export function direMot(mot: Pick<Mot, "id" | "arabe">) {
+  jouerOuSecours(urlVocabulaire(mot.id), () => direMot(mot));
+}
+
+/** Prononce un mot d'un verset : vrai enregistrement mot à mot du Coran. */
+export function direForme(sourate: number, verset: number, audio: number, texte: string) {
+  jouerOuSecours(urlMot(sourate, verset, audio), () => dire(texte));
+}
+
+/** Synthèse vocale du navigateur (secours uniquement). */
 export function dire(texte: string) {
   try {
     const synth = window.speechSynthesis;
@@ -162,7 +174,7 @@ function Choix({
 
 function Carte({ mot, onSuivant }: { mot: Mot; onSuivant: () => void }) {
   useEffect(() => {
-    dire(mot.arabe);
+    direMot(mot);
   }, [mot.arabe]);
 
   return (
@@ -179,7 +191,7 @@ function Carte({ mot, onSuivant }: { mot: Mot; onSuivant: () => void }) {
       </p>
 
       <button
-        onClick={() => dire(mot.arabe)}
+        onClick={() => direMot(mot)}
         className="mx-auto mt-4 flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold"
         style={{ background: "var(--card)", color: "var(--accent)" }}
       >
@@ -236,7 +248,7 @@ function QcmArFr({
   const [choisi, setChoisi] = useState<string | null>(null);
 
   useEffect(() => {
-    if (audio) dire(mot.arabe);
+    if (audio) direMot(mot);
   }, [audio, mot.arabe]);
 
   return (
@@ -247,7 +259,7 @@ function QcmArFr({
 
       {audio ? (
         <button
-          onClick={() => dire(mot.arabe)}
+          onClick={() => direMot(mot)}
           className="mx-auto mt-6 flex h-24 w-24 items-center justify-center rounded-full text-white transition active:scale-95"
           style={{ background: "var(--accent)" }}
           aria-label="Réécouter le mot"
@@ -294,13 +306,14 @@ function QcmArFr({
 
 function QcmFrAr({ mot, onReponse }: { mot: Mot; onReponse: (juste: boolean) => void }) {
   const { prefs } = usePrefs();
+  const candidats = useMemo(() => melanger([mot, ...leurres(mot)]), [mot]);
   const options = useMemo(
     () =>
-      melanger([mot, ...leurres(mot)]).map((m) => ({
+      candidats.map((m) => ({
         valeur: m.arabe,
         sous: prefs.phonetique ? m.translit : undefined,
       })),
-    [mot, prefs.phonetique]
+    [candidats, prefs.phonetique]
   );
   const [choisi, setChoisi] = useState<string | null>(null);
 
@@ -318,7 +331,9 @@ function QcmFrAr({ mot, onReponse }: { mot: Mot; onReponse: (juste: boolean) => 
         choisi={choisi}
         onChoisir={(valeur) => {
           setChoisi(valeur);
-          dire(valeur);
+          const m = candidats.find((c) => c.arabe === valeur);
+          if (m) direMot(m);
+          else dire(valeur);
         }}
       />
 
@@ -345,6 +360,7 @@ function DansLeVerset({
   onImpossible: () => void;
 }) {
   const [mots, setMots] = useState<string[] | null>(null);
+  const [audios, setAudios] = useState<number[]>([]);
   const [traduction, setTraduction] = useState("");
   const [cible, setCible] = useState<number | null>(null);
   const [choisi, setChoisi] = useState<number | null>(null);
@@ -365,6 +381,7 @@ function DansLeVerset({
         if (position === null) return setErreur(true);
 
         setMots(formes);
+        setAudios(verset.words.map((w) => w.audio));
         setTraduction(verset.traduction);
         setCible(position);
       })
@@ -418,7 +435,7 @@ function DansLeVerset({
               disabled={actif}
               onClick={() => {
                 setChoisi(i);
-                dire(forme);
+                direForme(mot.exemple[0], mot.exemple[1], audios[i], forme);
               }}
               style={style}
               className="arabic font-amiri card rounded-xl border-2 px-3 py-2 text-3xl transition active:scale-95 disabled:cursor-default"
@@ -503,7 +520,7 @@ export function Appariement({
                 disabled={fait}
                 onClick={() => {
                   setSelection(m.id);
-                  dire(m.arabe);
+                  direMot(m);
                 }}
                 style={{
                   borderColor: selection === m.id ? "var(--accent)" : "var(--border)",

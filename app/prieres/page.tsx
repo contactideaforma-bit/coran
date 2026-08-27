@@ -14,10 +14,9 @@ import {
   type JourCalendrier,
 } from "@/lib/prieres";
 import {
-  demanderPermission,
-  ecrireNotifs,
   notifsActivees,
-  notifsSupportees,
+  pushActif,
+  synchroniserAbonnement,
 } from "@/lib/notifications";
 import Entete from "@/components/Entete";
 import {
@@ -55,74 +54,34 @@ function tempsRestant(hhmm: string, maintenant: Date): string {
   return `dans ${Math.floor(reste / 60)} h ${String(reste % 60).padStart(2, "0")}`;
 }
 
-/** Interrupteur du rappel de prière. */
-function ToggleNotifs() {
-  const [actif, setActif] = useState(false);
-  const [refuse, setRefuse] = useState(false);
-  const [supporte, setSupporte] = useState(true);
+/** Accès aux réglages des notifications (page Rappels). */
+function CarteRappels() {
+  const [etat, setEtat] = useState<"off" | "push" | "local">("off");
 
   useEffect(() => {
-    setSupporte(notifsSupportees());
-    setActif(notifsActivees());
-    if (notifsSupportees() && Notification.permission === "denied")
-      setRefuse(true);
+    setEtat(pushActif() ? "push" : notifsActivees() ? "local" : "off");
   }, []);
 
-  const basculer = async () => {
-    if (actif) {
-      ecrireNotifs(false);
-      setActif(false);
-      return;
-    }
-    const ok = await demanderPermission();
-    if (ok) {
-      ecrireNotifs(true);
-      setActif(true);
-      setRefuse(false);
-    } else {
-      setRefuse(true);
-    }
-  };
-
   return (
-    <div className="card rounded-2xl p-4 shadow-soft">
-      <div className="flex items-center gap-3">
-        <span style={{ color: "var(--accent)" }}>
-          <Cloche taille={22} />
+    <Link
+      href="/rappels"
+      className="card flex items-center gap-3 rounded-2xl p-4 shadow-soft transition hover:scale-[1.01] active:scale-[0.99]"
+    >
+      <span style={{ color: "var(--accent)" }}>
+        <Cloche taille={22} />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block font-bold">Rappels et notifications</span>
+        <span className="block text-xs" style={{ color: "var(--muted)" }}>
+          {etat === "push"
+            ? "Activés — prières et rappels Coran, même appli fermée"
+            : etat === "local"
+              ? "Activés tant que l'appli est ouverte"
+              : "Être prévenu à l'heure de la prière et programmer des rappels de lecture"}
         </span>
-        <span className="min-w-0 flex-1">
-          <span className="block font-bold">Rappel à l&apos;heure de la prière</span>
-          <span className="block text-xs" style={{ color: "var(--muted)" }}>
-            {supporte
-              ? "Une notification quand l'heure arrive, tant que l'appli est ouverte"
-              : "Non pris en charge par ce navigateur (sur iPhone : installe d'abord l'appli sur l'écran d'accueil)"}
-          </span>
-        </span>
-        {supporte && (
-          <button
-            onClick={basculer}
-            role="switch"
-            aria-checked={actif}
-            aria-label="Activer le rappel de prière"
-            className="relative h-7 w-12 shrink-0 rounded-full transition"
-            style={{
-              backgroundColor: actif ? "var(--accent)" : "var(--border)",
-            }}
-          >
-            <span
-              className="absolute top-0.5 h-6 w-6 rounded-full bg-white shadow transition-all"
-              style={{ left: actif ? "1.375rem" : "0.125rem" }}
-            />
-          </button>
-        )}
-      </div>
-      {refuse && !actif && (
-        <p className="mt-2 text-xs" style={{ color: "var(--muted)" }}>
-          Les notifications sont bloquées pour ce site. Autorise-les dans les
-          réglages de ton navigateur, puis réessaie.
-        </p>
-      )}
-    </div>
+      </span>
+      <span style={{ color: "var(--accent)" }}>→</span>
+    </Link>
   );
 }
 
@@ -217,6 +176,7 @@ export default function Prieres() {
     ecrireConfigPriere(c);
     setConfig(c);
     setFormulaire(false);
+    synchroniserAbonnement(); // nouvelle ville → prévenir le serveur push
   };
 
   const suivante = horaires ? prochainePriere(horaires) : null;
@@ -598,7 +558,7 @@ export default function Prieres() {
             </div>
           )}
 
-          <ToggleNotifs />
+          <CarteRappels />
 
           <p className="text-center text-xs" style={{ color: "var(--muted)" }}>
             Source : AlAdhan.com •{" "}

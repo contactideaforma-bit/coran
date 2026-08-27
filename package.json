@@ -6,13 +6,16 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "vapid": "web-push generate-vapid-keys",
+    "audio": "tsx scripts/generer-audio.ts"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",
     "next": "^14.2.5",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "web-push": "^3.6.7"
   },
   "devDependencies": {
     "@types/node": "^20",
@@ -21,6 +24,8 @@
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.39",
     "tailwindcss": "^3.4.6",
-    "typescript": "^5"
+    "typescript": "^5",
+    "@types/web-push": "^3.6.4",
+    "tsx": "^4.19.0"
   }
 }

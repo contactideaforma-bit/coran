@@ -8,10 +8,11 @@ import {
   type ElementLecon,
   type Lecon,
   type Lettre,
+  cleAudioNourania,
 } from "@/data/nourania";
 import { usePrefs } from "@/lib/prefs";
 import { useEchap } from "@/lib/ui";
-import { urlMot } from "@/lib/audio";
+import { jouerOuSecours, urlMot, urlNourania } from "@/lib/audio";
 import Entete from "@/components/Entete";
 import { HautParleur, Lettres, Verifie } from "@/components/Icones";
 
@@ -96,22 +97,28 @@ export default function Nourania() {
     };
   }, []);
 
-  /** Joue l'élément : vrai enregistrement du Coran si disponible, sinon synthèse. */
+  const jouerUrl = (url: string, secours: string) =>
+    jouerOuSecours(url, () => prononcer(secours));
+
+  /** Joue l'élément : vrai enregistrement du Coran si disponible, sinon le
+   *  mp3 pré-généré (voix neuronale), sinon la synthèse du navigateur. */
   const jouerElement = (e: ElementLecon) => {
-    audioRef.current?.pause();
     if (e.audio) {
       const [s, v, w] = e.audio;
-      const audio = new Audio(urlMot(s, v, w));
-      audioRef.current = audio;
-      audio.play().catch(() => prononcer(e.vocal));
-    } else {
-      prononcer(e.vocal);
+      jouerUrl(urlMot(s, v, w), e.vocal);
+      return;
     }
+    const i = lecon ? lecon.elements.indexOf(e) : -1;
+    if (lecon && i >= 0) jouerUrl(urlNourania(cleAudioNourania(lecon.id, i)), e.vocal);
+    else prononcer(e.vocal);
   };
+
+  const jouerLettre = (l: Lettre) =>
+    jouerUrl(urlNourania(cleAudioNourania(1, ALPHABET.indexOf(l))), l.nomArabe);
 
   const clicLettre = (l: Lettre) => {
     setLettreActive(l);
-    prononcer(l.nomArabe);
+    jouerLettre(l);
   };
 
   const clicElement = (e: ElementLecon) => {
@@ -207,9 +214,10 @@ export default function Nourania() {
               className="mt-4 text-center text-xs"
               style={{ color: "var(--muted)" }}
             >
-              Aucune voix arabe détectée sur cet appareil : la prononciation
-              vocale sera approximative ou muette. Sur iPhone : Réglages →
-              Accessibilité → Contenu énoncé → Voix → ajouter l&apos;arabe.
+              Aucune voix arabe détectée sur cet appareil : sans connexion,
+              la prononciation de secours sera approximative ou muette. Sur
+              iPhone : Réglages → Accessibilité → Contenu énoncé → Voix →
+              ajouter l&apos;arabe.
             </p>
           )}
         </>
@@ -308,7 +316,7 @@ export default function Nourania() {
           </h3>
           <p className="mt-3">{lettreActive.conseil}</p>
           <BoutonsFiche
-            ecouter={() => prononcer(lettreActive.nomArabe)}
+            ecouter={() => jouerLettre(lettreActive)}
             fermer={() => setLettreActive(null)}
           />
         </Fiche>

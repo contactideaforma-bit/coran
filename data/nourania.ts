@@ -186,3 +186,28 @@ export const LECONS: Lecon[] = [
     ],
   },
 ];
+
+/* ===== Audio pré-généré (voix neuronale, public/audio/nourania) ===== */
+
+/** Clé du fichier mp3 d'un élément : les leçons 1 et 2 partagent les noms
+ *  de lettres (« lettre-03 »), les autres sont « l3-07 », etc. */
+export function cleAudioNourania(leconId: number, index: number) {
+  const n = String(index).padStart(2, "0");
+  return leconId <= 2 ? `lettre-${n}` : `l${leconId}-${n}`;
+}
+
+/** Tous les sons à générer : { cle, texte } (utilisé par le script). */
+export function listeAudioNourania(): { cle: string; texte: string }[] {
+  const liste = ALPHABET.map((l, i) => ({
+    cle: cleAudioNourania(1, i),
+    texte: l.nomArabe,
+  }));
+  for (const lecon of LECONS) {
+    if (lecon.id <= 2) continue;
+    lecon.elements.forEach((e, i) => {
+      if (e.audio) return; // vrai enregistrement du Coran : rien à générer
+      liste.push({ cle: cleAudioNourania(lecon.id, i), texte: e.vocal });
+    });
+  }
+  return liste;
+}

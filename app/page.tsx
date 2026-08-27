@@ -11,6 +11,7 @@ import GuideInstallation from "@/components/GuideInstallation";
 import {
   Calendrier as IconeCalendrier,
   Citation,
+  Cloche,
   Coeur,
   Cube,
   Pinceau,
@@ -58,6 +59,12 @@ const MODULES = [
     icone: Horloge,
     nom: "Prières",
     description: "Les horaires selon ta ville",
+  },
+  {
+    href: "/rappels",
+    icone: Cloche,
+    nom: "Rappels",
+    description: "Notifications des prières et rappels de lecture du Coran",
   },
   {
     href: "/calendrier",
