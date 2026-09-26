@@ -1,0 +1,503 @@
+/* Guides pas à pas (prière de la nuit, istikhâra, omra).
+   Contenu limité à ce qui est établi par la Sunna authentique ; quand un
+   point relève de l'avis des savants, c'est dit dans le texte. */
+
+export interface Dhikr {
+  titre?: string;
+  arabe: string;
+  translit: string;
+  fr: string;
+  source: string;
+}
+
+export type OutilGuide = "tawaf" | "say" | "dernier-tiers";
+
+export interface EtapeGuide {
+  titre: string;
+  resume: string; // une phrase, affichée sous le titre
+  illustration: string; // clé dans ILLUSTRATIONS (components/IllustrationsGuides)
+  points: string[];
+  dhikrs?: Dhikr[];
+  astuce?: string;
+  outil?: OutilGuide;
+  lien?: { href: string; libelle: string };
+}
+
+export interface Guide {
+  id: string;
+  titre: string;
+  sousTitre: string;
+  intro: string;
+  merites: { texte: string; source: string }[];
+  etapes: EtapeGuide[];
+  aEviter: string[];
+  fin: { titre: string; texte: string };
+}
+
+/* ================= Prière de la nuit ================= */
+
+export const GUIDE_NUIT: Guide = {
+  id: "nuit",
+  titre: "La prière de la nuit",
+  sousTitre: "Qiyâm al-layl / Tahajjud",
+  intro:
+    "Une sunna très appuyée que le Prophète ﷺ n'a jamais délaissée. Son temps va de la prière de 'Ishâ jusqu'à l'aube (Fajr), et le meilleur moment est le dernier tiers de la nuit.",
+  merites: [
+    {
+      texte:
+        "La meilleure prière après les prières prescrites est la prière de la nuit.",
+      source: "Muslim",
+    },
+    {
+      texte:
+        "Notre Seigneur descend chaque nuit vers le ciel le plus proche lorsqu'il reste le dernier tiers de la nuit, et dit : « Qui M'invoque, que Je l'exauce ? Qui Me demande, que Je lui donne ? Qui implore Mon pardon, que Je lui pardonne ? »",
+      source: "Al-Bukhari & Muslim",
+    },
+  ],
+  etapes: [
+    {
+      titre: "Repérer le bon moment",
+      resume: "De 'Ishâ jusqu'au Fajr — le dernier tiers est le meilleur.",
+      illustration: "lune",
+      outil: "dernier-tiers",
+      points: [
+        "La prière de la nuit peut se faire à tout moment entre 'Ishâ et le Fajr, même juste après 'Ishâ.",
+        "Le meilleur moment est le dernier tiers de la nuit : c'est l'heure de la descente divine et des invocations exaucées.",
+        "La nuit se compte du coucher du soleil (Maghrib) jusqu'à l'aube (Fajr) : on la divise en trois pour trouver le dernier tiers.",
+      ],
+    },
+    {
+      titre: "Préparer sa nuit",
+      resume: "Se coucher tôt, avec l'intention de se lever.",
+      illustration: "lit",
+      points: [
+        "Dors tôt après 'Ishâ en formulant dans ton cœur l'intention de te lever. L'intention se fait dans le cœur : aucune formule n'est à prononcer.",
+        "Celui qui se couche avec l'intention sincère de se lever et que le sommeil emporte jusqu'au matin : on lui inscrit ce qu'il comptait faire, et son sommeil est une aumône d'Allah pour lui (An-Nasa'i & Ibn Mâjah).",
+        "Si tu crains de ne pas te réveiller, prie le witr avant de dormir ; si tu es confiant, garde-le pour la fin de la nuit, c'est meilleur (Muslim).",
+        "Mets un réveil sur l'heure du dernier tiers calculée à l'étape précédente.",
+      ],
+    },
+    {
+      titre: "Au réveil",
+      resume: "Chasser le sommeil par le rappel d'Allah.",
+      illustration: "reveil",
+      points: [
+        "Frotte le sommeil de ton visage, puis récite les derniers versets de la sourate Âl 'Imrân (3:190 à 200), comme le faisait le Prophète ﷺ (Al-Bukhari & Muslim).",
+        "Nettoie-toi la bouche avec le siwâk (ou une brosse à dents) : le Prophète ﷺ le faisait en se levant la nuit (Al-Bukhari & Muslim).",
+      ],
+      dhikrs: [
+        {
+          titre: "Qui se réveille la nuit et dit…",
+          arabe:
+            "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، الْحَمْدُ لِلَّهِ، وَسُبْحَانَ اللَّهِ، وَلَا إِلَهَ إِلَّا اللَّهُ، وَاللَّهُ أَكْبَرُ، وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ، اللَّهُمَّ اغْفِرْ لِي",
+          translit:
+            "Lâ ilâha illâ-llâhu waḥdahu lâ sharîka lah, lahul-mulku wa lahul-ḥamd, wa huwa 'alâ kulli shay'in qadîr. Al-ḥamdu lillâh, wa subḥânallâh, wa lâ ilâha illâ-llâh, wallâhu akbar, wa lâ ḥawla wa lâ quwwata illâ billâh. Allâhumma-ghfir lî.",
+          fr: "Nulle divinité hormis Allah, Seul, sans associé ; à Lui la royauté et la louange, et Il est capable de toute chose. Louange à Allah, gloire à Allah, nulle divinité hormis Allah, Allah est le plus Grand, il n'y a de force ni de puissance qu'en Allah. Ô Allah, pardonne-moi.",
+          source: "Al-Bukhari",
+        },
+      ],
+      astuce:
+        "Le hadith ajoute : s'il invoque, il est exaucé ; s'il fait ses ablutions et prie, sa prière est acceptée.",
+      lien: { href: "/sourate/3#v-190", libelle: "Lire Âl 'Imrân 3:190-200" },
+    },
+    {
+      titre: "Ablutions et ouverture",
+      resume: "Commencer par deux rak'ât légères.",
+      illustration: "goutte",
+      points: [
+        "Fais tes ablutions, puis commence par deux rak'ât courtes : « Lorsque l'un de vous se lève la nuit, qu'il ouvre sa prière par deux rak'ât légères » (Muslim).",
+        "Tu peux ouvrir ta prière par l'invocation d'ouverture que le Prophète ﷺ disait la nuit (ci-dessous).",
+      ],
+      dhikrs: [
+        {
+          titre: "Invocation d'ouverture de la nuit",
+          arabe:
+            "اللَّهُمَّ رَبَّ جِبْرَائِيلَ وَمِيكَائِيلَ وَإِسْرَافِيلَ، فَاطِرَ السَّمَاوَاتِ وَالْأَرْضِ، عَالِمَ الْغَيْبِ وَالشَّهَادَةِ، أَنْتَ تَحْكُمُ بَيْنَ عِبَادِكَ فِيمَا كَانُوا فِيهِ يَخْتَلِفُونَ، اهْدِنِي لِمَا اخْتُلِفَ فِيهِ مِنَ الْحَقِّ بِإِذْنِكَ، إِنَّكَ تَهْدِي مَنْ تَشَاءُ إِلَى صِرَاطٍ مُسْتَقِيمٍ",
+          translit:
+            "Allâhumma Rabba Jibrâ'îla wa Mîkâ'îla wa Isrâfîl, fâṭiras-samâwâti wal-arḍ, 'âlimal-ghaybi wash-shahâdah, anta taḥkumu bayna 'ibâdika fîmâ kânû fîhi yakhtalifûn, ihdinî limâ-khtulifa fîhi minal-ḥaqqi bi-idhnik, innaka tahdî man tashâ'u ilâ ṣirâṭin mustaqîm.",
+          fr: "Ô Allah, Seigneur de Gabriel, de Michel et d'Israfil, Créateur des cieux et de la terre, Connaisseur de l'invisible et du visible, c'est Toi qui juges entre Tes serviteurs sur ce en quoi ils divergeaient. Guide-moi, par Ta permission, vers la vérité sur laquelle on a divergé : Tu guides qui Tu veux vers un droit chemin.",
+          source: "Muslim",
+        },
+      ],
+    },
+    {
+      titre: "Prier deux par deux",
+      resume: "Des rak'ât par paires, longues et apaisées.",
+      illustration: "paires",
+      points: [
+        "« La prière de la nuit se fait deux par deux » : tu fais le salâm toutes les deux rak'ât (Al-Bukhari & Muslim).",
+        "Le Prophète ﷺ ne dépassait généralement pas 11 rak'ât, en Ramadan comme en dehors (Al-Bukhari & Muslim) ; il a aussi prié 13 rak'ât. Aucun nombre minimum n'est imposé : deux rak'ât suivies du witr, c'est déjà la prière de la nuit.",
+        "Allonge la récitation, l'inclinaison et la prosternation. Le Prophète ﷺ, en passant sur un verset de glorification, glorifiait Allah ; sur un verset de demande, il demandait ; sur un verset de menace, il demandait protection (Muslim).",
+        "Récite d'une voix moyenne, ni trop forte ni trop basse (Coran 17:110), surtout si d'autres dorment.",
+        "Profite de la prosternation pour invoquer : c'est le moment où le serviteur est le plus proche de son Seigneur (Muslim).",
+      ],
+      astuce:
+        "Tu ne connais pas de longues sourates ? Récite ce que tu sais, en prenant ton temps, ou lis dans un mushaf : l'essentiel est la présence du cœur.",
+    },
+    {
+      titre: "Clôturer par le witr",
+      resume: "Une rak'a impaire pour conclure la nuit.",
+      illustration: "witr",
+      points: [
+        "« Faites du witr la dernière de vos prières de la nuit » (Al-Bukhari & Muslim). Il se prie en 1, 3, 5 rak'ât ou plus, toujours en nombre impair.",
+        "En 3 rak'ât, le Prophète ﷺ récitait : al-A'lâ (87), al-Kâfirûn (109) puis al-Ikhlâs (112) (Abu Dawud & An-Nasa'i).",
+        "Tu peux faire le qunût (invocation debout) dans la dernière rak'a, avant ou après l'inclinaison. Il est permis de le laisser de temps en temps.",
+      ],
+      dhikrs: [
+        {
+          titre: "Le qunût enseigné à al-Hasan",
+          arabe:
+            "اللَّهُمَّ اهْدِنِي فِيمَنْ هَدَيْتَ، وَعَافِنِي فِيمَنْ عَافَيْتَ، وَتَوَلَّنِي فِيمَنْ تَوَلَّيْتَ، وَبَارِكْ لِي فِيمَا أَعْطَيْتَ، وَقِنِي شَرَّ مَا قَضَيْتَ، فَإِنَّكَ تَقْضِي وَلَا يُقْضَى عَلَيْكَ، وَإِنَّهُ لَا يَذِلُّ مَنْ وَالَيْتَ، تَبَارَكْتَ رَبَّنَا وَتَعَالَيْتَ",
+          translit:
+            "Allâhumma-hdinî fîman hadayt, wa 'âfinî fîman 'âfayt, wa tawallanî fîman tawallayt, wa bârik lî fîmâ a'ṭayt, wa qinî sharra mâ qaḍayt, fa-innaka taqḍî wa lâ yuqḍâ 'alayk, wa innahu lâ yadhillu man wâlayt, tabârakta Rabbanâ wa ta'âlayt.",
+          fr: "Ô Allah, guide-moi parmi ceux que Tu as guidés, préserve-moi parmi ceux que Tu as préservés, prends-moi en charge parmi ceux que Tu as pris en charge, bénis-moi dans ce que Tu m'as donné, protège-moi du mal de ce que Tu as décrété. C'est Toi qui décrètes et nul ne décrète contre Toi ; celui que Tu soutiens n'est jamais humilié. Béni sois-Tu, notre Seigneur, et exalté.",
+          source: "Abu Dawud, At-Tirmidhi & An-Nasa'i",
+        },
+      ],
+    },
+    {
+      titre: "Après le witr : invoquer",
+      resume: "Le moment des demandes exaucées.",
+      illustration: "mains",
+      points: [
+        "Après le salâm du witr, le Prophète ﷺ disait trois fois « Subḥânal-Malikil-Quddûs », en élevant et prolongeant la voix la troisième fois (An-Nasa'i & Abu Dawud).",
+        "Puis invoque librement, dans ta langue : c'est l'heure où Allah demande « Qui M'invoque, que Je l'exauce ? ». Demande pardon, pour toi, tes parents, tes enfants, et tout ce dont tu as besoin.",
+        "Si tu as déjà prié le witr avant de dormir et que tu te réveilles, prie deux par deux sans refaire de witr : « Pas deux witr dans une même nuit » (Abu Dawud & At-Tirmidhi).",
+      ],
+      dhikrs: [
+        {
+          titre: "Après le salâm du witr (3 fois)",
+          arabe: "سُبْحَانَ الْمَلِكِ الْقُدُّوسِ",
+          translit: "Subḥânal-Malikil-Quddûs.",
+          fr: "Gloire au Souverain, au Très Saint.",
+          source: "An-Nasa'i & Abu Dawud",
+        },
+      ],
+    },
+    {
+      titre: "Tenir dans la durée",
+      resume: "Peu mais régulier, plutôt que beaucoup puis plus rien.",
+      illustration: "etoile",
+      points: [
+        "« L'œuvre la plus aimée d'Allah est la plus régulière, même si elle est petite » (Al-Bukhari & Muslim). Commence par 2 rak'ât + le witr, puis augmente doucement.",
+        "Si tu somnoles en priant, va dormir : tu risquerais de vouloir demander pardon et de te maudire sans le savoir (Al-Bukhari & Muslim).",
+        "Si le sommeil ou la maladie t'a empêché de prier la nuit, le Prophète ﷺ priait dans la journée 12 rak'ât (Muslim) : tu rattrapes en nombre pair, avant midi.",
+        "Ne fais pas comme celui qui priait la nuit puis a délaissé (Al-Bukhari) : mieux vaut un petit rythme tenu toute l'année.",
+      ],
+    },
+  ],
+  aEviter: [
+    "Prononcer l'intention à voix haute (« nawaytu… ») : l'intention est dans le cœur.",
+    "Faire deux witr dans la même nuit.",
+    "S'épuiser jusqu'à manquer la prière du Fajr : la prière obligatoire passe avant tout.",
+    "Veiller toute la nuit chaque nuit : le Prophète ﷺ priait et dormait (Al-Bukhari & Muslim).",
+    "Réveiller brutalement les autres ou réciter si fort qu'on les dérange.",
+  ],
+  fin: {
+    titre: "Qu'Allah accepte ta nuit !",
+    texte:
+      "Chaque nuit, une porte s'ouvre à nouveau. Garde ce guide sous la main et fixe-toi un petit objectif régulier.",
+  },
+};
+
+/* ================= Prière de consultation ================= */
+
+export const GUIDE_ISTIKHARA: Guide = {
+  id: "istikhara",
+  titre: "La prière de consultation",
+  sousTitre: "Ṣalât al-Istikhâra",
+  intro:
+    "Quand tu hésites dans une décision (mariage, travail, voyage, achat, déménagement…), tu demandes à Allah de choisir pour toi ce qui est bien. Jâbir rapporte : « Le Prophète ﷺ nous enseignait l'istikhâra dans toutes les affaires comme il nous enseignait une sourate du Coran » (Al-Bukhari).",
+  merites: [
+    {
+      texte:
+        "Lorsque l'un de vous envisage une affaire, qu'il prie deux rak'ât en dehors de la prière obligatoire, puis qu'il dise : « Allâhumma innî astakhîruka… »",
+      source: "Al-Bukhari",
+    },
+  ],
+  etapes: [
+    {
+      titre: "Quand faire l'istikhâra ?",
+      resume: "Pour une affaire permise où tu hésites.",
+      illustration: "carrefour",
+      points: [
+        "Pour toute affaire permise, petite ou grande : le hadith dit « dans toutes les affaires ».",
+        "Pas pour une obligation (prier, jeûner le Ramadan, être bon envers ses parents) ni pour un interdit : là, la réponse est déjà connue.",
+        "Consulte aussi des personnes sages et de confiance : « Et consulte-les à propos des affaires » (Coran 3:159). L'istikhâra (demander à Allah) et l'istishâra (demander conseil) vont ensemble.",
+      ],
+    },
+    {
+      titre: "Se purifier et prier deux rak'ât",
+      resume: "Une prière de deux rak'ât, en dehors de l'obligatoire.",
+      illustration: "tapis",
+      points: [
+        "Fais tes ablutions, puis prie deux rak'ât surérogatoires avec l'intention (dans le cœur) de faire l'istikhâra.",
+        "Tu récites al-Fâtiha et ce que tu veux ensuite : aucune sourate particulière n'est établie par un hadith authentique.",
+        "Évite les moments interdits (après le 'Asr jusqu'au coucher du soleil, après le Fajr jusqu'au lever, et juste avant le Dhuhr), sauf si l'affaire ne peut pas attendre.",
+        "Selon plusieurs savants, l'istikhâra peut se faire avec une sunna (rawâtib, prière de salutation de la mosquée) si l'intention est faite avant de la commencer.",
+      ],
+    },
+    {
+      titre: "Réciter l'invocation",
+      resume: "Après la prière, en nommant ton affaire.",
+      illustration: "mains",
+      points: [
+        "Après le salâm, récite l'invocation ci-dessous (certains savants autorisent aussi de la dire avant le salâm, après le tashahhud).",
+        "À « hâdhâ-l-amra » (cette affaire), nomme ton affaire : « ce mariage avec untel », « ce poste à Lyon »… ou pense-la clairement.",
+        "Tu peux la lire depuis ton téléphone si tu ne la connais pas par cœur.",
+      ],
+      dhikrs: [
+        {
+          titre: "L'invocation de l'istikhâra",
+          arabe:
+            "اللَّهُمَّ إِنِّي أَسْتَخِيرُكَ بِعِلْمِكَ، وَأَسْتَقْدِرُكَ بِقُدْرَتِكَ، وَأَسْأَلُكَ مِنْ فَضْلِكَ الْعَظِيمِ، فَإِنَّكَ تَقْدِرُ وَلَا أَقْدِرُ، وَتَعْلَمُ وَلَا أَعْلَمُ، وَأَنْتَ عَلَّامُ الْغُيُوبِ. اللَّهُمَّ إِنْ كُنْتَ تَعْلَمُ أَنَّ هَذَا الْأَمْرَ خَيْرٌ لِي فِي دِينِي وَمَعَاشِي وَعَاقِبَةِ أَمْرِي، فَاقْدُرْهُ لِي وَيَسِّرْهُ لِي، ثُمَّ بَارِكْ لِي فِيهِ. وَإِنْ كُنْتَ تَعْلَمُ أَنَّ هَذَا الْأَمْرَ شَرٌّ لِي فِي دِينِي وَمَعَاشِي وَعَاقِبَةِ أَمْرِي، فَاصْرِفْهُ عَنِّي وَاصْرِفْنِي عَنْهُ، وَاقْدُرْ لِيَ الْخَيْرَ حَيْثُ كَانَ، ثُمَّ أَرْضِنِي بِهِ",
+          translit:
+            "Allâhumma innî astakhîruka bi'ilmik, wa astaqdiruka biqudratik, wa as'aluka min faḍlikal-'aẓîm, fa-innaka taqdiru wa lâ aqdir, wa ta'lamu wa lâ a'lam, wa anta 'allâmul-ghuyûb. Allâhumma in kunta ta'lamu anna hâdhal-amra (…) khayrun lî fî dînî wa ma'âshî wa 'âqibati amrî, fa-qdurhu lî wa yassirhu lî, thumma bârik lî fîh. Wa in kunta ta'lamu anna hâdhal-amra sharrun lî fî dînî wa ma'âshî wa 'âqibati amrî, fa-ṣrifhu 'annî wa-ṣrifnî 'anh, wa-qdur liyal-khayra ḥaythu kân, thumma arḍinî bih.",
+          fr: "Ô Allah, je Te demande de choisir pour moi par Ta science, je Te demande de m'en rendre capable par Ta puissance, et je Te demande de Ton immense grâce. Car Toi Tu es capable et je ne le suis pas, Tu sais et je ne sais pas, et Tu es le Grand Connaisseur de l'invisible. Ô Allah, si Tu sais que cette affaire (…) est un bien pour moi dans ma religion, ma vie et l'issue de mon affaire, alors destine-la-moi, facilite-la-moi, puis bénis-la-moi. Et si Tu sais que cette affaire est un mal pour moi dans ma religion, ma vie et l'issue de mon affaire, alors écarte-la de moi et écarte-moi d'elle, destine-moi le bien où qu'il soit, puis rends-moi satisfait de lui.",
+          source: "Al-Bukhari",
+        },
+      ],
+    },
+    {
+      titre: "Avancer avec confiance",
+      resume: "Agir, puis accepter ce qu'Allah facilite.",
+      illustration: "chemin",
+      points: [
+        "Après l'istikhâra, avance dans ce que tu avais envisagé en t'appuyant sur Allah (tawakkul).",
+        "Si les choses se facilitent, c'est le bien qu'Allah t'a choisi ; si elles se bloquent, c'est qu'Il l'a écarté de toi. Dans les deux cas, tu as demandé « rends-moi satisfait ».",
+        "Il n'est pas nécessaire de voir un rêve ni de ressentir quelque chose : rien de tel n'est mentionné dans le hadith.",
+        "Si l'hésitation persiste, des savants permettent de répéter l'istikhâra.",
+      ],
+    },
+  ],
+  aEviter: [
+    "Attendre un rêve (ou dormir exprès après la prière) pour avoir la réponse : ce n'est pas dans la Sunna.",
+    "Demander à quelqu'un d'autre de faire l'istikhâra à ta place, ou payer quelqu'un pour « lire » la réponse.",
+    "Ouvrir le Coran au hasard, compter sur un chapelet ou tirer au sort pour décider : ces pratiques n'ont pas de fondement.",
+    "Faire l'istikhâra pour une chose interdite ou déjà obligatoire.",
+    "Prononcer l'intention à voix haute.",
+  ],
+  fin: {
+    titre: "Tu as remis ton affaire à Allah",
+    texte:
+      "« Tu sais et je ne sais pas » : avance sereinement, Allah choisit mieux pour toi que toi-même.",
+  },
+};
+
+/* ================= Omra ================= */
+
+export const GUIDE_OMRA: Guide = {
+  id: "omra",
+  titre: "Ma Omra pas à pas",
+  sousTitre: "De la sacralisation à la coupe des cheveux",
+  intro:
+    "La 'umra se compose de 4 piliers : l'ihrâm (sacralisation), le tawâf (7 tours de la Ka'ba), le sa'y (7 trajets entre Ṣafâ et Marwa) et le rasage ou raccourcissement des cheveux. Suis les étapes une par une, coche-les au fur et à mesure : ta progression est gardée sur ton téléphone.",
+  merites: [
+    {
+      texte:
+        "Une 'umra à une autre expie ce qui est entre elles, et le hajj agréé n'a d'autre récompense que le Paradis.",
+      source: "Al-Bukhari & Muslim",
+    },
+    {
+      texte: "Une 'umra pendant le Ramadan équivaut à un hajj.",
+      source: "Al-Bukhari & Muslim",
+    },
+  ],
+  etapes: [
+    {
+      titre: "Préparer son départ",
+      resume: "Le cœur, les connaissances et la valise.",
+      illustration: "valise",
+      points: [
+        "Purifie ton intention : faire la 'umra pour Allah seul, en suivant le Prophète ﷺ.",
+        "Repens-toi, règle tes dettes ou note-les, demande pardon à ceux que tu as pu blesser.",
+        "Apprends les étapes avant de partir (ce guide est fait pour ça) : sur place, l'émotion et la foule font vite oublier.",
+        "Homme : 2 draps blancs (izâr autour de la taille, ridâ' sur les épaules), des sandales laissant voir le dessus du pied, une ceinture. Femme : ses vêtements habituels, amples et pudiques, de n'importe quelle couleur.",
+        "Pense au savon et au déodorant sans parfum : une fois sacralisé, le parfum est interdit.",
+      ],
+    },
+    {
+      titre: "Au mîqât : la sacralisation",
+      resume: "On entre en état d'ihrâm avant de franchir la limite.",
+      illustration: "miqat",
+      points: [
+        "Le mîqât est la limite qu'on ne franchit pas sans être en ihrâm. Le Prophète ﷺ a fixé : Dhul-Ḥulayfa pour les gens de Médine, al-Juḥfa pour ceux du Shâm (et d'Égypte, du Maghreb, d'Europe), Qarn al-Manâzil pour le Najd, Yalamlam pour le Yémen (Al-Bukhari & Muslim), et Dhât 'Irq pour l'Irak (Muslim).",
+        "En avion depuis la France vers Djeddah, tu passes le mîqât en vol : prépare-toi avant (à la maison ou à l'aéroport), et formule l'intention dans l'avion quand l'équipage annonce le mîqât. Djeddah n'est pas un mîqât pour qui vient d'Europe.",
+        "Si tu vas d'abord à Médine, tu te sacralises au mîqât de Dhul-Ḥulayfa (Abyâr 'Alî) en partant vers La Mecque.",
+        "Avant l'ihrâm : fais un grand lavage (ghusl), coupe ongles et poils si besoin, et pour l'homme parfume son corps (tête, barbe) mais pas les vêtements, comme le Prophète ﷺ (Al-Bukhari & Muslim).",
+        "Il n'y a pas de prière propre à l'ihrâm : si le moment coïncide avec une prière obligatoire, sacralise-toi après elle, comme le Prophète ﷺ.",
+        "Une femme qui a ses règles entre quand même en ihrâm : elle fait tout sauf le tawâf, jusqu'à être pure (Al-Bukhari & Muslim).",
+      ],
+    },
+    {
+      titre: "L'intention et la talbiya",
+      resume: "« Labbayka 'umratan », puis la talbiya en boucle.",
+      illustration: "talbiya",
+      points: [
+        "Formule l'intention en disant : « Labbayka 'umratan » (Me voici, ô Allah, pour une 'umra).",
+        "Si tu crains un empêchement (maladie, problème de visa…), ajoute : « Allâhumma maḥillî ḥaythu ḥabastanî » — Mon lieu de désacralisation est là où Tu me retiendras (Al-Bukhari & Muslim).",
+        "Répète ensuite la talbiya souvent : les hommes à voix haute, les femmes à voix basse. Continue jusqu'au début du tawâf.",
+      ],
+      dhikrs: [
+        {
+          titre: "La talbiya",
+          arabe:
+            "لَبَّيْكَ اللَّهُمَّ لَبَّيْكَ، لَبَّيْكَ لَا شَرِيكَ لَكَ لَبَّيْكَ، إِنَّ الْحَمْدَ وَالنِّعْمَةَ لَكَ وَالْمُلْكَ، لَا شَرِيكَ لَكَ",
+          translit:
+            "Labbayka-llâhumma labbayk, labbayka lâ sharîka laka labbayk, innal-ḥamda wan-ni'mata laka wal-mulk, lâ sharîka lak.",
+          fr: "Me voici, ô Allah, me voici ! Me voici, Tu n'as pas d'associé, me voici ! La louange, le bienfait et la royauté T'appartiennent. Tu n'as pas d'associé.",
+          source: "Al-Bukhari & Muslim",
+        },
+      ],
+    },
+    {
+      titre: "Les interdits de l'ihrâm",
+      resume: "Ce qu'on laisse de côté jusqu'à la fin.",
+      illustration: "interdits",
+      points: [
+        "Pour tous : se couper cheveux ou poils, se couper les ongles, se parfumer (corps, vêtements, savon parfumé), chasser, conclure un mariage, les relations intimes et les préliminaires.",
+        "Homme : pas de vêtement cousu à la forme du corps (chemise, pantalon, caleçon, burnous), pas de couvre-chef collé à la tête, pas de chaussures couvrantes (Al-Bukhari & Muslim). Un parasol ou le toit d'un bus, c'est permis.",
+        "Femme : pas de niqâb ni de gants (Al-Bukhari). Elle peut couvrir son visage avec son voile en présence d'hommes étrangers.",
+        "Permis : se laver, changer de draps, porter montre, lunettes, ceinture-banane, se gratter doucement, dormir.",
+        "Commis par oubli ou ignorance : pas de péché. Si ça arrive volontairement ou par besoin (maladie…), renseigne-toi auprès d'un savant pour la compensation.",
+      ],
+    },
+    {
+      titre: "Entrer dans la Mosquée sacrée",
+      resume: "Pied droit, invocation, et le premier regard sur la Ka'ba.",
+      illustration: "mosquee",
+      points: [
+        "Entre du pied droit en disant : « Allâhumma-ftaḥ lî abwâba raḥmatik » (Muslim).",
+        "En voyant la Ka'ba, aucune invocation particulière n'est authentiquement établie : invoque avec ce que tu veux, dans ta langue.",
+        "Homme : juste avant le tawâf, découvre l'épaule droite (iḍṭibâ') en passant le drap sous le bras droit. On ne le fait que pendant ce tawâf.",
+        "Vérifie que tu as tes ablutions : la majorité des savants les exigent pour le tawâf.",
+      ],
+      dhikrs: [
+        {
+          titre: "En entrant à la mosquée",
+          arabe: "اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ",
+          translit: "Allâhumma-ftaḥ lî abwâba raḥmatik.",
+          fr: "Ô Allah, ouvre-moi les portes de Ta miséricorde.",
+          source: "Muslim",
+        },
+      ],
+    },
+    {
+      titre: "Le tawâf : 7 tours",
+      resume: "La Ka'ba à ta gauche, départ de la Pierre noire.",
+      illustration: "tawaf",
+      outil: "tawaf",
+      points: [
+        "Arrête la talbiya. Place-toi au niveau de la Pierre noire (repère : la lumière verte sur le mur de la mosquée), la Ka'ba à ta gauche.",
+        "À chaque passage devant la Pierre noire : touche-la ou embrasse-la si c'est facile ; sinon, fais-lui face et montre-la de la main droite en disant « Allâhu akbar » (Al-Bukhari). Ne bouscule personne pour l'atteindre.",
+        "Homme : marche rapide à petits pas (raml) pendant les 3 premiers tours, puis marche normale (Muslim).",
+        "Au coin yéménite (le coin juste avant la Pierre noire), touche-le de la main si c'est facile, sans l'embrasser ni le montrer du doigt.",
+        "Entre le coin yéménite et la Pierre noire, dis : « Rabbanâ âtinâ fid-dunyâ ḥasanah… » (Abu Dawud).",
+        "Le reste du temps : dhikr, Coran, invocations libres, dans ta langue. Il n'existe pas d'invocation propre à chaque tour.",
+        "Passe à l'extérieur du Ḥijr d'Ismâ'îl (le muret en demi-cercle) : il fait partie de la Ka'ba.",
+        "En cas de doute sur le nombre de tours, retiens le plus petit chiffre.",
+      ],
+      dhikrs: [
+        {
+          titre: "Entre le coin yéménite et la Pierre noire",
+          arabe:
+            "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+          translit:
+            "Rabbanâ âtinâ fid-dunyâ ḥasanatan wa fil-âkhirati ḥasanatan wa qinâ 'adhâban-nâr.",
+          fr: "Notre Seigneur, accorde-nous une belle part ici-bas et une belle part dans l'au-delà, et protège-nous du châtiment du Feu.",
+          source: "Abu Dawud — Coran 2:201",
+        },
+      ],
+    },
+    {
+      titre: "Deux rak'ât derrière le Maqâm",
+      resume: "Couvrir l'épaule, prier derrière le Maqâm Ibrâhîm.",
+      illustration: "maqam",
+      points: [
+        "Homme : recouvre ton épaule droite.",
+        "En allant vers le Maqâm Ibrâhîm, récite : « Wattakhidhû min maqâmi Ibrâhîma muṣallâ » (Coran 2:125).",
+        "Prie deux rak'ât derrière le Maqâm si possible, sinon n'importe où dans la mosquée. Le Prophète ﷺ y récitait al-Kâfirûn (109) puis al-Ikhlâs (112) (Muslim).",
+      ],
+      dhikrs: [
+        {
+          titre: "En allant vers le Maqâm",
+          arabe: "وَاتَّخِذُوا مِنْ مَقَامِ إِبْرَاهِيمَ مُصَلًّى",
+          translit: "Wattakhidhû min maqâmi Ibrâhîma muṣallâ.",
+          fr: "Prenez la station d'Abraham comme lieu de prière.",
+          source: "Coran 2:125 — Muslim",
+        },
+      ],
+    },
+    {
+      titre: "Zamzam et retour à la Pierre",
+      resume: "Boire l'eau bénie, puis toucher la Pierre si c'est facile.",
+      illustration: "zamzam",
+      points: [
+        "Bois de l'eau de Zamzam, comme le Prophète ﷺ après ses deux rak'ât (Muslim), et invoque pour ce que tu souhaites : « L'eau de Zamzam est pour ce pour quoi on la boit » (Ibn Mâjah).",
+        "Puis, si c'est facile, retourne toucher la Pierre noire avant d'aller au Ṣafâ (Muslim). Sinon, pas de souci : va directement au Ṣafâ.",
+      ],
+    },
+    {
+      titre: "Le sa'y : 7 trajets",
+      resume: "De Ṣafâ à Marwa, sur les pas de Hâjar.",
+      illustration: "say",
+      outil: "say",
+      points: [
+        "En approchant du Ṣafâ (la première fois seulement), récite : « Innaṣ-Ṣafâ wal-Marwata min sha'â'irillâh » puis « Abda'u bimâ bada'allâhu bih » (Je commence par ce par quoi Allah a commencé) (Muslim).",
+        "Monte sur le Ṣafâ, tourne-toi vers la Ka'ba, lève les mains et dis le dhikr ci-dessous trois fois, en faisant des invocations entre chaque fois (Muslim).",
+        "Marche vers Marwa. Homme : entre les deux lumières vertes, cours (Muslim) ; les femmes marchent normalement.",
+        "Arrivé à Marwa, fais la même chose qu'au Ṣafâ (sans relire le verset). Ṣafâ → Marwa = 1 trajet, Marwa → Ṣafâ = 2e trajet… Le 7e se termine à Marwa.",
+        "Les ablutions sont recommandées mais pas obligatoires pour le sa'y. Une femme dont les règles arrivent après le tawâf peut faire le sa'y.",
+      ],
+      dhikrs: [
+        {
+          titre: "Sur le Ṣafâ et sur Marwa (3 fois)",
+          arabe:
+            "اللَّهُ أَكْبَرُ، اللَّهُ أَكْبَرُ، اللَّهُ أَكْبَرُ، لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ، أَنْجَزَ وَعْدَهُ، وَنَصَرَ عَبْدَهُ، وَهَزَمَ الْأَحْزَابَ وَحْدَهُ",
+          translit:
+            "Allâhu akbar, Allâhu akbar, Allâhu akbar. Lâ ilâha illâ-llâhu waḥdahu lâ sharîka lah, lahul-mulku wa lahul-ḥamd, wa huwa 'alâ kulli shay'in qadîr. Lâ ilâha illâ-llâhu waḥdah, anjaza wa'dah, wa naṣara 'abdah, wa hazamal-aḥzâba waḥdah.",
+          fr: "Allah est le plus Grand (3 fois). Nulle divinité hormis Allah, Seul, sans associé ; à Lui la royauté et la louange, et Il est capable de toute chose. Nulle divinité hormis Allah, Seul : Il a tenu Sa promesse, secouru Son serviteur et vaincu, Seul, les coalisés.",
+          source: "Muslim",
+        },
+        {
+          titre: "En approchant du Ṣafâ (1re fois)",
+          arabe:
+            "إِنَّ الصَّفَا وَالْمَرْوَةَ مِنْ شَعَائِرِ اللَّهِ — أَبْدَأُ بِمَا بَدَأَ اللَّهُ بِهِ",
+          translit:
+            "Innaṣ-Ṣafâ wal-Marwata min sha'â'irillâh — Abda'u bimâ bada'allâhu bih.",
+          fr: "Ṣafâ et Marwa sont vraiment parmi les lieux sacrés d'Allah (Coran 2:158) — Je commence par ce par quoi Allah a commencé.",
+          source: "Muslim",
+        },
+      ],
+      astuce:
+        "Pendant les trajets, invoque librement. Des Compagnons (Ibn Mas'ûd, Ibn 'Umar) disaient : « Rabbi-ghfir warḥam, innaka antal-a'azzul-akram ».",
+    },
+    {
+      titre: "Couper les cheveux",
+      resume: "Le dernier geste : la 'umra est terminée !",
+      illustration: "ciseaux",
+      points: [
+        "Homme : raser la tête est le meilleur — le Prophète ﷺ a invoqué trois fois la miséricorde pour ceux qui rasent et une fois pour ceux qui raccourcissent (Al-Bukhari & Muslim). Si tu raccourcis, fais-le sur l'ensemble de la tête, pas seulement quelques mèches.",
+        "Femme : elle ne rase pas ; elle rassemble ses cheveux et en coupe l'équivalent d'une phalange (environ 1 à 2 cm) au bout (Abu Dawud). Elle le fait à l'abri des regards.",
+        "Ça y est : tous les interdits de l'ihrâm sont levés. Tu peux te changer, te parfumer, et reprendre ta vie normale.",
+      ],
+      astuce:
+        "Garde ton énergie : profite ensuite de ton séjour pour prier à la Mosquée sacrée (une prière y vaut 100 000 prières ailleurs — Ibn Mâjah & Ahmad) et faire des tawâf surérogatoires.",
+    },
+  ],
+  aEviter: [
+    "Réciter un livret de douas « spéciales » pour chaque tour de tawâf ou de sa'y : rien de tel n'est établi. Invoque avec tes propres mots.",
+    "Répéter en chœur, à voix forte, les invocations d'un guide : cela dérange les autres fidèles.",
+    "Bousculer ou faire mal pour toucher la Pierre noire : la montrer de la main suffit.",
+    "Toucher ou frotter le Maqâm Ibrâhîm, les murs ou le tissu de la Ka'ba pour la baraka : seuls la Pierre noire et le coin yéménite se touchent.",
+    "Garder l'épaule découverte en dehors du tawâf, ou pendant la prière.",
+    "Passer le mîqât sans ihrâm, en pensant se sacraliser à Djeddah.",
+    "Ne couper que quelques cheveux (homme) ou oublier la coupe : sans elle, la 'umra n'est pas terminée.",
+    "Passer le tawâf à filmer et à prendre des selfies : ce moment est une adoration.",
+  ],
+  fin: {
+    titre: "Taqabbala-llâhu minnâ wa minkum !",
+    texte:
+      "Ta 'umra est terminée. Qu'Allah l'accepte, efface tes péchés et te permette d'y revenir.",
+  },
+};

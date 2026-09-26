@@ -16,6 +16,7 @@ import {
   Cube,
   Pinceau,
   Horloge,
+  KaabaIcone,
   Lettres,
   LivreOuvert,
   Manette,
@@ -53,6 +54,12 @@ const MODULES = [
     icone: Coeur,
     nom: "Invocations",
     description: "Les douas authentiques du quotidien",
+  },
+  {
+    href: "/omra",
+    icone: KaabaIcone,
+    nom: "Omra",
+    description: "Guide pas à pas, de la sacralisation à la coupe des cheveux",
   },
   {
     href: "/prieres",

@@ -339,6 +339,29 @@ export const Trophee = (p: IconeProps) => (
 );
 
 /** Icônes des événements du calendrier, par identifiant. */
+export const KaabaIcone = (p: IconeProps) => (
+  <Trait {...p}>
+    <path d="M12 2l9 4.5v11L12 22l-9-4.5v-11z" />
+    <path d="M3 6.5L12 11l9-4.5" />
+    <path d="M12 11v11" />
+    <path d="M3 10l9 4.5 9-4.5" />
+  </Trait>
+);
+
+export const LuneEtoile = (p: IconeProps) => (
+  <Trait {...p}>
+    <path d="M17 17.5A8 8 0 1 1 10.5 4a6.5 6.5 0 0 0 6.5 13.5z" />
+    <path d="M18 3l.9 2.1L21 6l-2.1.9L18 9l-.9-2.1L15 6l2.1-.9z" />
+  </Trait>
+);
+
+export const Boussole = (p: IconeProps) => (
+  <Trait {...p}>
+    <circle cx="12" cy="12" r="10" />
+    <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+  </Trait>
+);
+
 export const ICONES_EVENEMENTS: Record<
   string,
   (p: IconeProps) => JSX.Element

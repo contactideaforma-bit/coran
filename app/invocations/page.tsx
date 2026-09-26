@@ -4,7 +4,35 @@ import Link from "next/link";
 import { CATEGORIES_INVOCATIONS } from "@/data/invocations";
 import { usePrefs } from "@/lib/prefs";
 import Entete from "@/components/Entete";
-import { Ampoule, Coeur, ICONES_CATEGORIES } from "@/components/Icones";
+import {
+  Ampoule,
+  Boussole,
+  Coeur,
+  ICONES_CATEGORIES,
+  KaabaIcone,
+  LuneEtoile,
+} from "@/components/Icones";
+
+const GUIDES = [
+  {
+    href: "/invocations/nuit",
+    icone: LuneEtoile,
+    nom: "La prière de la nuit",
+    description: "Qiyâm al-layl : horaire du dernier tiers, étapes et witr",
+  },
+  {
+    href: "/invocations/istikhara",
+    icone: Boussole,
+    nom: "La prière de consultation",
+    description: "Istikhâra : quand, comment, et l'invocation complète",
+  },
+  {
+    href: "/omra",
+    icone: KaabaIcone,
+    nom: "La Omra",
+    description: "De la sacralisation à la coupe des cheveux",
+  },
+];
 
 export default function Invocations() {
   const { prefs } = usePrefs();
@@ -30,7 +58,30 @@ export default function Invocations() {
         pour dérouler.
       </p>
 
-      <main className="mt-5 space-y-6">
+      <section className="mt-5">
+        <h3 className="mb-2 text-lg font-extrabold">Guides pas à pas</h3>
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+          {GUIDES.map((g) => (
+            <Link
+              key={g.href}
+              href={g.href}
+              className="card flex items-center gap-3 rounded-2xl p-4 shadow-soft transition hover:scale-[1.02] active:scale-[0.98] sm:flex-col sm:items-start"
+            >
+              <span className="tuile-icone">
+                <g.icone taille={22} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block font-extrabold leading-tight">{g.nom}</span>
+                <span className="mt-0.5 block text-xs" style={{ color: "var(--muted)" }}>
+                  {g.description}
+                </span>
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <main className="mt-6 space-y-6">
         {CATEGORIES_INVOCATIONS.map((cat) => {
           const Icone = ICONES_CATEGORIES[cat.icone] ?? Coeur;
           return (
