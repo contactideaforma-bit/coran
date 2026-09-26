@@ -99,6 +99,18 @@ const ILLUSTRATIONS: Record<string, () => JSX.Element> = {
       <Scintille x={86} y={16} r={5} />
     </Cadre>
   ),
+  impair: () => (
+    <Cadre>
+      {[1, 3, 5, 7].map((n, i) => (
+        <g key={n}>
+          <circle cx={16 + i * 21} cy={i % 2 ? 58 : 42} r="9" fill={i === 0 ? A : DOUX} stroke={i === 0 ? "none" : "currentColor"} />
+          <text x={16 + i * 21} y={(i % 2 ? 58 : 42) + 4.5} textAnchor="middle" fontSize="13" fontWeight="800" fill={i === 0 ? "#fff" : "currentColor"} stroke="none">{n}</text>
+        </g>
+      ))}
+      <path d="M58 16a12 12 0 1 0 10 18A9.5 9.5 0 1 1 58 16z" fill={A} stroke="none" transform="translate(-10 -6)" />
+      <path d="M10 82h76" strokeDasharray="3 5" />
+    </Cadre>
+  ),
   mains: () => (
     <Cadre>
       <path d="M46 84V56c0-6-3-10-8-14l-10-9c-3-3-7 0-5 4l7 12-12-16c-3-3-7 0-5 4l12 18c-3 6-1 14 6 20" fill={DOUX} />

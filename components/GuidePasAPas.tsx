@@ -258,6 +258,57 @@ export default function GuidePasAPas({
               ))}
             </ol>
 
+            {e.cas && (
+              <div className="mt-5 space-y-3">
+                {e.cas.map((c, i) => (
+                  <div
+                    key={i}
+                    className="rounded-2xl p-4"
+                    style={{ border: `${c.recommande ? 2 : 1}px solid ${c.recommande ? "var(--accent)" : "var(--border)"}` }}
+                  >
+                    <p className="flex flex-wrap items-center gap-2 font-extrabold">
+                      <span style={{ color: "var(--accent)" }}>Si…</span> {c.titre}
+                      {c.recommande && (
+                        <span
+                          className="rounded-full px-2 py-0.5 text-[11px] font-extrabold text-white"
+                          style={{ background: "var(--accent)" }}
+                        >
+                          Le meilleur
+                        </span>
+                      )}
+                    </p>
+                    <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                      {c.frise.map((f, j) => (
+                        <span key={j} className="flex items-center gap-1.5">
+                          {j > 0 && (
+                            <span className="text-xs" style={{ color: "var(--accent)" }}>
+                              →
+                            </span>
+                          )}
+                          <span
+                            className="rounded-full px-2.5 py-1 text-xs font-bold"
+                            style={{
+                              background: "color-mix(in srgb, var(--accent) 12%, transparent)",
+                              border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)",
+                            }}
+                          >
+                            {f}
+                          </span>
+                        </span>
+                      ))}
+                    </div>
+                    <div className="mt-3 space-y-2">
+                      {c.texte.map((t, j) => (
+                        <p key={j} className="text-sm leading-relaxed">
+                          {t}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
             {e.outil === "tawaf" && <CompteurTawaf />}
             {e.outil === "say" && <CompteurSay />}
             {e.outil === "dernier-tiers" && <DernierTiers />}

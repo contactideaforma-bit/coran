@@ -21,6 +21,15 @@ export interface EtapeGuide {
   astuce?: string;
   outil?: OutilGuide;
   lien?: { href: string; libelle: string };
+  /** Situations concrètes « si… alors… », avec une frise de la soirée. */
+  cas?: CasPratique[];
+}
+
+export interface CasPratique {
+  titre: string; // ex. « Je ne suis pas sûr de me réveiller »
+  frise: string[]; // étapes courtes affichées en pastilles fléchées
+  texte: string[];
+  recommande?: boolean;
 }
 
 export interface Guide {
@@ -67,14 +76,63 @@ export const GUIDE_NUIT: Guide = {
       ],
     },
     {
-      titre: "Préparer sa nuit",
-      resume: "Se coucher tôt, avec l'intention de se lever.",
+      titre: "Le witr : ce que c'est",
+      resume: "La prière impaire qui scelle la nuit.",
+      illustration: "impair",
+      points: [
+        "« Witr » veut dire « impair ». Le Prophète ﷺ a dit : « Allah est Witr (Unique) et Il aime ce qui est impair ; faites donc le witr, ô gens du Coran » (Abu Dawud & At-Tirmidhi). Par cette rak'a impaire, le croyant termine sa journée d'adoration en attestant l'unicité de Celui qu'il adore.",
+        "C'est une sunna très appuyée que le Prophète ﷺ ne délaissait jamais, même en voyage où il la priait sur sa monture (Al-Bukhari & Muslim). 'Alî a dit : « Le witr n'est pas obligatoire comme la prière prescrite, mais c'est une sunna établie par le Messager d'Allah ﷺ » (At-Tirmidhi & An-Nasa'i). Certains savants (hanafites) le considèrent même obligatoire : raison de plus pour ne pas le laisser.",
+        "Le witr fait partie de la prière de la nuit : c'est sa conclusion. « Faites du witr la dernière de vos prières de la nuit » (Al-Bukhari & Muslim). Les rak'ât qu'on prie avant lui, deux par deux, sont la prière de la nuit elle-même.",
+        "Son temps va de après 'Ishâ jusqu'à l'aube. 'Â'isha a dit : « Dans chaque partie de la nuit le Messager d'Allah ﷺ a fait le witr : au début, au milieu et à la fin ; et son witr a fini par se fixer à l'approche de l'aube » (Al-Bukhari & Muslim).",
+        "Ces fameuses « 2 + 1 » après 'Ishâ ? Ce n'est pas une prière à part : les 2 rak'ât (souvent appelées « shaf' », le pair) sont une petite prière de la nuit, et la rak'a unique est le witr. Celui qui les prie a donc déjà fait une prière de la nuit, même courte, et c'est une bonne chose. Attention à ne pas les confondre avec les 2 rak'ât de sunna (rawâtib) de 'Ishâ, qui sont une prière distincte.",
+      ],
+      astuce:
+        "Le witr est le « sceau » de la nuit : où que tu le places, tout ce que tu pries cette nuit-là doit logiquement venir avant lui, sauf exception expliquée à l'étape suivante.",
+    },
+    {
+      titre: "'Ishâ, witr et sommeil : ton plan",
+      resume: "Où placer le witr selon ta situation.",
       illustration: "lit",
       points: [
-        "Dors tôt après 'Ishâ en formulant dans ton cœur l'intention de te lever. L'intention se fait dans le cœur : aucune formule n'est à prononcer.",
-        "Celui qui se couche avec l'intention sincère de se lever et que le sommeil emporte jusqu'au matin : on lui inscrit ce qu'il comptait faire, et son sommeil est une aumône d'Allah pour lui (An-Nasa'i & Ibn Mâjah).",
-        "Si tu crains de ne pas te réveiller, prie le witr avant de dormir ; si tu es confiant, garde-le pour la fin de la nuit, c'est meilleur (Muslim).",
-        "Mets un réveil sur l'heure du dernier tiers calculée à l'étape précédente.",
+        "Le Prophète ﷺ a dit : « Celui qui craint de ne pas se lever à la fin de la nuit, qu'il fasse le witr au début. Celui qui compte se lever à la fin, qu'il le fasse à la fin de la nuit, car la prière de la fin de la nuit a des témoins (les anges) et elle est meilleure » (Muslim).",
+        "Les deux choix sont donc conformes à la Sunna : tout dépend de toi. Choisis ton cas ci-dessous.",
+        "Dans tous les cas, couche-toi tôt avec l'intention sincère de te lever : si le sommeil t'emporte malgré toi, on t'inscrit ce que tu comptais faire et ton sommeil devient une aumône d'Allah pour toi (An-Nasa'i & Ibn Mâjah). L'intention se fait dans le cœur, sans formule.",
+      ],
+      cas: [
+        {
+          titre: "Je ne suis pas sûr de me réveiller",
+          frise: ["'Ishâ", "2 rak'ât sunna", "2 + 1 witr", "Dormir", "Fajr"],
+          texte: [
+            "Prie ton witr avant de dormir : c'est exactement la recommandation du Prophète ﷺ à Abû Hurayra, qui a dit : « Mon ami ﷺ m'a recommandé trois choses […] et de faire le witr avant de dormir » (Al-Bukhari & Muslim).",
+            "Tu as ainsi une prière de la nuit complète, même petite, et tu ne perds rien si tu dors jusqu'au Fajr.",
+          ],
+        },
+        {
+          titre: "J'ai fait mon witr, mais je me réveille quand même",
+          frise: ["Witr avant de dormir", "Réveil", "2 + 2 + …", "Pas de 2e witr", "Fajr"],
+          texte: [
+            "Excellent ! Prie deux par deux autant que tu veux, puis invoque. Ne refais pas de witr : « Pas deux witr dans une même nuit » (Abu Dawud, At-Tirmidhi & An-Nasa'i).",
+            "Prier après son witr est permis : le Prophète ﷺ a prié deux rak'ât assis après son witr (Muslim).",
+            "Certains Compagnons, comme Ibn 'Umar, commençaient par une rak'a seule au réveil pour « rendre pair » le premier witr, puis refaisaient un witr à la fin. Le plus proche de ce que faisait le Prophète ﷺ reste de prier deux par deux sans rien ajouter.",
+          ],
+        },
+        {
+          titre: "Je suis confiant de me lever",
+          frise: ["'Ishâ", "2 rak'ât sunna", "Dormir", "Dernier tiers : 2 + 2 + … + witr", "Fajr"],
+          recommande: true,
+          texte: [
+            "Après 'Ishâ, contente-toi des 2 rak'ât de sunna et va dormir sans faire le witr. Au dernier tiers, prie deux par deux puis termine par le witr juste avant le Fajr : c'est le meilleur, d'après le hadith.",
+            "Mets un réveil : c'est ce qui transforme l'intention en habitude.",
+          ],
+        },
+        {
+          titre: "J'avais gardé le witr pour la nuit… et je ne me suis pas réveillé",
+          frise: ["Réveil au Fajr", "Pas de panique", "Rattraper le jour, en pair"],
+          texte: [
+            "« Celui qui s'endort sans avoir fait son witr ou l'oublie, qu'il le prie lorsqu'il s'en souvient ou se réveille » (Abu Dawud & At-Tirmidhi).",
+            "La pratique du Prophète ﷺ précise la manière : quand le sommeil ou une douleur l'avait empêché de prier la nuit, il priait dans la journée douze rak'ât (Muslim), soit son nombre habituel rendu pair. Par exemple, si tu fais d'habitude 2 + 1, rattrape 4 rak'ât (deux fois deux) entre le lever du soleil et le Dhuhr.",
+          ],
+        },
       ],
     },
     {
@@ -140,6 +198,7 @@ export const GUIDE_NUIT: Guide = {
       illustration: "witr",
       points: [
         "« Faites du witr la dernière de vos prières de la nuit » (Al-Bukhari & Muslim). Il se prie en 1, 3, 5 rak'ât ou plus, toujours en nombre impair.",
+        "En 3 rak'ât, deux façons sont rapportées : 2 rak'ât, salâm, puis 1 rak'a seule (comme le faisait Ibn 'Umar, Al-Bukhari) ; ou 3 rak'ât d'affilée avec un seul tashahhud à la fin, sans s'asseoir après la 2e pour ne pas ressembler au Maghrib.",
         "En 3 rak'ât, le Prophète ﷺ récitait : al-A'lâ (87), al-Kâfirûn (109) puis al-Ikhlâs (112) (Abu Dawud & An-Nasa'i).",
         "Tu peux faire le qunût (invocation debout) dans la dernière rak'a, avant ou après l'inclinaison. Il est permis de le laisser de temps en temps.",
       ],
@@ -162,7 +221,6 @@ export const GUIDE_NUIT: Guide = {
       points: [
         "Après le salâm du witr, le Prophète ﷺ disait trois fois « Subḥânal-Malikil-Quddûs », en élevant et prolongeant la voix la troisième fois (An-Nasa'i & Abu Dawud).",
         "Puis invoque librement, dans ta langue : c'est l'heure où Allah demande « Qui M'invoque, que Je l'exauce ? ». Demande pardon, pour toi, tes parents, tes enfants, et tout ce dont tu as besoin.",
-        "Si tu as déjà prié le witr avant de dormir et que tu te réveilles, prie deux par deux sans refaire de witr : « Pas deux witr dans une même nuit » (Abu Dawud & At-Tirmidhi).",
       ],
       dhikrs: [
         {
@@ -181,7 +239,7 @@ export const GUIDE_NUIT: Guide = {
       points: [
         "« L'œuvre la plus aimée d'Allah est la plus régulière, même si elle est petite » (Al-Bukhari & Muslim). Commence par 2 rak'ât + le witr, puis augmente doucement.",
         "Si tu somnoles en priant, va dormir : tu risquerais de vouloir demander pardon et de te maudire sans le savoir (Al-Bukhari & Muslim).",
-        "Si le sommeil ou la maladie t'a empêché de prier la nuit, le Prophète ﷺ priait dans la journée 12 rak'ât (Muslim) : tu rattrapes en nombre pair, avant midi.",
+        "Nuit manquée ? Rattrape-la le jour, en nombre pair (voir « 'Ishâ, witr et sommeil : ton plan »).",
         "Ne fais pas comme celui qui priait la nuit puis a délaissé (Al-Bukhari) : mieux vaut un petit rythme tenu toute l'année.",
       ],
     },
@@ -189,6 +247,8 @@ export const GUIDE_NUIT: Guide = {
   aEviter: [
     "Prononcer l'intention à voix haute (« nawaytu… ») : l'intention est dans le cœur.",
     "Faire deux witr dans la même nuit.",
+    "Croire que les « 2 + 1 » après 'Ishâ empêchent de prier plus tard dans la nuit : on peut encore prier deux par deux, sans refaire de witr.",
+    "Délaisser complètement le witr : même une seule rak'a avant de dormir vaut mieux que rien.",
     "S'épuiser jusqu'à manquer la prière du Fajr : la prière obligatoire passe avant tout.",
     "Veiller toute la nuit chaque nuit : le Prophète ﷺ priait et dormait (Al-Bukhari & Muslim).",
     "Réveiller brutalement les autres ou réciter si fort qu'on les dérange.",
