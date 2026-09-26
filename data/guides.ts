@@ -561,3 +561,160 @@ export const GUIDE_OMRA: Guide = {
       "Ta 'umra est terminée. Qu'Allah l'accepte, efface tes péchés et te permette d'y revenir.",
   },
 };
+
+/* ================= Repentir ================= */
+
+export const GUIDE_TAWBA: Guide = {
+  id: "tawba",
+  titre: "Le repentir",
+  sousTitre: "At-Tawba : revenir vers Allah",
+  intro:
+    "Tawba veut dire « retour » : revenir vers Allah après s'être éloigné de Lui. Elle est obligatoire pour tout péché, et sa porte reste ouverte jusqu'au dernier souffle. Personne n'est trop loin : c'est Allah Lui-même qui appelle Ses serviteurs à revenir.",
+  merites: [
+    {
+      texte:
+        "Dis : « Ô Mes serviteurs qui avez commis des excès à votre propre détriment, ne désespérez pas de la miséricorde d'Allah. Allah pardonne tous les péchés, car c'est Lui le Pardonneur, le Très Miséricordieux. »",
+      source: "Coran 39:53",
+    },
+    {
+      texte:
+        "Allah se réjouit davantage du repentir de Son serviteur que l'un de vous qui, ayant perdu sa monture chargée de ses provisions en plein désert, la retrouve soudain.",
+      source: "Al-Bukhari & Muslim",
+    },
+    {
+      texte:
+        "Celui qui se repent du péché est comme celui qui n'a pas de péché.",
+      source: "Ibn Mâjah (bon)",
+    },
+  ],
+  etapes: [
+    {
+      titre: "Comprendre la tawba",
+      resume: "Une porte grande ouverte, pour tous les péchés.",
+      illustration: "porte",
+      points: [
+        "Même le Prophète ﷺ, pardonné de tout, disait : « Ô gens, repentez-vous à Allah : je me repens à Lui cent fois par jour » (Muslim). Le repentir n'est pas réservé aux « grands pécheurs » : c'est l'adoration de tous les jours.",
+        "Allah tend Sa main la nuit pour que se repente celui qui a mal agi le jour, et le jour pour que se repente celui qui a mal agi la nuit, jusqu'à ce que le soleil se lève à l'ouest (Muslim).",
+        "Le repentir est accepté tant que l'âme n'est pas arrivée à la gorge, au moment de l'agonie (At-Tirmidhi). N'attends donc pas : personne ne connaît son terme.",
+        "Pour celui qui se repent sincèrement, Allah fait plus que pardonner : « Allah changera leurs mauvaises actions en bonnes » (Coran 25:70).",
+      ],
+    },
+    {
+      titre: "Les trois conditions",
+      resume: "Cesser, regretter, ne plus recommencer.",
+      illustration: "coeur",
+      points: [
+        "Cesser le péché tout de suite : on ne peut pas se repentir d'une chose qu'on continue à faire.",
+        "Le regretter sincèrement dans son cœur : « Le regret, c'est le repentir » (Ibn Mâjah & Ahmad).",
+        "Avoir la ferme résolution de ne pas y revenir. Si tu rechutes plus tard, ton premier repentir n'est pas annulé : tu te repens à nouveau (voir la dernière étape).",
+        "Le faire sincèrement pour Allah, et non par peur du regard des gens ou d'une conséquence de ce monde.",
+      ],
+      astuce:
+        "Pas besoin de raconter ton péché à qui que ce soit : le repentir est entre toi et Allah, sans intermédiaire.",
+    },
+    {
+      titre: "Rendre aux gens leurs droits",
+      resume: "Une 4e condition quand le péché touche autrui.",
+      illustration: "balance",
+      points: [
+        "Si le péché concerne quelqu'un d'autre (argent pris, dette, médisance, tort causé), il faut en plus rendre son droit ou obtenir son pardon.",
+        "« Que celui qui a commis une injustice envers son frère, dans son honneur ou autre chose, s'en libère aujourd'hui, avant le jour où il n'y aura ni dinar ni dirham » : ce jour-là, on prendra de ses bonnes actions pour les donner à sa victime (Al-Bukhari).",
+        "Rends ce que tu as pris, même discrètement. Si la personne est introuvable ou décédée, donne l'équivalent en aumône en son nom et invoque pour elle.",
+        "Pour la médisance, si révéler la faute risque d'aggraver les choses, des savants conseillent d'invoquer pour la personne et de dire du bien d'elle là où tu en avais dit du mal.",
+        "Rattrape aussi ce qui peut l'être envers Allah : jeûnes manqués du Ramadan, zakât non versée. Pour les prières délaissées, les savants divergent : demande conseil et multiplie les prières surérogatoires.",
+      ],
+    },
+    {
+      titre: "La prière du repentir",
+      resume: "Ablutions, deux rak'ât, puis demander pardon.",
+      illustration: "tapis",
+      points: [
+        "Abû Bakr rapporte que le Prophète ﷺ a dit : « Il n'est pas d'homme qui commet un péché, puis se lève, se purifie, prie deux rak'ât et demande pardon à Allah, sans qu'Allah ne lui pardonne. » Puis il récita : « Et ceux qui, lorsqu'ils ont commis une turpitude ou fait du tort à eux-mêmes, se souviennent d'Allah et demandent pardon pour leurs péchés… » (Coran 3:135) — Abu Dawud & At-Tirmidhi.",
+        "Fais des ablutions complètes et soignées : les péchés sortent avec l'eau (Muslim).",
+        "Prie deux rak'ât surérogatoires, avec les sourates que tu veux, en dehors des moments interdits.",
+        "Puis demande pardon avec tes mots et avec les formules de l'étape suivante, en reconnaissant sincèrement ta faute.",
+      ],
+    },
+    {
+      titre: "Les formules du pardon",
+      resume: "Les mots enseignés par le Prophète ﷺ.",
+      illustration: "mains",
+      points: [
+        "Le Prophète ﷺ demandait pardon plus de soixante-dix fois par jour (Al-Bukhari). Prends l'habitude d'un nombre fixe, par exemple 100 fois « Astaghfirullâh wa atûbu ilayh ».",
+        "La meilleure formule est le Sayyid al-Istighfâr, à dire le matin et le soir.",
+      ],
+      dhikrs: [
+        {
+          titre: "Sayyid al-Istighfâr",
+          arabe:
+            "اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ",
+          translit:
+            "Allâhumma anta Rabbî lâ ilâha illâ anta, khalaqtanî wa anâ 'abduka, wa anâ 'alâ 'ahdika wa wa'dika mâ-staṭa'tu, a'ûdhu bika min sharri mâ ṣana'tu, abû'u laka bini'matika 'alayya, wa abû'u bidhanbî, fa-ghfir lî fa-innahu lâ yaghfiru-dh-dhunûba illâ anta.",
+          fr: "Ô Allah, Tu es mon Seigneur, il n'y a de divinité que Toi. Tu m'as créé et je suis Ton serviteur. Je me tiens à Ton pacte et à Ta promesse autant que je le peux. Je cherche protection auprès de Toi contre le mal que j'ai commis. Je reconnais Tes bienfaits envers moi et je reconnais mon péché : pardonne-moi, car nul ne pardonne les péchés en dehors de Toi.",
+          source: "Al-Bukhari",
+        },
+        {
+          titre: "Même s'il avait fui le combat",
+          arabe:
+            "أَسْتَغْفِرُ اللَّهَ الَّذِي لَا إِلَهَ إِلَّا هُوَ الْحَيَّ الْقَيُّومَ وَأَتُوبُ إِلَيْهِ",
+          translit:
+            "Astaghfirullâhal-ladhî lâ ilâha illâ huwal-Ḥayyal-Qayyûma wa atûbu ilayh.",
+          fr: "Je demande pardon à Allah, en dehors de qui il n'y a pas de divinité, le Vivant, Celui qui subsiste par Lui-même, et je me repens à Lui.",
+          source: "Abu Dawud & At-Tirmidhi",
+        },
+        {
+          titre: "Cent fois dans une assemblée",
+          arabe:
+            "رَبِّ اغْفِرْ لِي وَتُبْ عَلَيَّ إِنَّكَ أَنْتَ التَّوَّابُ الرَّحِيمُ",
+          translit: "Rabbi-ghfir lî wa tub 'alayya innaka antat-Tawwâbur-Raḥîm.",
+          fr: "Seigneur, pardonne-moi et accepte mon repentir, Tu es le Très Accueillant au repentir, le Très Miséricordieux.",
+          source: "Abu Dawud & At-Tirmidhi",
+        },
+        {
+          titre: "L'invocation d'Adam et Ève",
+          arabe:
+            "رَبَّنَا ظَلَمْنَا أَنْفُسَنَا وَإِنْ لَمْ تَغْفِرْ لَنَا وَتَرْحَمْنَا لَنَكُونَنَّ مِنَ الْخَاسِرِينَ",
+          translit:
+            "Rabbanâ ẓalamnâ anfusanâ wa in lam taghfir lanâ wa tarḥamnâ lanakûnanna minal-khâsirîn.",
+          fr: "Notre Seigneur, nous nous sommes fait du tort à nous-mêmes. Si Tu ne nous pardonnes pas et ne nous fais pas miséricorde, nous serons certes du nombre des perdants.",
+          source: "Coran 7:23",
+        },
+      ],
+    },
+    {
+      titre: "Effacer par le bien",
+      resume: "Les bonnes actions et les moments bénis.",
+      illustration: "etoile",
+      points: [
+        "« Crains Allah où que tu sois, fais suivre la mauvaise action d'une bonne qui l'effacera, et comporte-toi bien avec les gens » (At-Tirmidhi). « Les bonnes actions dissipent les mauvaises » (Coran 11:114).",
+        "Les cinq prières, le vendredi au vendredi et le Ramadan au Ramadan effacent ce qui est entre eux, tant qu'on évite les grands péchés (Muslim).",
+        "Choisis les moments où l'invocation est exaucée : le dernier tiers de la nuit, la prosternation, entre l'appel à la prière et l'iqâma, la dernière heure du vendredi, le jour de 'Arafa, et pendant le jeûne.",
+        "Change d'environnement si nécessaire : l'homme qui avait tué cent personnes fut conseillé de quitter la terre de ses péchés pour une terre de gens pieux (Al-Bukhari & Muslim).",
+      ],
+    },
+    {
+      titre: "Et si je rechute ?",
+      resume: "Recommencer à se repentir, sans jamais désespérer.",
+      illustration: "chemin",
+      points: [
+        "Dans un hadith qudsi, un serviteur pèche puis dit « Seigneur, pardonne-moi », et Allah dit : « Mon serviteur a su qu'il a un Seigneur qui pardonne les péchés et qui en tient compte : Je lui ai pardonné. » Cela se répète plusieurs fois, et Allah lui pardonne à chaque fois (Al-Bukhari & Muslim).",
+        "« Tous les fils d'Adam commettent des fautes, et les meilleurs de ceux qui commettent des fautes sont ceux qui se repentent » (At-Tirmidhi & Ibn Mâjah).",
+        "La rechute ne doit pas te faire abandonner : c'est justement ce que Satan veut. Chaque retour vers Allah est une victoire sur lui.",
+        "Mais le repentir n'est pas un permis : continuer à pécher en comptant se repentir « plus tard » est une ruse de Satan. Reviens tout de suite.",
+      ],
+    },
+  ],
+  aEviter: [
+    "Désespérer de la miséricorde d'Allah : c'est en soi un grand péché (Coran 12:87 et 39:53).",
+    "Repousser son repentir à plus tard : la mort arrive sans prévenir.",
+    "Afficher ses péchés ou s'en vanter : « Toute ma communauté sera pardonnée, sauf ceux qui s'exposent » — celui qui raconte ce qu'Allah avait couvert pendant la nuit (Al-Bukhari & Muslim).",
+    "Croire qu'il faut se confesser à quelqu'un, un imam ou un « cheikh », pour être pardonné.",
+    "Dire « Astaghfirullâh » en continuant le péché, sans regret ni résolution.",
+    "Négliger les droits des gens en pensant que le repentir envers Allah suffit.",
+  ],
+  fin: {
+    titre: "Bienvenue sur le chemin du retour",
+    texte:
+      "« Allah aime ceux qui se repentent et Il aime ceux qui se purifient » (Coran 2:222). Garde l'istighfâr sur ta langue chaque jour.",
+  },
+};

@@ -111,6 +111,32 @@ const ILLUSTRATIONS: Record<string, () => JSX.Element> = {
       <path d="M10 82h76" strokeDasharray="3 5" />
     </Cadre>
   ),
+  porte: () => (
+    <Cadre>
+      <path d="M22 88V34a26 26 0 0 1 52 0v54" fill={DOUX} />
+      <path d="M48 88V20" strokeWidth="1.5" />
+      <path d="M48 88L66 80V26L48 20" fill={A} stroke="none" />
+      <circle cx="61" cy="54" r="2.5" fill="var(--sur-accent)" stroke="none" />
+      <path d="M8 88h80" />
+      <path d="M36 4v6M18 12l4 5M78 12l-4 5" stroke={A} strokeWidth="3" />
+    </Cadre>
+  ),
+  coeur: () => (
+    <Cadre>
+      <path d="M48 82C26 66 12 54 12 36a18 18 0 0 1 36-4 18 18 0 0 1 36 4c0 18-14 30-36 46z" fill={DOUX} />
+      <path d="M48 82C70 66 84 54 84 36a18 18 0 0 0-36-4z" fill={A} stroke="none" />
+      <path d="M48 32l-6 12 10 6-6 12" strokeWidth="3" />
+    </Cadre>
+  ),
+  balance: () => (
+    <Cadre>
+      <path d="M48 12v70M30 86h36M20 24h56" />
+      <circle cx="48" cy="12" r="4" fill={A} stroke="none" />
+      <path d="M20 24L8 52h24zM76 24L64 52h24z" />
+      <path d="M8 52a12 6 0 0 0 24 0z" fill={A} stroke="none" />
+      <path d="M64 52a12 6 0 0 0 24 0z" fill={DOUX} />
+    </Cadre>
+  ),
   mains: () => (
     <Cadre>
       <path d="M46 84V56c0-6-3-10-8-14l-10-9c-3-3-7 0-5 4l7 12-12-16c-3-3-7 0-5 4l12 18c-3 6-1 14 6 20" fill={DOUX} />

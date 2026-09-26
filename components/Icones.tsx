@@ -362,6 +362,19 @@ export const Boussole = (p: IconeProps) => (
   </Trait>
 );
 
+export const Bouclier = (p: IconeProps) => (
+  <Trait {...p}>
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+  </Trait>
+);
+
+export const Nuage = (p: IconeProps) => (
+  <Trait {...p}>
+    <path d="M17.5 17H7a4.5 4.5 0 1 1 1.3-8.8A6 6 0 0 1 19.8 10 3.5 3.5 0 0 1 17.5 17z" />
+    <path d="M8 20l-1 2M12 20l-1 2M16 20l-1 2" />
+  </Trait>
+);
+
 export const ICONES_EVENEMENTS: Record<
   string,
   (p: IconeProps) => JSX.Element
@@ -389,4 +402,9 @@ export const ICONES_CATEGORIES: Record<
   coeur: Coeur,
   horloge: Horloge,
   epingle: Epingle,
+  goutte: Goutte,
+  etoile: Etoile,
+  nuage: Nuage,
+  bouclier: Bouclier,
+  montagne: Montagne,
 };
