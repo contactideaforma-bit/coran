@@ -228,3 +228,60 @@ button.card:hover {
 main {
   animation: apparition 0.4s ease-out;
 }
+
+/* ===== Scroll halal : animations des paysages ===== */
+@keyframes fil-derive {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100px); }
+}
+@keyframes fil-traverse {
+  from { transform: translateX(-30px); }
+  to { transform: translateX(135px); }
+}
+@keyframes fil-pluie {
+  from { transform: translate(0, 0); }
+  to { transform: translate(-36px, 178px); }
+}
+@keyframes fil-scintille {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 1; }
+}
+@keyframes fil-respire {
+  0%, 100% { transform: scale(1); opacity: 0.35; }
+  50% { transform: scale(1.12); opacity: 0.6; }
+}
+.fil-derive { animation: fil-derive 12s linear infinite; }
+.fil-inverse { animation-direction: reverse; }
+.fil-traverse { animation: fil-traverse 60s linear infinite; }
+.fil-pluie { animation: fil-pluie 1.1s linear infinite; }
+.fil-scintille { animation: fil-scintille 3s ease-in-out infinite; }
+.fil-respire {
+  animation: fil-respire 7s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.scene-fige * { animation-play-state: paused !important; }
+@media (prefers-reduced-motion: reduce) {
+  .fil-derive, .fil-traverse, .fil-pluie, .fil-scintille, .fil-respire { animation: none !important; }
+}
+
+/* Fil vertical plein écran, une carte à la fois */
+.fil-conteneur {
+  height: 100dvh;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+.fil-conteneur::-webkit-scrollbar { display: none; }
+.fil-carte {
+  height: 100dvh;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+.verre {
+  background: color-mix(in srgb, var(--card) 76%, transparent);
+  -webkit-backdrop-filter: blur(10px) saturate(1.3);
+  backdrop-filter: blur(10px) saturate(1.3);
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, var(--border));
+}

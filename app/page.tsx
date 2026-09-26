@@ -14,6 +14,7 @@ import {
   Cloche,
   Coeur,
   Cube,
+  Defiler,
   Pinceau,
   Horloge,
   KaabaIcone,
@@ -30,6 +31,12 @@ const MODULES = [
     icone: LivreOuvert,
     nom: "Coran",
     description: "Lire avec le tajwid en couleur, écouter mot à mot",
+  },
+  {
+    href: "/scroll",
+    icone: Defiler,
+    nom: "Scroll halal",
+    description: "Coran récité, hadiths et invocations, 10 rappels à la fois",
   },
   {
     href: "/apprentissage",
