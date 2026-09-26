@@ -186,8 +186,8 @@ export default function Nourania() {
                     className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border font-extrabold"
                     style={{
                       borderColor: "var(--accent)",
-                      backgroundColor: faite ? "var(--accent)" : "transparent",
-                      color: faite ? "#fff" : "var(--accent)",
+                      backgroundColor: faite ? "var(--accent-fort)" : "transparent",
+                      color: faite ? "var(--sur-accent)" : "var(--accent-fort)",
                     }}
                   >
                     {faite ? <Verifie taille={18} /> : id}
@@ -204,7 +204,7 @@ export default function Nourania() {
                           "…"}
                     </span>
                   </span>
-                  <span style={{ color: "var(--accent)" }}>→</span>
+                  <span style={{ color: "var(--accent-fort)" }}>→</span>
                 </button>
               );
             })}
@@ -310,7 +310,7 @@ export default function Nourania() {
           </p>
           <h3 className="mt-3 text-xl font-extrabold">
             {lettreActive.nom}{" "}
-            <span style={{ color: "var(--accent)" }}>
+            <span style={{ color: "var(--accent-fort)" }}>
               ({lettreActive.translit})
             </span>
           </h3>
@@ -331,7 +331,7 @@ export default function Nourania() {
           >
             {elementActif.principal}
           </p>
-          <h3 className="mt-3 text-lg font-extrabold" style={{ color: "var(--accent)" }}>
+          <h3 className="mt-3 text-lg font-extrabold" style={{ color: "var(--accent-fort)" }}>
             {elementActif.translit}
           </h3>
           {elementActif.aide && <p className="mt-3">{elementActif.aide}</p>}
@@ -384,7 +384,7 @@ function BoutonsFiche({
       <button
         onClick={ecouter}
         className="flex h-12 w-12 items-center justify-center rounded-full text-white transition active:scale-95"
-        style={{ backgroundColor: "var(--accent)" }}
+        style={{ backgroundColor: "var(--accent-fort)" }}
         aria-label="Écouter"
       >
         <HautParleur taille={22} className="text-white" />
@@ -392,7 +392,7 @@ function BoutonsFiche({
       <button
         onClick={fermer}
         className="rounded-full px-6 py-2 font-bold text-white transition active:scale-95"
-        style={{ backgroundColor: "var(--accent)" }}
+        style={{ backgroundColor: "var(--accent-fort)" }}
       >
         Compris !
       </button>
@@ -420,7 +420,7 @@ function BoutonTerminer({
               border: "1px solid var(--border)",
               color: "var(--muted)",
             }
-          : { backgroundColor: "var(--accent)", color: "#fff" }
+          : { backgroundColor: "var(--accent-fort)", color: "var(--sur-accent)" }
       }
     >
       <Verifie taille={18} />

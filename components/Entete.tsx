@@ -59,7 +59,7 @@ export default function Entete() {
             onClick={() => setPersoOuverte(true)}
             aria-label="Personnaliser l'appli"
             className="card rounded-xl p-2.5 transition hover:scale-105 active:scale-95"
-            style={{ color: "var(--accent)" }}
+            style={{ color: "var(--accent-fort)" }}
           >
             <Pinceau taille={20} />
           </button>
@@ -67,7 +67,7 @@ export default function Entete() {
             onClick={() => maj({ dark: !prefs.dark })}
             aria-label="Basculer le mode sombre"
             className="card rounded-xl p-2.5 transition hover:scale-105 active:scale-95"
-            style={{ color: "var(--accent)" }}
+            style={{ color: "var(--accent-fort)" }}
           >
             {prefs.dark ? <Soleil taille={20} /> : <Lune taille={20} />}
           </button>

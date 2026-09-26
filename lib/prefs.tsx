@@ -11,12 +11,12 @@ import {
 /* ========== Options de personnalisation ========== */
 
 export const FONDS = [
-  { id: "creme", nom: "Crème", bg: "#faf6ef", card: "#ffffff", border: "#ece4d4" },
-  { id: "blanc", nom: "Blanc", bg: "#f7f7f7", card: "#ffffff", border: "#e5e5e5" },
-  { id: "vert-eau", nom: "Vert d'eau", bg: "#eef5ef", card: "#ffffff", border: "#d9e7db" },
-  { id: "ciel", nom: "Ciel", bg: "#eef3f8", card: "#ffffff", border: "#d8e3ee" },
-  { id: "rose", nom: "Rose poudré", bg: "#f9f0f0", card: "#ffffff", border: "#eddcdc" },
-  { id: "sable", nom: "Sable", bg: "#f6efe3", card: "#fffdf8", border: "#e8dcc4" },
+  { id: "creme", nom: "Crème", bg: "#faf6ef", card: "#ffffff", border: "#e0d4bd" },
+  { id: "blanc", nom: "Blanc", bg: "#f7f7f7", card: "#ffffff", border: "#d9d9d9" },
+  { id: "vert-eau", nom: "Vert d'eau", bg: "#eef5ef", card: "#ffffff", border: "#c6d9c9" },
+  { id: "ciel", nom: "Ciel", bg: "#eef3f8", card: "#ffffff", border: "#c5d4e3" },
+  { id: "rose", nom: "Rose poudré", bg: "#f9f0f0", card: "#ffffff", border: "#e2caca" },
+  { id: "sable", nom: "Sable", bg: "#f6efe3", card: "#fffdf8", border: "#dccdb0" },
 ];
 
 export const ACCENTS = [
@@ -79,12 +79,12 @@ const CLE = "coran-prefs";
 const PALETTE_SOMBRE = {
   bg: "#17161a",
   card: "#211f26",
-  border: "#35323c",
+  border: "#45414d",
   text: "#eae6de",
-  muted: "#9a948a",
+  muted: "#b3ada3",
 };
 
-const TEXTE_CLAIR = { text: "#2d2a26", muted: "#8a8378" };
+const TEXTE_CLAIR = { text: "#221f1b", muted: "#6b645a" };
 
 function appliquer(p: Prefs) {
   const root = document.documentElement;

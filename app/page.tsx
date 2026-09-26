@@ -111,7 +111,7 @@ export default function Accueil() {
       <section className="mt-8 text-center">
         <p
           className="arabic font-amiri text-4xl"
-          style={{ color: "var(--accent)" }}
+          style={{ color: "var(--accent-fort)" }}
         >
           ﷽
         </p>
@@ -133,7 +133,7 @@ export default function Accueil() {
         >
           <p
             className="flex items-center gap-1.5 text-sm font-bold"
-            style={{ color: "var(--accent)" }}
+            style={{ color: "var(--accent-fort)" }}
           >
             <Citation taille={16} /> Hadith du jour
           </p>
@@ -152,7 +152,7 @@ export default function Accueil() {
           href={`/sourate/${marque.s}#v-${marque.v}`}
           className="card mt-4 flex items-center gap-3 rounded-2xl p-4 shadow-soft transition hover:scale-[1.02] active:scale-[0.98]"
         >
-          <span style={{ color: "var(--accent)" }}>
+          <span style={{ color: "var(--accent-fort)" }}>
             <MarquePageIcone taille={24} rempli />
           </span>
           <span className="min-w-0 flex-1">
@@ -162,7 +162,7 @@ export default function Accueil() {
               {marque.t ? ` • ${depuis(marque.t)}` : ""}
             </span>
           </span>
-          <span style={{ color: "var(--accent)" }}>→</span>
+          <span style={{ color: "var(--accent-fort)" }}>→</span>
         </Link>
       )}
 
@@ -186,7 +186,7 @@ export default function Accueil() {
                 {m.description}
               </span>
             </span>
-            <span style={{ color: "var(--accent)" }}>→</span>
+            <span style={{ color: "var(--accent-fort)" }}>→</span>
           </Link>
         ))}
       </main>

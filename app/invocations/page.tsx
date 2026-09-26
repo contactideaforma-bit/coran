@@ -87,7 +87,7 @@ export default function Invocations() {
           return (
             <section key={cat.id}>
               <h3 className="mb-2 flex items-center gap-2 text-lg font-extrabold">
-                <span style={{ color: "var(--accent)" }}>
+                <span style={{ color: "var(--accent-fort)" }}>
                   <Icone taille={20} />
                 </span>
                 {cat.nom}
@@ -121,7 +121,7 @@ export default function Invocations() {
                       </p>
                       <p
                         className="mt-3 text-sm italic"
-                        style={{ color: "var(--accent)" }}
+                        style={{ color: "var(--accent-fort)" }}
                       >
                         {inv.translit}
                       </p>

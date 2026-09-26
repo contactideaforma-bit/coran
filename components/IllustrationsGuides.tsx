@@ -74,7 +74,7 @@ const ILLUSTRATIONS: Record<string, () => JSX.Element> = {
   goutte: () => (
     <Cadre>
       <path d="M48 12c-2 14-20 26-20 44a20 20 0 0 0 40 0c0-18-18-30-20-44z" fill={A} stroke="none" />
-      <path d="M40 58a9 9 0 0 0 8 9" stroke="#fff" strokeWidth="3" />
+      <path d="M40 58a9 9 0 0 0 8 9" stroke="var(--sur-accent)" strokeWidth="3" />
       <path d="M14 84c6-4 12-4 18 0s12 4 18 0 12-4 18 0 12 4 14 2" />
     </Cadre>
   ),
@@ -95,7 +95,7 @@ const ILLUSTRATIONS: Record<string, () => JSX.Element> = {
       <rect x="10" y="34" width="16" height="36" rx="3" fill={DOUX} />
       <rect x="30" y="34" width="16" height="36" rx="3" fill={DOUX} />
       <rect x="56" y="24" width="26" height="50" rx="4" fill={A} stroke="none" />
-      <text x="69" y="56" textAnchor="middle" fontSize="20" fill="#fff" stroke="none" fontWeight="800">1</text>
+      <text x="69" y="56" textAnchor="middle" fontSize="20" fill="var(--sur-accent)" stroke="none" fontWeight="800">1</text>
       <Scintille x={86} y={16} r={5} />
     </Cadre>
   ),
@@ -107,7 +107,7 @@ const ILLUSTRATIONS: Record<string, () => JSX.Element> = {
           <text x={16 + i * 21} y={(i % 2 ? 58 : 42) + 4.5} textAnchor="middle" fontSize="13" fontWeight="800" fill={i === 0 ? "#fff" : "currentColor"} stroke="none">{n}</text>
         </g>
       ))}
-      <path d="M58 16a12 12 0 1 0 10 18A9.5 9.5 0 1 1 58 16z" fill={A} stroke="none" transform="translate(-10 -6)" />
+      <path d="M58 16a12 12 0 1 0 10 18A9.5 9.5 0 1 1 58 16z" fill={A} stroke="none" transform="translate(52 -2) scale(0.6)" />
       <path d="M10 82h76" strokeDasharray="3 5" />
     </Cadre>
   ),
@@ -245,7 +245,7 @@ const ILLUSTRATIONS: Record<string, () => JSX.Element> = {
   fin: () => (
     <Cadre>
       <circle cx="48" cy="48" r="32" fill={A} stroke="none" />
-      <path d="M34 48l10 10 20-22" stroke="#fff" strokeWidth="6" />
+      <path d="M34 48l10 10 20-22" stroke="var(--sur-accent)" strokeWidth="6" />
       <Scintille x={14} y={18} r={5} />
       <Scintille x={84} y={22} r={4} />
       <Scintille x={82} y={80} r={5} />

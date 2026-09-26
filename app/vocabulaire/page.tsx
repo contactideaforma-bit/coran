@@ -40,7 +40,7 @@ export default function Vocabulaire() {
 
       {/* Compteur de couverture */}
       <div className="card mt-6 rounded-3xl p-6 shadow-soft">
-        <p className="flex items-center gap-1.5 text-sm font-bold" style={{ color: "var(--accent)" }}>
+        <p className="flex items-center gap-1.5 text-sm font-bold" style={{ color: "var(--accent-fort)" }}>
           <Trophee taille={16} /> Ta progression
         </p>
 
@@ -59,7 +59,7 @@ export default function Vocabulaire() {
             className="h-full rounded-full transition-all duration-500"
             style={{
               width: `${Math.min(global.couverture, 100)}%`,
-              background: "var(--accent)",
+              background: "var(--accent-fort)",
             }}
           />
         </div>
@@ -78,7 +78,7 @@ export default function Vocabulaire() {
           className="card mt-4 flex items-center gap-3 rounded-2xl p-4 shadow-soft transition hover:scale-[1.02] active:scale-[0.98]"
           style={{ borderColor: "var(--accent)" }}
         >
-          <span style={{ color: "var(--accent)" }}>
+          <span style={{ color: "var(--accent-fort)" }}>
             <Repeter taille={24} />
           </span>
           <span className="min-w-0 flex-1">
@@ -87,7 +87,7 @@ export default function Vocabulaire() {
               {global.dus} mot{global.dus > 1 ? "s" : ""} à revoir aujourd'hui
             </span>
           </span>
-          <span style={{ color: "var(--accent)" }}>→</span>
+          <span style={{ color: "var(--accent-fort)" }}>→</span>
         </Link>
       )}
 
@@ -108,7 +108,7 @@ export default function Vocabulaire() {
         <span
           className="relative h-6 w-11 shrink-0 rounded-full transition"
           style={{
-            backgroundColor: prefs.phonetique ? "var(--accent)" : "var(--border)",
+            backgroundColor: prefs.phonetique ? "var(--accent-fort)" : "var(--border)",
           }}
         >
           <span
@@ -153,7 +153,7 @@ export default function Vocabulaire() {
                 >
                   <span
                     className="block h-full rounded-full transition-all"
-                    style={{ width: `${pourcent}%`, background: "var(--accent)" }}
+                    style={{ width: `${pourcent}%`, background: "var(--accent-fort)" }}
                   />
                 </span>
 
@@ -165,12 +165,12 @@ export default function Vocabulaire() {
                     {s.memorises}/{s.total} mémorisés
                   </span>
                   {s.dus > 0 && (
-                    <span style={{ color: "var(--accent)" }}>{s.dus} à revoir</span>
+                    <span style={{ color: "var(--accent-fort)" }}>{s.dus} à revoir</span>
                   )}
                 </span>
               </span>
 
-              <span style={{ color: "var(--accent)" }}>→</span>
+              <span style={{ color: "var(--accent-fort)" }}>→</span>
             </Link>
           );
         })}

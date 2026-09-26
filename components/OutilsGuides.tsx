@@ -59,7 +59,7 @@ export function CompteurTawaf() {
 
   return (
     <div className="card mt-4 rounded-2xl p-4 text-center">
-      <p className="text-sm font-extrabold" style={{ color: "var(--accent)" }}>
+      <p className="text-sm font-extrabold" style={{ color: "var(--accent-fort)" }}>
         Compteur de tours
       </p>
       <svg viewBox="0 0 200 200" className="mx-auto mt-2 h-48 w-48" aria-hidden="true">
@@ -105,7 +105,7 @@ export function CompteurTawaf() {
           onClick={() => changer(n + 1)}
           disabled={fini}
           className={`${bouton} px-6 py-3 text-base text-white shadow-soft`}
-          style={{ background: "var(--accent)" }}
+          style={{ background: "var(--accent-fort)" }}
         >
           {fini ? "7 tours ✓" : `Tour ${tour} terminé ✓`}
         </button>
@@ -132,15 +132,15 @@ export function CompteurSay() {
 
   return (
     <div className="card mt-4 rounded-2xl p-4 text-center">
-      <p className="text-sm font-extrabold" style={{ color: "var(--accent)" }}>
+      <p className="text-sm font-extrabold" style={{ color: "var(--accent-fort)" }}>
         Compteur de trajets
       </p>
       <div className="mt-3 flex items-center gap-2">
         <span
           className="shrink-0 rounded-full px-3 py-1 text-xs font-extrabold"
           style={{
-            background: !aMarwa ? "var(--accent)" : "transparent",
-            color: !aMarwa ? "#fff" : "var(--text)",
+            background: !aMarwa ? "var(--accent-fort)" : "transparent",
+            color: !aMarwa ? "var(--sur-accent)" : "var(--text)",
             border: "1px solid var(--accent)",
           }}
         >
@@ -152,8 +152,8 @@ export function CompteurSay() {
               key={i}
               className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold"
               style={{
-                background: i < n ? "var(--accent)" : "transparent",
-                color: i < n ? "#fff" : "var(--muted)",
+                background: i < n ? "var(--accent-fort)" : "transparent",
+                color: i < n ? "var(--sur-accent)" : "var(--muted)",
                 border: `2px solid ${i === n ? "var(--accent)" : "var(--border)"}`,
                 transition: "background .3s",
               }}
@@ -165,8 +165,8 @@ export function CompteurSay() {
         <span
           className="shrink-0 rounded-full px-3 py-1 text-xs font-extrabold"
           style={{
-            background: aMarwa ? "var(--accent)" : "transparent",
-            color: aMarwa ? "#fff" : "var(--text)",
+            background: aMarwa ? "var(--accent-fort)" : "transparent",
+            color: aMarwa ? "var(--sur-accent)" : "var(--text)",
             border: "1px solid var(--accent)",
           }}
         >
@@ -174,7 +174,7 @@ export function CompteurSay() {
         </span>
       </div>
       {!fini && (
-        <p className="mt-3 text-2xl font-extrabold" style={{ color: "var(--accent)" }}>
+        <p className="mt-3 text-2xl font-extrabold" style={{ color: "var(--accent-fort)" }}>
           {versMarwa ? "→" : "←"}
         </p>
       )}
@@ -194,7 +194,7 @@ export function CompteurSay() {
           onClick={() => changer(n + 1)}
           disabled={fini}
           className={`${bouton} px-6 py-3 text-base text-white shadow-soft`}
-          style={{ background: "var(--accent)" }}
+          style={{ background: "var(--accent-fort)" }}
         >
           {fini ? "7 trajets ✓" : `Arrivé ${versMarwa ? "à Marwa" : "au Ṣafâ"} ✓`}
         </button>
@@ -251,7 +251,7 @@ export function DernierTiers() {
 
   return (
     <div className="card mt-4 rounded-2xl p-4">
-      <p className="text-sm font-extrabold" style={{ color: "var(--accent)" }}>
+      <p className="text-sm font-extrabold" style={{ color: "var(--accent-fort)" }}>
         Ta nuit ce soir
       </p>
       {etat.t === "chargement" && (
@@ -262,7 +262,7 @@ export function DernierTiers() {
       {etat.t === "sans-ville" && (
         <p className="mt-2 text-sm">
           Choisis ta ville dans{" "}
-          <Link href="/prieres" className="font-bold underline" style={{ color: "var(--accent)" }}>
+          <Link href="/prieres" className="font-bold underline" style={{ color: "var(--accent-fort)" }}>
             Prières
           </Link>{" "}
           pour voir l'heure du dernier tiers de la nuit.
@@ -292,7 +292,7 @@ export function DernierTiers() {
                 <p className="text-xs" style={{ color: "var(--muted)" }}>
                   {c.l}
                 </p>
-                <p className="text-lg font-extrabold" style={c.fort ? { color: "var(--accent)" } : undefined}>
+                <p className="text-lg font-extrabold" style={c.fort ? { color: "var(--accent-fort)" } : undefined}>
                   {c.v}
                 </p>
               </div>

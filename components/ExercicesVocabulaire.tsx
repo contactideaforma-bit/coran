@@ -97,7 +97,7 @@ function Correction({
       <button
         onClick={onSuivant}
         className="mt-4 w-full rounded-2xl px-4 py-3.5 font-extrabold text-white transition active:scale-[0.98]"
-        style={{ background: "var(--accent)" }}
+        style={{ background: "var(--accent-fort)" }}
       >
         Suivant
       </button>
@@ -183,7 +183,7 @@ function Carte({ mot, onSuivant }: { mot: Mot; onSuivant: () => void }) {
         Nouveau mot
       </p>
 
-      <p className="arabic font-amiri mt-4 text-6xl" style={{ color: "var(--accent)" }}>
+      <p className="arabic font-amiri mt-4 text-6xl" style={{ color: "var(--accent-fort)" }}>
         {mot.arabe}
       </p>
       <p className="mt-2 text-lg italic" style={{ color: "var(--muted)" }}>
@@ -193,7 +193,7 @@ function Carte({ mot, onSuivant }: { mot: Mot; onSuivant: () => void }) {
       <button
         onClick={() => direMot(mot)}
         className="mx-auto mt-4 flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold"
-        style={{ background: "var(--card)", color: "var(--accent)" }}
+        style={{ background: "var(--card)", color: "var(--accent-fort)" }}
       >
         <HautParleur taille={16} /> Écouter
       </button>
@@ -221,7 +221,7 @@ function Carte({ mot, onSuivant }: { mot: Mot; onSuivant: () => void }) {
       <button
         onClick={onSuivant}
         className="mt-8 w-full rounded-2xl px-4 py-3.5 font-extrabold text-white transition active:scale-[0.98]"
-        style={{ background: "var(--accent)" }}
+        style={{ background: "var(--accent-fort)" }}
       >
         J'ai compris
       </button>
@@ -261,7 +261,7 @@ function QcmArFr({
         <button
           onClick={() => direMot(mot)}
           className="mx-auto mt-6 flex h-24 w-24 items-center justify-center rounded-full text-white transition active:scale-95"
-          style={{ background: "var(--accent)" }}
+          style={{ background: "var(--accent-fort)" }}
           aria-label="Réécouter le mot"
         >
           <HautParleur taille={40} />
@@ -270,7 +270,7 @@ function QcmArFr({
         <>
           <p
             className="arabic font-amiri mt-6 text-center text-6xl"
-            style={{ color: "var(--accent)" }}
+            style={{ color: "var(--accent-fort)" }}
           >
             {mot.arabe}
           </p>
@@ -413,7 +413,7 @@ function DansLeVerset({
   return (
     <div>
       <p className="text-center text-sm font-bold" style={{ color: "var(--muted)" }}>
-        Retrouve <span style={{ color: "var(--accent)" }}>{mot.sens}</span> dans le verset
+        Retrouve <span style={{ color: "var(--accent-fort)" }}>{mot.sens}</span> dans le verset
       </p>
       <p className="mt-1 text-center text-xs" style={{ color: "var(--muted)" }}>
         {refVerset(mot)}

@@ -251,7 +251,7 @@ function CadrePartie({
         <span>
           Question {Math.min(question + 1, NB_QUESTIONS)}/{NB_QUESTIONS}
         </span>
-        <span style={{ color: "var(--accent)" }}>{score} pts</span>
+        <span style={{ color: "var(--accent-fort)" }}>{score} pts</span>
       </div>
       <div
         className="mb-5 h-2 overflow-hidden rounded-full"
@@ -261,7 +261,7 @@ function CadrePartie({
           className="h-full rounded-full transition-all"
           style={{
             width: `${(question / NB_QUESTIONS) * 100}%`,
-            backgroundColor: "var(--accent)",
+            backgroundColor: "var(--accent-fort)",
           }}
         />
       </div>
@@ -299,7 +299,7 @@ function EcranFin({
 
   return (
     <div className="card mt-6 rounded-3xl p-8 text-center shadow-soft">
-      <p className="flex justify-center" style={{ color: "var(--accent)" }}>
+      <p className="flex justify-center" style={{ color: "var(--accent-fort)" }}>
         <Trophee taille={44} />
       </p>
       <p className="mt-3 text-3xl font-extrabold">
@@ -313,7 +313,7 @@ function EcranFin({
         <button
           onClick={rejouer}
           className="rounded-full px-6 py-2 font-bold text-white transition active:scale-95"
-          style={{ backgroundColor: "var(--accent)" }}
+          style={{ backgroundColor: "var(--accent-fort)" }}
         >
           Rejouer
         </button>
@@ -516,7 +516,7 @@ function JeuNourania({
             <button
               onClick={() => ecouter(q)}
               className="flex h-16 w-16 items-center justify-center rounded-full text-white transition hover:scale-105 active:scale-95"
-              style={{ backgroundColor: "var(--accent)" }}
+              style={{ backgroundColor: "var(--accent-fort)" }}
               aria-label="Réécouter"
             >
               <HautParleur taille={28} className="text-white" />
@@ -526,7 +526,7 @@ function JeuNourania({
       ) : (
         <p className="text-center font-bold">
           Trouve :{" "}
-          <span style={{ color: "var(--accent)" }}>{q.bonne.translit}</span>
+          <span style={{ color: "var(--accent-fort)" }}>{q.bonne.translit}</span>
         </p>
       )}
       <div
@@ -569,7 +569,7 @@ function JeuNourania({
           <button
             onClick={suivant}
             className="w-full rounded-full px-6 py-3 font-bold text-white transition active:scale-95"
-            style={{ backgroundColor: "var(--accent)" }}
+            style={{ backgroundColor: "var(--accent-fort)" }}
           >
             {idx + 1 >= questions.length ? "Voir mon score" : "Question suivante"}
           </button>
@@ -609,7 +609,7 @@ function ChoixNiveau({
         >
           <span
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border text-sm font-extrabold"
-            style={{ borderColor: "var(--accent)", color: "var(--accent)" }}
+            style={{ borderColor: "var(--accent)", color: "var(--accent-fort)" }}
           >
             L{n.lecon}
           </span>
@@ -619,7 +619,7 @@ function ChoixNiveau({
               {n.id === conseille && (
                 <span
                   className="rounded-full px-2 py-0.5 text-[10px] font-bold text-white"
-                  style={{ backgroundColor: "var(--accent)" }}
+                  style={{ backgroundColor: "var(--accent-fort)" }}
                 >
                   Conseillé
                 </span>
@@ -631,14 +631,14 @@ function ChoixNiveau({
             {(records[`nourania-${n.id}`] ?? 0) > 0 && (
               <span
                 className="mt-1 flex items-center gap-1 text-xs font-bold"
-                style={{ color: "var(--accent)" }}
+                style={{ color: "var(--accent-fort)" }}
               >
                 <Trophee taille={13} /> Record : {records[`nourania-${n.id}`]}/
                 {NB_QUESTIONS}
               </span>
             )}
           </span>
-          <span style={{ color: "var(--accent)" }}>→</span>
+          <span style={{ color: "var(--accent-fort)" }}>→</span>
         </button>
       ))}
       <button
@@ -740,7 +740,7 @@ function JeuQuiz({ quitter }: { quitter: () => void }) {
           <button
             onClick={suivant}
             className="w-full rounded-full px-6 py-3 font-bold text-white transition active:scale-95"
-            style={{ backgroundColor: "var(--accent)" }}
+            style={{ backgroundColor: "var(--accent-fort)" }}
           >
             {idx + 1 >= questions.length ? "Voir mon score" : "Question suivante"}
           </button>
@@ -816,14 +816,14 @@ export default function Jeux() {
                 {meilleurNourania > 0 && (
                   <span
                     className="mt-1 flex items-center gap-1 text-xs font-bold"
-                    style={{ color: "var(--accent)" }}
+                    style={{ color: "var(--accent-fort)" }}
                   >
                     <Trophee taille={13} /> Meilleur record : {meilleurNourania}
                     /{NB_QUESTIONS}
                   </span>
                 )}
               </span>
-              <span style={{ color: "var(--accent)" }}>→</span>
+              <span style={{ color: "var(--accent-fort)" }}>→</span>
             </button>
 
             <button
@@ -844,14 +844,14 @@ export default function Jeux() {
                 {(records["quiz"] ?? 0) > 0 && (
                   <span
                     className="mt-1 flex items-center gap-1 text-xs font-bold"
-                    style={{ color: "var(--accent)" }}
+                    style={{ color: "var(--accent-fort)" }}
                   >
                     <Trophee taille={13} /> Record : {records["quiz"]}/
                     {NB_QUESTIONS}
                   </span>
                 )}
               </span>
-              <span style={{ color: "var(--accent)" }}>→</span>
+              <span style={{ color: "var(--accent-fort)" }}>→</span>
             </button>
           </main>
         </>

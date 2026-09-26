@@ -118,7 +118,7 @@ export default function Calendrier() {
             className="card overflow-hidden rounded-2xl shadow-soft"
           >
             <summary className="flex cursor-pointer list-none items-center gap-3 p-4">
-              <span style={{ color: "var(--accent)" }}>
+              <span style={{ color: "var(--accent-fort)" }}>
                 {(() => {
                   const Icone = ICONES_EVENEMENTS[evt.icone] ?? Lune;
                   return <Icone taille={24} />;
@@ -146,7 +146,7 @@ export default function Calendrier() {
                   backgroundColor:
                     jours !== null && jours <= 0
                       ? "#2e7d5b"
-                      : "var(--accent)",
+                      : "var(--accent-fort)",
                 }}
               >
                 {libelleDelai(jours)}
@@ -164,7 +164,7 @@ export default function Calendrier() {
                 <ul className="mt-1 space-y-1">
                   {evt.conseils.map((c, i) => (
                     <li key={i} className="flex gap-2 text-sm">
-                      <span style={{ color: "var(--accent)" }}>•</span>
+                      <span style={{ color: "var(--accent-fort)" }}>•</span>
                       {c}
                     </li>
                   ))}

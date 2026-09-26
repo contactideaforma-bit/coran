@@ -47,7 +47,7 @@ export default function Personnalisation({
           style={{ borderColor: "var(--border)" }}
         >
           <h2 className="flex items-center gap-2 text-lg font-extrabold">
-            <span style={{ color: "var(--accent)" }}>
+            <span style={{ color: "var(--accent-fort)" }}>
               <Pinceau taille={20} />
             </span>
             Personnaliser mon appli
@@ -79,8 +79,8 @@ export default function Personnalisation({
                 borderColor:
                   prefs.dark === t.dark ? "var(--accent)" : "var(--border)",
                 backgroundColor:
-                  prefs.dark === t.dark ? "var(--accent)" : "var(--card)",
-                color: prefs.dark === t.dark ? "#fff" : "var(--text)",
+                  prefs.dark === t.dark ? "var(--accent-fort)" : "var(--card)",
+                color: prefs.dark === t.dark ? "var(--sur-accent)" : "var(--text)",
               }}
             >
               {t.icone}
@@ -158,8 +158,8 @@ export default function Personnalisation({
                 borderColor:
                   prefs.taille === i ? "var(--accent)" : "var(--border)",
                 backgroundColor:
-                  prefs.taille === i ? "var(--accent)" : "var(--card)",
-                color: prefs.taille === i ? "#fff" : "var(--text)",
+                  prefs.taille === i ? "var(--accent-fort)" : "var(--card)",
+                color: prefs.taille === i ? "var(--sur-accent)" : "var(--text)",
                 fontSize: `${0.8 + i * 0.15}rem`,
               }}
             >
@@ -180,8 +180,8 @@ export default function Personnalisation({
                 borderColor:
                   prefs.police === f.id ? "var(--accent)" : "var(--border)",
                 backgroundColor:
-                  prefs.police === f.id ? "var(--accent)" : "var(--card)",
-                color: prefs.police === f.id ? "#fff" : "var(--text)",
+                  prefs.police === f.id ? "var(--accent-fort)" : "var(--card)",
+                color: prefs.police === f.id ? "var(--sur-accent)" : "var(--text)",
               }}
             >
               <span className="arabic text-xl leading-none">بسم الله</span>
@@ -221,7 +221,7 @@ export default function Personnalisation({
                 {prefs.recitateur === r.id && (
                   <span
                     className="h-2.5 w-2.5 rounded-full"
-                    style={{ backgroundColor: "var(--accent)" }}
+                    style={{ backgroundColor: "var(--accent-fort)" }}
                   />
                 )}
               </span>
@@ -258,7 +258,7 @@ export default function Personnalisation({
           <button
             onClick={fermer}
             className="w-full rounded-full px-6 py-3 font-bold text-white transition active:scale-95"
-            style={{ backgroundColor: "var(--accent)" }}
+            style={{ backgroundColor: "var(--accent-fort)" }}
           >
             Fermer
           </button>

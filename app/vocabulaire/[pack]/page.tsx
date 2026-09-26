@@ -183,7 +183,7 @@ export default function SessionVocabulaire({ params }: { params: { pack: string 
     return (
       <div className="mx-auto max-w-3xl px-4 py-20 text-center">
         <p className="font-bold">Ce pack n'existe pas.</p>
-        <Link href="/vocabulaire" className="mt-4 inline-block font-bold" style={{ color: "var(--accent)" }}>
+        <Link href="/vocabulaire" className="mt-4 inline-block font-bold" style={{ color: "var(--accent-fort)" }}>
           ← Retour au vocabulaire
         </Link>
       </div>
@@ -205,7 +205,7 @@ export default function SessionVocabulaire({ params }: { params: { pack: string 
             className="h-full rounded-full transition-all duration-300"
             style={{
               width: `${phase === "exercices" ? avancement : 100}%`,
-              background: "var(--accent)",
+              background: "var(--accent-fort)",
             }}
           />
         </div>
@@ -303,7 +303,7 @@ function Bilan({
         <Link
           href="/vocabulaire"
           className="mt-6 inline-block rounded-2xl px-6 py-3 font-extrabold text-white"
-          style={{ background: "var(--accent)" }}
+          style={{ background: "var(--accent-fort)" }}
         >
           Retour aux packs
         </Link>
@@ -326,7 +326,7 @@ function Bilan({
       {gagnes > 0 && (
         <p
           className="mx-auto mt-3 flex w-fit items-center gap-1.5 rounded-full px-4 py-2 text-sm font-bold"
-          style={{ background: "var(--card)", color: "var(--accent)" }}
+          style={{ background: "var(--card)", color: "var(--accent-fort)" }}
         >
           <Trophee taille={16} /> {gagnes} nouveau{gagnes > 1 ? "x" : ""} mot
           {gagnes > 1 ? "s" : ""} mémorisé{gagnes > 1 ? "s" : ""}
@@ -363,7 +363,7 @@ function Bilan({
           <button
             onClick={onRecommencer}
             className="rounded-2xl px-6 py-3.5 font-extrabold text-white transition active:scale-[0.98]"
-            style={{ background: "var(--accent)" }}
+            style={{ background: "var(--accent-fort)" }}
           >
             Continuer ce pack
           </button>
@@ -371,7 +371,7 @@ function Bilan({
         <Link
           href="/vocabulaire"
           className="card rounded-2xl px-6 py-3.5 font-extrabold"
-          style={{ color: "var(--accent)" }}
+          style={{ color: "var(--accent-fort)" }}
         >
           Retour aux packs
         </Link>

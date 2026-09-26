@@ -391,7 +391,7 @@ export default function Lecteur({ n }: { n: number }) {
           <button
             onClick={clicSourate}
             className="flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 font-bold text-white shadow-soft transition hover:scale-[1.01] active:scale-[0.99]"
-            style={{ backgroundColor: "var(--accent)" }}
+            style={{ backgroundColor: "var(--accent-fort)" }}
           >
             {lecture?.type === "sourate" ? (
               <>
@@ -411,7 +411,7 @@ export default function Lecteur({ n }: { n: number }) {
           <Link
             href={`/apprentissage?s=${n}`}
             className="card flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-bold shadow-soft transition hover:scale-[1.01] active:scale-[0.99]"
-            style={{ color: "var(--accent)" }}
+            style={{ color: "var(--accent-fort)" }}
           >
             <Repeter taille={15} /> Mode apprentissage : répéter des versets ou
             des mots
@@ -433,7 +433,7 @@ export default function Lecteur({ n }: { n: number }) {
               className="relative h-6 w-11 shrink-0 rounded-full transition"
               style={{
                 backgroundColor: prefs.phonetique
-                  ? "var(--accent)"
+                  ? "var(--accent-fort)"
                   : "var(--border)",
               }}
             >
@@ -460,7 +460,7 @@ export default function Lecteur({ n }: { n: number }) {
               className="relative h-6 w-11 shrink-0 rounded-full transition"
               style={{
                 backgroundColor: prefs.vocabulaire
-                  ? "var(--accent)"
+                  ? "var(--accent-fort)"
                   : "var(--border)",
               }}
             >
@@ -484,8 +484,8 @@ export default function Lecteur({ n }: { n: number }) {
                   borderColor:
                     section === i ? "var(--accent)" : "var(--border)",
                   backgroundColor:
-                    section === i ? "var(--accent)" : "var(--card)",
-                  color: section === i ? "#fff" : "var(--text)",
+                    section === i ? "var(--accent-fort)" : "var(--card)",
+                  color: section === i ? "var(--sur-accent)" : "var(--text)",
                 }}
               >
                 Juz&apos; {s.juz}{" "}
@@ -503,7 +503,7 @@ export default function Lecteur({ n }: { n: number }) {
         <p
           className={`arabic mt-5 text-center text-2xl ${police}`}
           dir="rtl"
-          style={{ color: "var(--accent)" }}
+          style={{ color: "var(--accent-fort)" }}
         >
           {BASMALA}
         </p>
@@ -514,7 +514,7 @@ export default function Lecteur({ n }: { n: number }) {
         <div className="card mt-6 rounded-2xl p-8 text-center shadow-soft">
           <p
             className="flex animate-pulse justify-center"
-            style={{ color: "var(--accent)" }}
+            style={{ color: "var(--accent-fort)" }}
           >
             <LivreOuvert taille={36} />
           </p>
@@ -528,7 +528,7 @@ export default function Lecteur({ n }: { n: number }) {
         <div className="card mt-6 rounded-2xl p-8 text-center shadow-soft">
           <p
             className="flex justify-center"
-            style={{ color: "var(--accent)" }}
+            style={{ color: "var(--accent-fort)" }}
           >
             <Alerte taille={36} />
           </p>
@@ -547,7 +547,7 @@ export default function Lecteur({ n }: { n: number }) {
                 .catch(() => setErreur(true));
             }}
             className="mt-4 rounded-full px-6 py-2 font-bold text-white transition active:scale-95"
-            style={{ backgroundColor: "var(--accent)" }}
+            style={{ backgroundColor: "var(--accent-fort)" }}
           >
             Réessayer
           </button>
@@ -585,7 +585,7 @@ export default function Lecteur({ n }: { n: number }) {
                         estMarque
                           ? {
                               borderColor: "var(--accent)",
-                              color: "var(--accent)",
+                              color: "var(--accent-fort)",
                             }
                           : undefined
                       }
@@ -603,9 +603,9 @@ export default function Lecteur({ n }: { n: number }) {
                       className="flex items-center gap-1 rounded-full border px-3 py-1.5 text-sm font-bold transition hover:scale-105 active:scale-95"
                       style={{
                         borderColor: "var(--accent)",
-                        color: versetEnLecture(v.n) ? "#fff" : "var(--accent)",
+                        color: versetEnLecture(v.n) ? "var(--sur-accent)" : "var(--accent-fort)",
                         backgroundColor: versetEnLecture(v.n)
-                          ? "var(--accent)"
+                          ? "var(--accent-fort)"
                           : "transparent",
                       }}
                       aria-label={`Écouter le verset ${v.n} récité par ${nomRecitateur}`}
@@ -669,7 +669,7 @@ export default function Lecteur({ n }: { n: number }) {
                 {prefs.phonetique && phonetiques?.[v.n - 1] && (
                   <p
                     className={`mt-3 italic ${TAILLES[taille].trad}`}
-                    style={{ color: "var(--accent)" }}
+                    style={{ color: "var(--accent-fort)" }}
                   >
                     {phonetiques[v.n - 1]}
                   </p>
@@ -741,7 +741,7 @@ export default function Lecteur({ n }: { n: number }) {
         aria-hidden={!bulleReglesVisible}
         className="fixed right-6 z-30 flex items-center gap-2 rounded-full px-5 py-3 font-bold text-white shadow-lg transition-all duration-300 hover:scale-105 active:scale-95"
         style={{
-          backgroundColor: "var(--accent)",
+          backgroundColor: "var(--accent-fort)",
           bottom: "calc(1.5rem + env(safe-area-inset-bottom))",
           opacity: bulleReglesVisible ? 1 : 0,
           transform: bulleReglesVisible
@@ -791,7 +791,7 @@ export default function Lecteur({ n }: { n: number }) {
               <button
                 onClick={() => clicMot(motActif.v, motActif.w, motActif.word)}
                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition active:scale-95"
-                style={{ backgroundColor: "var(--accent)" }}
+                style={{ backgroundColor: "var(--accent-fort)" }}
                 aria-label="Réécouter le mot"
               >
                 <HautParleur taille={20} className="text-white" />
@@ -843,10 +843,10 @@ export default function Lecteur({ n }: { n: number }) {
                         "color-mix(in srgb, var(--accent) 12%, transparent)",
                     }}
                   >
-                    <span style={{ color: "var(--accent)" }}>
+                    <span style={{ color: "var(--accent-fort)" }}>
                       <Verifie taille={13} />
                     </span>
-                    <span className="font-bold" style={{ color: "var(--accent)" }}>
+                    <span className="font-bold" style={{ color: "var(--accent-fort)" }}>
                       {connu.sens}
                     </span>
                     <span style={{ color: "var(--muted)" }}>· mot mémorisé</span>
@@ -854,7 +854,7 @@ export default function Lecteur({ n }: { n: number }) {
                       <Link
                         href={`/vocabulaire/${pack.id}`}
                         className="ml-auto shrink-0 font-bold underline"
-                        style={{ color: "var(--accent)" }}
+                        style={{ color: "var(--accent-fort)" }}
                       >
                         réviser
                       </Link>
@@ -876,13 +876,13 @@ export default function Lecteur({ n }: { n: number }) {
                       lecture?.type === "paire" &&
                       lecture.v === motActif.v &&
                       lecture.w === motActif.w
-                        ? "#fff"
-                        : "var(--accent)",
+                        ? "var(--sur-accent)"
+                        : "var(--accent-fort)",
                     backgroundColor:
                       lecture?.type === "paire" &&
                       lecture.v === motActif.v &&
                       lecture.w === motActif.w
-                        ? "var(--accent)"
+                        ? "var(--accent-fort)"
                         : "transparent",
                   }}
                   title="Travailler la liaison entre les deux mots"
@@ -930,7 +930,7 @@ export default function Lecteur({ n }: { n: number }) {
           >
             <div className="mb-3 flex items-center justify-between">
               <h2 className="flex items-center gap-2 text-lg font-extrabold">
-                <span style={{ color: "var(--accent)" }}>
+                <span style={{ color: "var(--accent-fort)" }}>
                   <Goutte taille={20} />
                 </span>
                 Code couleur du tajwid
@@ -1005,7 +1005,7 @@ export default function Lecteur({ n }: { n: number }) {
             <button
               onClick={() => setRegleActive(null)}
               className="mt-5 rounded-full px-6 py-2 font-bold text-white transition active:scale-95"
-              style={{ backgroundColor: "var(--accent)" }}
+              style={{ backgroundColor: "var(--accent-fort)" }}
             >
               Compris !
             </button>

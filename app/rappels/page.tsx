@@ -45,7 +45,7 @@ function Interrupteur({
       aria-checked={actif}
       aria-label={label}
       className="relative h-7 w-12 shrink-0 rounded-full transition"
-      style={{ backgroundColor: actif ? "var(--accent)" : "var(--border)" }}
+      style={{ backgroundColor: actif ? "var(--accent-fort)" : "var(--border)" }}
     >
       <span
         className="absolute top-0.5 h-6 w-6 rounded-full bg-white shadow transition-all"
@@ -239,7 +239,7 @@ export default function Rappels() {
             <Link
               href="/prieres"
               className="font-bold underline"
-              style={{ color: "var(--accent)" }}
+              style={{ color: "var(--accent-fort)" }}
             >
               Prières
             </Link>{" "}
@@ -265,7 +265,7 @@ export default function Rappels() {
                       backgroundColor: on
                         ? "color-mix(in srgb, var(--accent) 14%, transparent)"
                         : "transparent",
-                      color: on ? "var(--accent)" : "var(--muted)",
+                      color: on ? "var(--accent-fort)" : "var(--muted)",
                     }}
                   >
                     {on && <Verifie taille={14} />}
@@ -286,7 +286,7 @@ export default function Rappels() {
                     className="rounded-full border px-3 py-1.5 text-sm font-bold transition"
                     style={{
                       borderColor: on ? "var(--accent)" : "var(--border)",
-                      color: on ? "var(--accent)" : "var(--muted)",
+                      color: on ? "var(--accent-fort)" : "var(--muted)",
                     }}
                   >
                     {a === 0 ? "à l'heure" : `${a} min avant`}
@@ -308,7 +308,7 @@ export default function Rappels() {
             <button
               onClick={() => setFormulaire(true)}
               className="rounded-full px-4 py-1.5 text-sm font-bold text-white"
-              style={{ backgroundColor: "var(--accent)" }}
+              style={{ backgroundColor: "var(--accent-fort)" }}
             >
               + Ajouter
             </button>
@@ -349,8 +349,8 @@ export default function Rappels() {
                     className="h-9 w-9 rounded-full border text-sm font-bold transition"
                     style={{
                       borderColor: on ? "var(--accent)" : "var(--border)",
-                      backgroundColor: on ? "var(--accent)" : "transparent",
-                      color: on ? "#fff" : "var(--muted)",
+                      backgroundColor: on ? "var(--accent-fort)" : "transparent",
+                      color: on ? "var(--sur-accent)" : "var(--muted)",
                     }}
                   >
                     {j.court}
@@ -378,7 +378,7 @@ export default function Rappels() {
                 type="submit"
                 disabled={jours.length === 0}
                 className="rounded-full px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
-                style={{ backgroundColor: "var(--accent)" }}
+                style={{ backgroundColor: "var(--accent-fort)" }}
               >
                 Enregistrer
               </button>

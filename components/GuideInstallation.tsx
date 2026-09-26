@@ -364,7 +364,7 @@ export default function GuideInstallation() {
             style={{
               backgroundColor:
                 "color-mix(in srgb, var(--accent) 15%, transparent)",
-              color: "var(--accent)",
+              color: "var(--accent-fort)",
             }}
           >
             {/* petit téléphone avec flèche */}
@@ -398,7 +398,7 @@ export default function GuideInstallation() {
           <button
             onClick={() => setOuvert(true)}
             className="shrink-0 rounded-full px-4 py-2 text-sm font-bold text-white transition active:scale-95"
-            style={{ backgroundColor: "var(--accent)" }}
+            style={{ backgroundColor: "var(--accent-fort)" }}
           >
             Voir comment
           </button>
@@ -453,8 +453,8 @@ export default function GuideInstallation() {
                   style={{
                     borderColor: os === id ? "var(--accent)" : "var(--border)",
                     backgroundColor:
-                      os === id ? "var(--accent)" : "var(--card)",
-                    color: os === id ? "#fff" : "var(--text)",
+                      os === id ? "var(--accent-fort)" : "var(--card)",
+                    color: os === id ? "var(--sur-accent)" : "var(--text)",
                   }}
                 >
                   {nom}
@@ -487,7 +487,7 @@ export default function GuideInstallation() {
               <button
                 onClick={installerNatif}
                 className="mb-4 w-full rounded-2xl px-4 py-3 font-bold text-white shadow-soft transition active:scale-[0.99]"
-                style={{ backgroundColor: "var(--accent)" }}
+                style={{ backgroundColor: "var(--accent-fort)" }}
               >
                 📲 Installer maintenant (en 1 clic)
               </button>
@@ -503,7 +503,7 @@ export default function GuideInstallation() {
                   <p className="flex items-center gap-2 font-extrabold">
                     <span
                       className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm text-white"
-                      style={{ backgroundColor: "var(--accent)" }}
+                      style={{ backgroundColor: "var(--accent-fort)" }}
                     >
                       {i + 1}
                     </span>

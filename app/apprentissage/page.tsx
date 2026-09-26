@@ -332,8 +332,8 @@ export default function Apprentissage() {
             className="flex-1 rounded-full border px-4 py-2 text-sm font-bold transition active:scale-95"
             style={{
               borderColor: mode === m.id ? "var(--accent)" : "var(--border)",
-              backgroundColor: mode === m.id ? "var(--accent)" : "var(--card)",
-              color: mode === m.id ? "#fff" : "var(--text)",
+              backgroundColor: mode === m.id ? "var(--accent-fort)" : "var(--card)",
+              color: mode === m.id ? "var(--sur-accent)" : "var(--text)",
             }}
           >
             {m.nom}
@@ -353,7 +353,7 @@ export default function Apprentissage() {
           className="relative h-6 w-11 shrink-0 rounded-full transition"
           style={{
             backgroundColor: prefs.phonetique
-              ? "var(--accent)"
+              ? "var(--accent-fort)"
               : "var(--border)",
           }}
         >
@@ -381,8 +381,8 @@ export default function Apprentissage() {
               style={{
                 borderColor: section === i ? "var(--accent)" : "var(--border)",
                 backgroundColor:
-                  section === i ? "var(--accent)" : "var(--card)",
-                color: section === i ? "#fff" : "var(--text)",
+                  section === i ? "var(--accent-fort)" : "var(--card)",
+                color: section === i ? "var(--sur-accent)" : "var(--text)",
               }}
             >
               Juz&apos; {s.juz}{" "}
@@ -399,7 +399,7 @@ export default function Apprentissage() {
         <div className="card mt-4 rounded-2xl p-8 text-center shadow-soft">
           <p
             className="flex animate-pulse justify-center"
-            style={{ color: "var(--accent)" }}
+            style={{ color: "var(--accent-fort)" }}
           >
             <LivreOuvert taille={32} />
           </p>
@@ -408,7 +408,7 @@ export default function Apprentissage() {
       )}
       {erreur && (
         <div className="card mt-4 rounded-2xl p-6 text-center shadow-soft">
-          <p className="flex justify-center" style={{ color: "var(--accent)" }}>
+          <p className="flex justify-center" style={{ color: "var(--accent-fort)" }}>
             <Alerte taille={28} />
           </p>
           <p className="mt-2 font-bold">Impossible de charger la sourate</p>
@@ -420,7 +420,7 @@ export default function Apprentissage() {
                 .catch(() => setErreur(true));
             }}
             className="mt-3 rounded-full px-5 py-2 font-bold text-white"
-            style={{ backgroundColor: "var(--accent)" }}
+            style={{ backgroundColor: "var(--accent-fort)" }}
           >
             Réessayer
           </button>
@@ -464,8 +464,8 @@ export default function Apprentissage() {
                     className="flex h-6 w-6 items-center justify-center rounded-full border-2 text-sm font-bold transition"
                     style={{
                       borderColor: actif ? "var(--accent)" : "var(--border)",
-                      backgroundColor: actif ? "var(--accent)" : "transparent",
-                      color: "#fff",
+                      backgroundColor: actif ? "var(--accent-fort)" : "transparent",
+                      color: "var(--sur-accent)",
                     }}
                   >
                     {actif ? "✓" : ""}
@@ -535,7 +535,7 @@ export default function Apprentissage() {
                 {prefs.phonetique && phonetiques?.[v.n - 1] && (
                   <p
                     className={`mt-2 italic ${TAILLES[taille].trad}`}
-                    style={{ color: "var(--accent)" }}
+                    style={{ color: "var(--accent-fort)" }}
                   >
                     {phonetiques[v.n - 1]}
                   </p>
@@ -577,8 +577,8 @@ export default function Apprentissage() {
                       borderColor:
                         reps === r ? "var(--accent)" : "var(--border)",
                       backgroundColor:
-                        reps === r ? "var(--accent)" : "var(--card)",
-                      color: reps === r ? "#fff" : "var(--text)",
+                        reps === r ? "var(--accent-fort)" : "var(--card)",
+                      color: reps === r ? "var(--sur-accent)" : "var(--text)",
                     }}
                   >
                     ×{r}
@@ -603,7 +603,7 @@ export default function Apprentissage() {
                 }
                 disabled={!pretALancer}
                 className="flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 font-bold text-white shadow-soft transition active:scale-[0.99] disabled:opacity-40"
-                style={{ backgroundColor: "var(--accent)" }}
+                style={{ backgroundColor: "var(--accent-fort)" }}
               >
                 <IconeLecture taille={15} />
                 {mode === "versets"
@@ -623,7 +623,7 @@ export default function Apprentissage() {
                   className="flex flex-1 items-center justify-center gap-2 rounded-xl border px-4 py-3 font-bold transition active:scale-[0.99]"
                   style={{
                     borderColor: "var(--accent)",
-                    color: "var(--accent)",
+                    color: "var(--accent-fort)",
                   }}
                 >
                   {etat === "pause" ? (
@@ -639,7 +639,7 @@ export default function Apprentissage() {
                 <button
                   onClick={stopAudio}
                   className="flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 font-bold text-white transition active:scale-[0.99]"
-                  style={{ backgroundColor: "var(--accent)" }}
+                  style={{ backgroundColor: "var(--accent-fort)" }}
                 >
                   ■ Arrêter
                 </button>
@@ -648,7 +648,7 @@ export default function Apprentissage() {
 
             <p
               className="text-center text-xs font-bold"
-              style={{ color: progression ? "var(--accent)" : "var(--muted)" }}
+              style={{ color: progression ? "var(--accent-fort)" : "var(--muted)" }}
             >
               {progression ||
                 (mode === "versets"

@@ -65,7 +65,7 @@ export default function Coran() {
           className="card mt-5 flex items-center gap-3 rounded-2xl p-4 shadow-soft transition hover:scale-[1.02] active:scale-[0.98]"
           style={{ borderColor: "var(--accent)" }}
         >
-          <span style={{ color: "var(--accent)" }}>
+          <span style={{ color: "var(--accent-fort)" }}>
             <MarquePageIcone taille={24} rempli />
           </span>
           <span className="min-w-0 flex-1">
@@ -74,7 +74,7 @@ export default function Coran() {
               {sourateMarquee.nom} — verset {marque.v}
             </span>
           </span>
-          <span style={{ color: "var(--accent)" }}>→</span>
+          <span style={{ color: "var(--accent-fort)" }}>→</span>
         </Link>
       )}
 

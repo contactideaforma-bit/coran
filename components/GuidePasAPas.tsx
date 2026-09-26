@@ -33,14 +33,14 @@ function BlocDhikr({ d }: { d: Dhikr }) {
   return (
     <div className="mt-4 rounded-2xl p-4" style={{ border: "1px solid var(--border)" }}>
       {d.titre && (
-        <p className="mb-2 text-xs font-extrabold uppercase tracking-wide" style={{ color: "var(--accent)" }}>
+        <p className="mb-2 text-xs font-extrabold uppercase tracking-wide" style={{ color: "var(--accent-fort)" }}>
           {d.titre}
         </p>
       )}
       <p className={`arabic text-2xl leading-loose ${prefs.police}`} dir="rtl">
         {d.arabe}
       </p>
-      <p className="mt-3 text-sm italic" style={{ color: "var(--accent)" }}>
+      <p className="mt-3 text-sm italic" style={{ color: "var(--accent-fort)" }}>
         {d.translit}
       </p>
       <p className="mt-2 text-sm">{d.fr}</p>
@@ -129,20 +129,20 @@ export default function GuidePasAPas({
           ← {retour.libelle}
         </Link>
         <h2 className="flex items-center gap-2 text-right text-xl font-extrabold">
-          <span style={{ color: "var(--accent)" }}>{icone}</span> {guide.titre}
+          <span style={{ color: "var(--accent-fort)" }}>{icone}</span> {guide.titre}
         </h2>
       </section>
 
       {/* Intro */}
       <div className="card mt-5 rounded-3xl p-5 shadow-soft">
-        <p className="text-sm font-extrabold" style={{ color: "var(--accent)" }}>
+        <p className="text-sm font-extrabold" style={{ color: "var(--accent-fort)" }}>
           {guide.sousTitre}
         </p>
         <p className="mt-2 text-sm leading-relaxed">{guide.intro}</p>
         <div className="mt-3 space-y-2">
           {guide.merites.map((m, i) => (
             <p key={i} className="flex items-start gap-2 text-sm">
-              <span className="mt-0.5 shrink-0" style={{ color: "var(--accent)" }}>
+              <span className="mt-0.5 shrink-0" style={{ color: "var(--accent-fort)" }}>
                 <Citation taille={14} />
               </span>
               <span>
@@ -167,7 +167,7 @@ export default function GuidePasAPas({
         <div className="mt-1.5 h-2 overflow-hidden rounded-full" style={{ background: "var(--border)" }}>
           <div
             className="h-full rounded-full"
-            style={{ width: `${pourcent}%`, background: "var(--accent)", transition: "width .4s" }}
+            style={{ width: `${pourcent}%`, background: "var(--accent-fort)", transition: "width .4s" }}
           />
         </div>
         <div className="mt-3 flex flex-wrap justify-center gap-2">
@@ -183,8 +183,8 @@ export default function GuidePasAPas({
                 aria-current={active ? "step" : undefined}
                 className="flex h-9 w-9 items-center justify-center rounded-full text-sm font-extrabold transition active:scale-90"
                 style={{
-                  background: faite ? "var(--accent)" : "var(--card)",
-                  color: faite ? "#fff" : "var(--text)",
+                  background: faite ? "var(--accent-fort)" : "var(--card)",
+                  color: faite ? "var(--sur-accent)" : "var(--text)",
                   border: `2px solid ${active ? "var(--accent)" : faite ? "var(--accent)" : "var(--border)"}`,
                   transform: active ? "scale(1.15)" : undefined,
                 }}
@@ -215,7 +215,7 @@ export default function GuidePasAPas({
               <button
                 onClick={recommencer}
                 className="rounded-full px-4 py-2 text-sm font-bold text-white shadow-soft transition active:scale-95"
-                style={{ background: "var(--accent)" }}
+                style={{ background: "var(--accent-fort)" }}
               >
                 Tout recommencer
               </button>
@@ -234,7 +234,7 @@ export default function GuidePasAPas({
                 <Illustration nom={e.illustration} />
               </div>
               <div className="min-w-0">
-                <p className="text-xs font-extrabold uppercase tracking-wide" style={{ color: "var(--accent)" }}>
+                <p className="text-xs font-extrabold uppercase tracking-wide" style={{ color: "var(--accent-fort)" }}>
                   Étape {etape + 1} / {total}
                 </p>
                 <h3 className="mt-1 text-xl font-extrabold leading-tight">{e.titre}</h3>
@@ -249,7 +249,7 @@ export default function GuidePasAPas({
                 <li key={i} className="flex gap-3 text-sm leading-relaxed">
                   <span
                     className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-extrabold"
-                    style={{ border: "1.5px solid var(--accent)", color: "var(--accent)" }}
+                    style={{ border: "1.5px solid var(--accent)", color: "var(--accent-fort)" }}
                   >
                     {i + 1}
                   </span>
@@ -267,11 +267,11 @@ export default function GuidePasAPas({
                     style={{ border: `${c.recommande ? 2 : 1}px solid ${c.recommande ? "var(--accent)" : "var(--border)"}` }}
                   >
                     <p className="flex flex-wrap items-center gap-2 font-extrabold">
-                      <span style={{ color: "var(--accent)" }}>Si…</span> {c.titre}
+                      <span style={{ color: "var(--accent-fort)" }}>Si…</span> {c.titre}
                       {c.recommande && (
                         <span
                           className="rounded-full px-2 py-0.5 text-[11px] font-extrabold text-white"
-                          style={{ background: "var(--accent)" }}
+                          style={{ background: "var(--accent-fort)" }}
                         >
                           Le meilleur
                         </span>
@@ -281,7 +281,7 @@ export default function GuidePasAPas({
                       {c.frise.map((f, j) => (
                         <span key={j} className="flex items-center gap-1.5">
                           {j > 0 && (
-                            <span className="text-xs" style={{ color: "var(--accent)" }}>
+                            <span className="text-xs" style={{ color: "var(--accent-fort)" }}>
                               →
                             </span>
                           )}
@@ -320,7 +320,7 @@ export default function GuidePasAPas({
                 className="mt-4 flex items-start gap-2 rounded-2xl p-3 text-sm"
                 style={{ border: "1.5px solid var(--accent)" }}
               >
-                <span className="mt-0.5 shrink-0" style={{ color: "var(--accent)" }}>
+                <span className="mt-0.5 shrink-0" style={{ color: "var(--accent-fort)" }}>
                   <Ampoule taille={16} />
                 </span>
                 {e.astuce}
@@ -331,7 +331,7 @@ export default function GuidePasAPas({
               <Link
                 href={e.lien.href}
                 className="mt-4 inline-block text-sm font-bold underline"
-                style={{ color: "var(--accent)" }}
+                style={{ color: "var(--accent-fort)" }}
               >
                 {e.lien.libelle} →
               </Link>
@@ -348,7 +348,7 @@ export default function GuidePasAPas({
               <button
                 onClick={valider}
                 className="whitespace-nowrap rounded-full px-5 py-3 text-sm font-extrabold text-white shadow-soft transition hover:scale-105 active:scale-95"
-                style={{ background: "var(--accent)" }}
+                style={{ background: "var(--accent-fort)" }}
               >
                 {etape === total - 1 ? "Terminer ✓" : "C'est fait ✓ Suivant"}
               </button>
@@ -360,7 +360,7 @@ export default function GuidePasAPas({
       {/* À éviter */}
       <details className="card mt-6 overflow-hidden rounded-2xl shadow-soft">
         <summary className="flex cursor-pointer list-none items-center gap-3 p-4">
-          <span style={{ color: "var(--accent)" }}>
+          <span style={{ color: "var(--accent-fort)" }}>
             <Alerte taille={20} />
           </span>
           <span className="min-w-0 flex-1 font-bold">Erreurs fréquentes à éviter</span>
@@ -371,7 +371,7 @@ export default function GuidePasAPas({
         <ul className="space-y-2 border-t px-4 pb-4 pt-3" style={{ borderColor: "var(--border)" }}>
           {guide.aEviter.map((a, i) => (
             <li key={i} className="flex gap-2 text-sm">
-              <span className="shrink-0 font-extrabold" style={{ color: "var(--accent)" }}>
+              <span className="shrink-0 font-extrabold" style={{ color: "var(--accent-fort)" }}>
                 ✕
               </span>
               {a}

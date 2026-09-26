@@ -67,7 +67,7 @@ function CarteRappels() {
       href="/rappels"
       className="card flex items-center gap-3 rounded-2xl p-4 shadow-soft transition hover:scale-[1.01] active:scale-[0.99]"
     >
-      <span style={{ color: "var(--accent)" }}>
+      <span style={{ color: "var(--accent-fort)" }}>
         <Cloche taille={22} />
       </span>
       <span className="min-w-0 flex-1">
@@ -80,7 +80,7 @@ function CarteRappels() {
               : "Être prévenu à l'heure de la prière et programmer des rappels de lecture"}
         </span>
       </span>
-      <span style={{ color: "var(--accent)" }}>→</span>
+      <span style={{ color: "var(--accent-fort)" }}>→</span>
     </Link>
   );
 }
@@ -268,7 +268,7 @@ export default function Prieres() {
             <button
               type="submit"
               className="flex-1 rounded-full px-6 py-3 font-bold text-white transition active:scale-95"
-              style={{ backgroundColor: "var(--accent)" }}
+              style={{ backgroundColor: "var(--accent-fort)" }}
             >
               Afficher les horaires
             </button>
@@ -332,8 +332,8 @@ export default function Prieres() {
                 style={{
                   borderColor: vue === v.id ? "var(--accent)" : "var(--border)",
                   backgroundColor:
-                    vue === v.id ? "var(--accent)" : "var(--card)",
-                  color: vue === v.id ? "#fff" : "var(--text)",
+                    vue === v.id ? "var(--accent-fort)" : "var(--card)",
+                  color: vue === v.id ? "var(--sur-accent)" : "var(--text)",
                 }}
               >
                 {v.nom}
@@ -345,7 +345,7 @@ export default function Prieres() {
             <div className="card rounded-2xl p-6 text-center shadow-soft">
               <p
                 className="flex justify-center"
-                style={{ color: "var(--accent)" }}
+                style={{ color: "var(--accent-fort)" }}
               >
                 <Alerte taille={28} />
               </p>
@@ -353,7 +353,7 @@ export default function Prieres() {
               <button
                 onClick={() => setFormulaire(true)}
                 className="mt-3 rounded-full px-5 py-2 font-bold text-white"
-                style={{ backgroundColor: "var(--accent)" }}
+                style={{ backgroundColor: "var(--accent-fort)" }}
               >
                 Modifier la ville
               </button>
@@ -364,7 +364,7 @@ export default function Prieres() {
             <div className="card rounded-2xl p-8 text-center shadow-soft">
               <p
                 className="flex animate-pulse justify-center"
-                style={{ color: "var(--accent)" }}
+                style={{ color: "var(--accent-fort)" }}
               >
                 <Horloge taille={36} />
               </p>
@@ -391,14 +391,14 @@ export default function Prieres() {
                     }
                   >
                     <span className="flex items-center gap-3 font-bold">
-                      <span style={{ color: "var(--accent)" }}>
+                      <span style={{ color: "var(--accent-fort)" }}>
                         <l.icone taille={20} />
                       </span>
                       {l.nom}
                       {estSuivante && (
                         <span
                           className="rounded-full px-2 py-0.5 text-[10px] font-bold text-white"
-                          style={{ backgroundColor: "var(--accent)" }}
+                          style={{ backgroundColor: "var(--accent-fort)" }}
                         >
                           {maintenant
                             ? tempsRestant(horaires[l.id], maintenant)
@@ -447,7 +447,7 @@ export default function Prieres() {
                         });
                       }}
                       className="text-xs font-bold underline"
-                      style={{ color: "var(--accent)" }}
+                      style={{ color: "var(--accent-fort)" }}
                     >
                       Revenir à aujourd&apos;hui
                     </button>
@@ -466,7 +466,7 @@ export default function Prieres() {
                 <div className="p-6 text-center">
                   <p
                     className="flex justify-center"
-                    style={{ color: "var(--accent)" }}
+                    style={{ color: "var(--accent-fort)" }}
                   >
                     <Alerte taille={28} />
                   </p>
@@ -481,7 +481,7 @@ export default function Prieres() {
                 <div className="p-8 text-center">
                   <p
                     className="flex animate-pulse justify-center"
-                    style={{ color: "var(--accent)" }}
+                    style={{ color: "var(--accent-fort)" }}
                   >
                     <Horloge taille={32} />
                   </p>
@@ -527,7 +527,7 @@ export default function Prieres() {
                               ? {
                                   backgroundColor:
                                     "color-mix(in srgb, var(--accent) 14%, transparent)",
-                                  color: "var(--accent)",
+                                  color: "var(--accent-fort)",
                                   fontWeight: 800,
                                 }
                               : {}),
