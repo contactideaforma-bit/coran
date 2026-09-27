@@ -556,7 +556,7 @@ export default function Apprentissage() {
 
       {/* ===== Barre de lecture fixe ===== */}
       {data && (
-        <div className="fixed inset-x-0 bottom-0 z-30 px-4 pb-4 pt-2">
+        <div className="fixed inset-x-0 z-30 px-4 pb-4 pt-2" style={{ bottom: "var(--hauteur-onglets)" }}>
           <div
             className="card mx-auto max-w-3xl space-y-2.5 rounded-2xl p-3 shadow-lg"
             style={{

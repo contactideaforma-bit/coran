@@ -4,6 +4,7 @@ import { PrefsProvider } from "@/lib/prefs";
 import EnregistrerSW from "@/components/EnregistrerSW";
 import RappelPriere from "@/components/RappelPriere";
 import BadgeHorsLigne from "@/components/BadgeHorsLigne";
+import BarreOnglets from "@/components/BarreOnglets";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -66,7 +67,10 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: scriptTheme }} />
       </head>
       <body className="font-ui min-h-screen antialiased">
-        <PrefsProvider>{children}</PrefsProvider>
+        <PrefsProvider>
+          {children}
+          <BarreOnglets />
+        </PrefsProvider>
         <EnregistrerSW />
         <RappelPriere />
         <BadgeHorsLigne />

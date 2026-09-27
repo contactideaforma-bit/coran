@@ -24,8 +24,8 @@ export default function BadgeHorsLigne() {
   return (
     <div
       role="status"
-      className="card fixed bottom-6 left-6 z-30 flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold shadow-soft"
-      style={{ color: "var(--muted)" }}
+      className="card fixed left-6 z-30 flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold shadow-soft"
+      style={{ color: "var(--muted)", bottom: "calc(1.5rem + var(--hauteur-onglets))" }}
     >
       {/* nuage barré */}
       <svg

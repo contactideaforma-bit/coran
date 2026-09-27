@@ -293,3 +293,16 @@ main {
 }
 .accueil-fond { animation: accueil-zoom 24s ease-in-out infinite alternate; }
 @media (prefers-reduced-motion: reduce) { .accueil-fond { animation: none; } }
+
+/* ===== Barre d'onglets du bas ===== */
+:root { --hauteur-onglets: 0px; }
+.avec-onglets { --hauteur-onglets: calc(4rem + env(safe-area-inset-bottom)); }
+.avec-onglets body { padding-bottom: var(--hauteur-onglets); }
+.barre-onglets {
+  padding-bottom: env(safe-area-inset-bottom);
+  background: color-mix(in srgb, var(--card) 88%, transparent);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  backdrop-filter: blur(16px) saturate(1.4);
+  border-top: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border));
+  box-shadow: 0 -6px 24px -12px rgba(40, 30, 10, 0.18);
+}
