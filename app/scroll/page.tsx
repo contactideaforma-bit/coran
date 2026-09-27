@@ -9,6 +9,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   sceneDe,
   tirerSerie,
+  videoDe,
   trouverCarte,
   type Carte,
   type Filtre,
@@ -242,7 +243,7 @@ export default function ScrollHalal() {
         <div ref={conteneurRef} className="fil-conteneur">
           {elements.length === 0 && (
             <section className="fil-carte relative flex items-center justify-center overflow-hidden px-5">
-              <SceneNature scene="montagnes" anime />
+              <SceneNature scene="montagnes" anime video="/fonds/montagnes-1" charger lire />
               <div className="verre relative z-10 rounded-3xl p-6 text-center shadow-soft">
                 <p className="font-extrabold">Aucun favori pour l'instant</p>
                 <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
@@ -264,7 +265,7 @@ export default function ScrollHalal() {
             if (el.type === "pause") {
               return (
                 <section key={el.id} data-index={i} className="fil-carte relative flex items-center overflow-hidden px-5">
-                  <SceneNature scene="aube" anime={anime} />
+                  <SceneNature scene="aube" anime={anime} video="/fonds/aube-2" charger={anime} lire={i === actif} />
                   <div className="verre relative z-10 w-full rounded-3xl p-6 text-center shadow-soft">
                     <p className="text-xs font-extrabold uppercase tracking-wide" style={{ color: "var(--accent-fort)" }}>
                       Petite pause
@@ -312,7 +313,13 @@ export default function ScrollHalal() {
                 className="fil-carte relative flex items-center overflow-hidden px-4 pb-24 pt-16"
                 onClick={() => demarre && setEnPause((p) => !p)}
               >
-                <SceneNature scene={sceneDe(el.id)} anime={anime && !enPause} />
+                <SceneNature
+                  scene={sceneDe(el.id)}
+                  anime={anime && !enPause}
+                  video={videoDe(el.id)}
+                  charger={anime}
+                  lire={i === actif && !enPause}
+                />
                 <div className="relative z-10 max-h-full w-full overflow-y-auto pr-12">
                   {el.type === "coran" ? (
                     <CarteCoran

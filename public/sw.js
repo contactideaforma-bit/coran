@@ -33,6 +33,10 @@ self.addEventListener("fetch", (event) => {
   if (req.method !== "GET") return;
   const url = new URL(req.url);
 
+  // Vidéos de fond et requêtes partielles (Range) : laisser le navigateur
+  // les gérer directement (sinon la lecture vidéo casse sur iPhone).
+  if (url.pathname.startsWith("/fonds/") || req.headers.has("range")) return;
+
   // Données + polices : cache d'abord (le texte du Coran ne change pas)
   if (HOTES_DONNEES.includes(url.hostname)) {
     event.respondWith(

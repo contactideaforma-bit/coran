@@ -98,11 +98,33 @@ export function nomSourate(s: number) {
   return SOURATES.find((x) => x.n === s)?.nom ?? `Sourate ${s}`;
 }
 
-/** Scène de fond stable pour une carte donnée. */
-export function sceneDe(id: string): SceneId {
+const hacher = (id: string) => {
   let h = 0;
   for (const ch of id) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
-  return SCENES[h % SCENES.length];
+  return h;
+};
+
+/** Scène de fond stable pour une carte donnée. */
+export function sceneDe(id: string): SceneId {
+  return SCENES[hacher(id) % SCENES.length];
+}
+
+/** Nombre de vidéos réelles (Pexels, compressées dans public/fonds) par scène. */
+const VIDEOS_PAR_SCENE: Record<SceneId, number> = {
+  aube: 2,
+  mer: 2,
+  desert: 2,
+  nuit: 2,
+  foret: 2,
+  montagnes: 2,
+};
+
+/** Vidéo de fond d'une carte : /fonds/<scene>-<n>.mp4 (+ .jpg en aperçu). */
+export function videoDe(id: string): string | null {
+  const scene = sceneDe(id);
+  const nb = VIDEOS_PAR_SCENE[scene];
+  if (!nb) return null;
+  return `/fonds/${scene}-${(Math.floor(hacher(id) / SCENES.length) % nb) + 1}`;
 }
 
 function melanger<T>(t: T[]): T[] {

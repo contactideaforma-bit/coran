@@ -2,7 +2,7 @@
    aucun fichier vidéo à télécharger, aucun droit, fonctionne hors ligne.
    Animations définies dans globals.css (préfixe fil-). */
 
-import { useId } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import type { SceneId } from "@/data/fil";
 
 /** Générateur pseudo-aléatoire déterministe (mêmes étoiles à chaque rendu). */
@@ -213,17 +213,60 @@ const SCENES_SVG: Record<SceneId, (p: { u: string }) => JSX.Element> = {
   montagnes: Montagnes,
 };
 
-export default function SceneNature({ scene, anime }: { scene: SceneId; anime: boolean }) {
+/** Fond d'une carte : vraie vidéo de nature (si fournie et chargeable),
+ *  avec le paysage dessiné en dessous comme secours (hors ligne, chargement). */
+export default function SceneNature({
+  scene,
+  anime,
+  video,
+  charger = false,
+  lire = false,
+}: {
+  scene: SceneId;
+  anime: boolean; // animer le dessin de secours
+  video?: string | null; // chemin sans extension, ex. /fonds/mer-1
+  charger?: boolean; // télécharger la vidéo (carte visible ou voisine)
+  lire?: boolean; // lire la vidéo (carte visible et pas en pause)
+}) {
   const u = useId().replace(/[^a-zA-Z0-9]/g, "");
   const Dessin = SCENES_SVG[scene];
+  const ref = useRef<HTMLVideoElement>(null);
+  const [erreur, setErreur] = useState(false);
+  const [prete, setPrete] = useState(false);
+  const avecVideo = !!video && !erreur;
+
+  useEffect(() => {
+    const v = ref.current;
+    if (!v || !avecVideo) return;
+    if (lire && charger) v.play().catch(() => {});
+    else v.pause();
+  }, [lire, charger, avecVideo]);
+
   return (
-    <svg
-      viewBox="0 0 100 178"
-      preserveAspectRatio="xMidYMid slice"
-      className={`absolute inset-0 h-full w-full ${anime ? "" : "scene-fige"}`}
-      aria-hidden="true"
-    >
-      <Dessin u={u} />
-    </svg>
+    <>
+      <svg
+        viewBox="0 0 100 178"
+        preserveAspectRatio="xMidYMid slice"
+        className={`absolute inset-0 h-full w-full ${anime && !prete ? "" : "scene-fige"}`}
+        aria-hidden="true"
+      >
+        <Dessin u={u} />
+      </svg>
+      {avecVideo && (
+        <video
+          ref={ref}
+          className="absolute inset-0 h-full w-full object-cover"
+          src={charger ? `${video}.mp4` : undefined}
+          poster={`${video}.jpg`}
+          muted
+          loop
+          playsInline
+          preload={charger ? "auto" : "none"}
+          onLoadedData={() => setPrete(true)}
+          onError={() => setErreur(true)}
+          aria-hidden="true"
+        />
+      )}
+    </>
   );
 }
