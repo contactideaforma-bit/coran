@@ -17,7 +17,7 @@ import {
 import { Ambiance, SON_DE_SCENE } from "@/lib/ambiance";
 import { lireMarquePage } from "@/lib/marquePage";
 import SceneNature from "@/components/ScenesNature";
-import { CarteCoran, CarteTexte } from "@/components/CartesFil";
+import { CarteCoran, CarteNom, CarteTexte } from "@/components/CartesFil";
 import {
   Coeur,
   CoeurPlein,
@@ -35,6 +35,7 @@ const FILTRES: { id: Filtre; nom: string }[] = [
   { id: "coran", nom: "Coran" },
   { id: "hadith", nom: "Hadiths" },
   { id: "invocation", nom: "Douas" },
+  { id: "nom", nom: "Noms" },
   { id: "favoris", nom: "♥" },
 ];
 
@@ -53,6 +54,7 @@ function lireFavoris(): Set<string> {
 function lienDe(c: Carte): { href: string; libelle: string } | null {
   if (c.type === "coran") return { href: `/sourate/${c.s}#v-${c.de}`, libelle: "Lire la sourate" };
   if (c.type === "invocation") return { href: "/invocations", libelle: "Toutes les invocations" };
+  if (c.type === "nom") return { href: `/sourate/${c.nom.verset.s}#v-${c.nom.verset.v}`, libelle: "Lire le verset" };
   return null;
 }
 
@@ -133,7 +135,7 @@ export default function ScrollHalal() {
   useEffect(() => {
     const amb = ambianceRef.current;
     if (!amb) return;
-    if (!demarre || muet || enPause || !courant || courant.type === "coran") {
+    if (!demarre || muet || enPause || !courant || courant.type === "coran" || courant.type === "nom") {
       amb.arreter();
       return;
     }
@@ -189,7 +191,13 @@ export default function ScrollHalal() {
   const partager = async (c: Carte) => {
     const url = `${window.location.origin}/scroll?c=${c.id}`;
     const texte =
-      c.type === "hadith" ? `« ${c.texte} » — ${c.source}` : c.type === "invocation" ? `${c.titre} : ${c.fr}` : c.theme;
+      c.type === "hadith"
+        ? `« ${c.texte} » — ${c.source}`
+        : c.type === "invocation"
+          ? `${c.titre} : ${c.fr}`
+          : c.type === "nom"
+            ? `${c.nom.arabe} — ${c.nom.translit}, ${c.nom.nomFr} : ${c.nom.sens}`
+            : c.theme;
     try {
       if (navigator.share) {
         await navigator.share({ title: "My Easy Muslim", text: texte, url });
@@ -220,7 +228,7 @@ export default function ScrollHalal() {
           >
             ←
           </Link>
-          <div className="pointer-events-auto flex min-w-0 flex-1 items-center justify-center gap-4">
+          <div className="pointer-events-auto flex min-w-0 flex-1 items-center justify-center gap-3">
             {FILTRES.map((f) => {
               const actifF = filtre === f.id;
               return (
@@ -228,7 +236,7 @@ export default function ScrollHalal() {
                   key={f.id}
                   onClick={() => changerFiltre(f.id)}
                   aria-label={f.id === "favoris" ? "Favoris" : undefined}
-                  className="relative shrink-0 py-2 text-[15px] font-extrabold transition active:scale-95"
+                  className="relative shrink-0 py-2 text-sm font-extrabold transition active:scale-95"
                   style={{
                     color: "#fff",
                     opacity: actifF ? 1 : 0.72,
@@ -347,6 +355,14 @@ export default function ScrollHalal() {
                         lecture={demarre && !enPause}
                         audio={audio}
                       />
+                    ) : el.type === "nom" ? (
+                      <CarteNom
+                        nom={el.nom}
+                        proche={Math.abs(i - actif) <= 2}
+                        actif={i === actif}
+                        lecture={demarre && !enPause}
+                        audio={audio}
+                      />
                     ) : (
                       <CarteTexte carte={el} />
                     )}
@@ -375,7 +391,7 @@ export default function ScrollHalal() {
                         className="verre flex items-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-bold shadow-soft transition active:scale-95"
                         style={{ color: "var(--accent-fort)" }}
                       >
-                        <LivreOuvert taille={17} /> {el.type === "coran" ? "Sourate" : "Douas"}
+                        <LivreOuvert taille={17} /> {el.type === "coran" ? "Sourate" : el.type === "nom" ? "Verset" : "Douas"}
                       </Link>
                     )}
                   </div>

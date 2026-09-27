@@ -5,6 +5,7 @@
 import { HADITHS } from "@/data/hadiths";
 import { CATEGORIES_INVOCATIONS } from "@/data/invocations";
 import { SOURATES } from "@/data/sourates";
+import { NOMS_ALLAH, type NomAllah } from "@/data/noms-allah";
 
 export type SceneId = "aube" | "mer" | "desert" | "nuit" | "foret" | "montagnes";
 export const SCENES: SceneId[] = ["aube", "mer", "desert", "nuit", "foret", "montagnes"];
@@ -20,9 +21,10 @@ export type Carte =
       translit: string;
       fr: string;
       source: string;
-    };
+    }
+  | { type: "nom"; id: string; nom: NomAllah };
 
-export type Filtre = "tout" | "coran" | "hadith" | "invocation" | "favoris";
+export type Filtre = "tout" | "coran" | "hadith" | "invocation" | "nom" | "favoris";
 
 /** Passages courts et apaisants (sourate, premier et dernier verset). */
 const EXTRAITS: [number, number, number, string][] = [
@@ -86,10 +88,18 @@ export const CARTES_INVOCATION: Carte[] = CATEGORIES_INVOCATIONS.flatMap((c) =>
     }))
 );
 
+/** Les 99 noms, dans l'ordre. */
+export const CARTES_NOM: Carte[] = NOMS_ALLAH.map((nom) => ({
+  type: "nom",
+  id: `nom-${nom.n}`,
+  nom,
+}));
+
 export const TOUTES_LES_CARTES: Carte[] = [
   ...CARTES_CORAN,
   ...CARTES_HADITH,
   ...CARTES_INVOCATION,
+  ...CARTES_NOM,
 ];
 
 export const trouverCarte = (id: string) => TOUTES_LES_CARTES.find((c) => c.id === id);
@@ -151,6 +161,11 @@ export function tirerSerie(
   if (filtre === "favoris") {
     return pool(TOUTES_LES_CARTES.filter((c) => favoris.has(c.id))).slice(0, n);
   }
+  if (filtre === "nom") {
+    // Dans l'ordre, pour apprendre les noms l'un après l'autre (on reboucle à la fin)
+    const suivants = CARTES_NOM.filter((c) => !dejaVues.has(c.id));
+    return (suivants.length ? suivants : CARTES_NOM).slice(0, n);
+  }
   if (filtre !== "tout") {
     const src = filtre === "coran" ? CARTES_CORAN : filtre === "hadith" ? CARTES_HADITH : CARTES_INVOCATION;
     return pool(src).slice(0, n);
@@ -158,6 +173,7 @@ export function tirerSerie(
   const c = pool(CARTES_CORAN);
   const h = pool(CARTES_HADITH);
   const v = pool(CARTES_INVOCATION);
-  const ordre: Carte[][] = [c, v, h, c, h, v, c, v, h, c];
+  const nm = pool(CARTES_NOM);
+  const ordre: Carte[][] = [c, v, nm, h, c, v, nm, h, c, nm];
   return ordre.map((l) => l.shift()!).filter(Boolean).slice(0, n);
 }
