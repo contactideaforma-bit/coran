@@ -34,8 +34,8 @@ const FILTRES: { id: Filtre; nom: string }[] = [
   { id: "tout", nom: "Tout" },
   { id: "coran", nom: "Coran" },
   { id: "hadith", nom: "Hadiths" },
-  { id: "invocation", nom: "Invocations" },
-  { id: "favoris", nom: "Favoris" },
+  { id: "invocation", nom: "Douas" },
+  { id: "favoris", nom: "♥" },
 ];
 
 const CLE_FAVORIS = "coran-fil-favoris";
@@ -204,36 +204,53 @@ export default function ScrollHalal() {
   return (
     <div className="fixed inset-0 z-40" style={{ background: "var(--bg)" }}>
       <div className="relative mx-auto h-full max-w-[480px]">
-        {/* Barre du haut */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start gap-2 p-3">
+        {/* Voile sombre en haut : garde les onglets lisibles sur tous les fonds */}
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 z-10 h-28"
+          style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0))" }}
+        />
+
+        {/* Barre du haut : retour, onglets façon TikTok, son */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-center gap-2 px-3 pt-3">
           <Link
             href="/"
             aria-label="Retour à l'accueil"
-            className="verre pointer-events-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-lg font-bold shadow-soft"
+            className="pointer-events-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xl font-bold text-white"
+            style={{ background: "rgba(0,0,0,0.25)", color: "#fff" }}
           >
             ←
           </Link>
-          <div className="pointer-events-auto flex min-w-0 flex-1 gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
-            {FILTRES.map((f) => (
-              <button
-                key={f.id}
-                onClick={() => changerFiltre(f.id)}
-                className={`${filtre === f.id ? "" : "verre"} shrink-0 rounded-full px-3 py-2 text-xs font-extrabold shadow-soft transition active:scale-95`}
-                style={
-                  filtre === f.id
-                    ? { background: "var(--accent-fort)", color: "var(--sur-accent)" }
-                    : undefined
-                }
-              >
-                {f.nom}
-              </button>
-            ))}
+          <div className="pointer-events-auto flex min-w-0 flex-1 items-center justify-center gap-4">
+            {FILTRES.map((f) => {
+              const actifF = filtre === f.id;
+              return (
+                <button
+                  key={f.id}
+                  onClick={() => changerFiltre(f.id)}
+                  aria-label={f.id === "favoris" ? "Favoris" : undefined}
+                  className="relative shrink-0 py-2 text-[15px] font-extrabold transition active:scale-95"
+                  style={{
+                    color: "#fff",
+                    opacity: actifF ? 1 : 0.72,
+                    textShadow: "0 1px 6px rgba(0,0,0,0.55)",
+                  }}
+                >
+                  {f.nom}
+                  {actifF && (
+                    <span
+                      className="absolute inset-x-1 -bottom-0.5 h-[3px] rounded-full"
+                      style={{ background: "#fff", boxShadow: "0 1px 4px rgba(0,0,0,0.4)" }}
+                    />
+                  )}
+                </button>
+              );
+            })}
           </div>
           <button
             onClick={() => setMuet((m) => !m)}
             aria-label={muet ? "Activer le son" : "Couper le son"}
-            className="verre pointer-events-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-full shadow-soft"
-            style={{ color: "var(--accent-fort)" }}
+            className="pointer-events-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
+            style={{ background: "rgba(0,0,0,0.25)", color: "#fff" }}
           >
             {muet ? <Muet taille={18} /> : <HautParleur taille={18} />}
           </button>
@@ -310,7 +327,7 @@ export default function ScrollHalal() {
               <section
                 key={`${el.id}-${i}`}
                 data-index={i}
-                className="fil-carte relative flex items-center overflow-hidden px-4 pb-24 pt-16"
+                className="fil-carte relative flex items-center justify-center overflow-hidden px-4 pb-10 pt-20"
                 onClick={() => demarre && setEnPause((p) => !p)}
               >
                 <SceneNature
@@ -320,51 +337,48 @@ export default function ScrollHalal() {
                   charger={anime}
                   lire={i === actif && !enPause}
                 />
-                <div className="relative z-10 max-h-full w-full overflow-y-auto pr-12">
-                  {el.type === "coran" ? (
-                    <CarteCoran
-                      carte={el}
-                      proche={Math.abs(i - actif) <= 2}
-                      actif={i === actif}
-                      lecture={demarre && !enPause}
-                      audio={audio}
-                    />
-                  ) : (
-                    <CarteTexte carte={el} />
-                  )}
-                </div>
+                <div className="relative z-10 flex max-h-full w-full flex-col items-center gap-3">
+                  <div className="min-h-0 w-full overflow-y-auto rounded-3xl">
+                    {el.type === "coran" ? (
+                      <CarteCoran
+                        carte={el}
+                        proche={Math.abs(i - actif) <= 2}
+                        actif={i === actif}
+                        lecture={demarre && !enPause}
+                        audio={audio}
+                      />
+                    ) : (
+                      <CarteTexte carte={el} />
+                    )}
+                  </div>
 
-                {/* Actions façon TikTok */}
-                <div
-                  className="absolute bottom-24 right-3 z-20 flex flex-col items-center gap-3"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <button
-                    onClick={() => basculerFavori(el.id)}
-                    aria-label={fav ? "Retirer des favoris" : "Ajouter aux favoris"}
-                    className="verre flex h-11 w-11 items-center justify-center rounded-full shadow-soft transition active:scale-90"
-                    style={{ color: fav ? "#d9435a" : "var(--text)" }}
-                  >
-                    {fav ? <CoeurPlein taille={20} /> : <Coeur taille={20} />}
-                  </button>
-                  <button
-                    onClick={() => partager(el)}
-                    aria-label="Partager"
-                    className="verre flex h-11 w-11 items-center justify-center rounded-full shadow-soft transition active:scale-90"
-                  >
-                    <Partager taille={19} />
-                  </button>
-                  {lien && (
-                    <Link
-                      href={lien.href}
-                      aria-label={lien.libelle}
-                      title={lien.libelle}
-                      className="verre flex h-11 w-11 items-center justify-center rounded-full shadow-soft transition active:scale-90"
-                      style={{ color: "var(--accent-fort)" }}
+                  {/* Actions, centrées sous la carte */}
+                  <div className="flex shrink-0 flex-wrap justify-center gap-2" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      onClick={() => basculerFavori(el.id)}
+                      aria-pressed={fav}
+                      className="verre flex items-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-bold shadow-soft transition active:scale-95"
+                      style={{ color: fav ? "#d9435a" : "var(--text)" }}
                     >
-                      <LivreOuvert taille={19} />
-                    </Link>
-                  )}
+                      {fav ? <CoeurPlein taille={18} /> : <Coeur taille={18} />}
+                      {fav ? "Gardé" : "Garder"}
+                    </button>
+                    <button
+                      onClick={() => partager(el)}
+                      className="verre flex items-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-bold shadow-soft transition active:scale-95"
+                    >
+                      <Partager taille={17} /> Partager
+                    </button>
+                    {lien && (
+                      <Link
+                        href={lien.href}
+                        className="verre flex items-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-bold shadow-soft transition active:scale-95"
+                        style={{ color: "var(--accent-fort)" }}
+                      >
+                        <LivreOuvert taille={17} /> {el.type === "coran" ? "Sourate" : "Douas"}
+                      </Link>
+                    )}
+                  </div>
                 </div>
 
                 {enPause && i === actif && (
@@ -377,8 +391,8 @@ export default function ScrollHalal() {
 
                 {i === 0 && demarre && actif === 0 && (
                   <p
-                    className="pointer-events-none absolute inset-x-0 bottom-8 z-10 text-center text-xs font-bold"
-                    style={{ color: "var(--text)", textShadow: "0 1px 6px var(--card)" }}
+                    className="pointer-events-none absolute inset-x-0 bottom-3 z-10 text-center text-xs font-bold"
+                    style={{ color: "#fff", textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}
                   >
                     Fais glisser vers le haut ↑
                   </p>
