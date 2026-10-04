@@ -10,6 +10,7 @@ import type { Dhikr, Guide } from "@/data/guides";
 import { usePrefs } from "@/lib/prefs";
 import Entete from "@/components/Entete";
 import Illustration from "@/components/IllustrationsGuides";
+import VersetsGuide from "@/components/VersetsGuide";
 import { CompteurSay, CompteurTawaf, DernierTiers } from "@/components/OutilsGuides";
 import { Alerte, Ampoule, Citation } from "@/components/Icones";
 
@@ -312,6 +313,8 @@ export default function GuidePasAPas({
             {e.outil === "tawaf" && <CompteurTawaf />}
             {e.outil === "say" && <CompteurSay />}
             {e.outil === "dernier-tiers" && <DernierTiers />}
+
+            {e.versets?.map((g, i) => <VersetsGuide key={`${g.s}-${g.de}`} groupe={g} />)}
 
             {e.dhikrs?.map((d, i) => <BlocDhikr key={i} d={d} />)}
 

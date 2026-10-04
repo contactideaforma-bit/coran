@@ -1,4 +1,4 @@
-/* Guides pas à pas (prière de la nuit, istikhâra, omra).
+/* Guides pas à pas (prière de la nuit, istikhâra, omra, repentir, roqya).
    Contenu limité à ce qui est établi par la Sunna authentique ; quand un
    point relève de l'avis des savants, c'est dit dans le texte. */
 
@@ -12,12 +12,22 @@ export interface Dhikr {
 
 export type OutilGuide = "tawaf" | "say" | "dernier-tiers";
 
+/** Groupe de versets à afficher et à écouter (texte chargé depuis l'API). */
+export interface VersetsGuide {
+  titre: string;
+  s: number; // sourate
+  de: number; // premier verset
+  a: number; // dernier verset (inclus)
+  note?: string; // pourquoi ces versets (hadith / avis des savants)
+}
+
 export interface EtapeGuide {
   titre: string;
   resume: string; // une phrase, affichée sous le titre
   illustration: string; // clé dans ILLUSTRATIONS (components/IllustrationsGuides)
   points: string[];
   dhikrs?: Dhikr[];
+  versets?: VersetsGuide[];
   astuce?: string;
   outil?: OutilGuide;
   lien?: { href: string; libelle: string };
@@ -716,5 +726,263 @@ export const GUIDE_TAWBA: Guide = {
     titre: "Bienvenue sur le chemin du retour",
     texte:
       "« Allah aime ceux qui se repentent et Il aime ceux qui se purifient » (Coran 2:222). Garde l'istighfâr sur ta langue chaque jour.",
+  },
+};
+
+/* ================= La roqya ================= */
+
+export const GUIDE_ROQYA: Guide = {
+  id: "roqya",
+  titre: "La roqya",
+  sousTitre: "Se soigner par le Coran et la Sunna",
+  intro:
+    "La roqya, c'est réciter le Coran et les invocations du Prophète ﷺ sur un malade — ou sur soi-même — pour demander à Allah la guérison et la protection : contre le mauvais œil, la sorcellerie, les troubles liés aux jinns, mais aussi contre la douleur et la maladie. Ce guide rassemble, type par type, ce que le Prophète ﷺ a réellement fait et enseigné.",
+  merites: [
+    {
+      texte:
+        "Il n'y a pas de mal à la roqya tant qu'elle ne comporte pas d'association (shirk).",
+      source: "Muslim",
+    },
+    {
+      texte:
+        "Ô serviteurs d'Allah, soignez-vous ! Car Allah n'a pas fait descendre de maladie sans faire descendre son remède.",
+      source: "Abu Dawud & At-Tirmidhi",
+    },
+    {
+      texte: "Le mauvais œil est une réalité.",
+      source: "Al-Bukhari & Muslim",
+    },
+  ],
+  etapes: [
+    {
+      titre: "Comprendre la roqya",
+      resume: "Ce qui la rend licite, et pourquoi la faire soi-même.",
+      illustration: "bouclier",
+      points: [
+        "La roqya licite réunit trois conditions, sur lesquelles les savants sont unanimes (Ibn Hajar) : elle se fait avec la parole d'Allah, Ses noms ou Ses attributs ; en arabe ou dans une langue dont on comprend le sens ; et avec la certitude qu'elle n'agit pas par elle-même, mais par la permission d'Allah.",
+        "Toute roqya qui ne respecte pas ces conditions — formules incompréhensibles, symboles, appel à autre qu'Allah — est interdite, et peut relever du shirk.",
+        "Le Prophète ﷺ faisait la roqya sur lui-même : chaque soir, et quand il était malade, il récitait les trois sourates de protection (Al-Ikhlâs, Al-Falaq, An-Nâs) dans ses mains, soufflait dedans, puis passait ses mains sur tout son corps (Al-Bukhari & Muslim).",
+        "Se faire la roqya à soi-même est donc la voie la plus sûre : on dépend d'Allah seul. Parmi les 70 000 qui entreront au Paradis sans jugement, le Prophète ﷺ a cité ceux qui « ne demandent pas qu'on leur fasse la roqya » et qui placent leur confiance en leur Seigneur (Al-Bukhari & Muslim). Demander la roqya à quelqu'un reste permis — mais la faire soi-même est meilleur.",
+        "On peut aussi faire la roqya sur un proche (enfant, parent, conjoint) : le Prophète ﷺ la faisait sur les membres de sa famille et sur ses Compagnons, et Jibrîl l'a faite sur lui (Muslim).",
+      ],
+      astuce:
+        "Comment faire concrètement : purifie-toi si possible, place-toi près du malade (ou pose la main sur l'endroit douloureux), récite les versets et les invocations à voix audible, et souffle légèrement (sans cracher) dans tes mains ou sur le malade. Le cœur présent compte plus que le nombre de répétitions.",
+    },
+    {
+      titre: "Les versets de la roqya",
+      resume: "Les passages que le Prophète ﷺ a lui-même utilisés.",
+      illustration: "livre",
+      points: [
+        "Al-Fâtiha : un Compagnon l'a récitée sept fois sur un chef de tribu piqué par un scorpion, qui s'est levé guéri. Le Prophète ﷺ a validé : « Qu'est-ce qui t'a fait savoir que c'était une roqya ? » (Al-Bukhari & Muslim). C'est la base de toute roqya.",
+        "Âyat al-Kursî : « Celui qui la récite en se couchant, un gardien envoyé par Allah veille sur lui et aucun diable ne l'approche jusqu'au matin » — paroles d'un diable, confirmées par le Prophète ﷺ : « Il t'a dit vrai, bien qu'il soit un grand menteur » (Al-Bukhari).",
+        "Les deux derniers versets d'Al-Baqara : « Celui qui les récite une nuit, ils lui suffisent » (Al-Bukhari & Muslim) — contre tout mal, selon les savants.",
+        "Les trois sourates de protection (al-mu'awwidhât) : le Prophète ﷺ disait : « Récite les mu'awwidhât : tu ne chercheras jamais protection avec quelque chose de semblable » (An-Nasa'i & Abu Dawud). Dans sa dernière maladie, 'Â'isha les lui récitait et passait sa main sur lui (Al-Bukhari & Muslim).",
+        "Tu peux lire tout le Coran en roqya : « Nous faisons descendre du Coran ce qui est guérison et miséricorde pour les croyants » (17:82). Les versets ci-dessous sont simplement ceux dont l'usage est établi par la Sunna.",
+      ],
+      versets: [
+        { titre: "Al-Fâtiha — l'ouverture", s: 1, de: 1, a: 7, note: "À réciter en premier, une ou sept fois, en soufflant légèrement sur le malade après chaque lecture." },
+        { titre: "Âyat al-Kursî", s: 2, de: 255, a: 255 },
+        { titre: "Les deux derniers versets d'Al-Baqara", s: 2, de: 285, a: 286 },
+        { titre: "Al-Ikhlâs", s: 112, de: 1, a: 4 },
+        { titre: "Al-Falaq", s: 113, de: 1, a: 5, note: "Sourate révélée pour la protection contre l'envieux et la sorcellerie." },
+        { titre: "An-Nâs", s: 114, de: 1, a: 6, note: "Contre les suggestions (waswâs) des diables, parmi les jinns et les hommes." },
+      ],
+      astuce:
+        "Ordre simple à retenir : Al-Fâtiha → Âyat al-Kursî → fin d'Al-Baqara → les trois Qul. Répète trois fois les trois Qul, comme le Prophète ﷺ le faisait matin et soir (Abu Dawud & At-Tirmidhi).",
+    },
+    {
+      titre: "Les invocations du Prophète ﷺ",
+      resume: "Les formules de roqya rapportées dans les hadiths authentiques.",
+      illustration: "mains",
+      points: [
+        "Ces invocations se disent après les versets, ou seules : le Prophète ﷺ les prononçait en passant sa main droite sur le malade (Al-Bukhari & Muslim).",
+        "On remplace « toi » par le prénom du malade, ou on dit « moi » si c'est pour soi-même.",
+      ],
+      dhikrs: [
+        {
+          titre: "La roqya du Prophète ﷺ sur les malades",
+          arabe: "اللَّهُمَّ رَبَّ النَّاسِ، أَذْهِبِ الْبَأْسَ، اشْفِ أَنْتَ الشَّافِي، لَا شِفَاءَ إِلَّا شِفَاؤُكَ، شِفَاءً لَا يُغَادِرُ سَقَمًا",
+          translit:
+            "Allâhumma rabba-n-nâs, adhhibi-l-ba's, ishfi anta-sh-Shâfî, lâ shifâ'a illâ shifâ'uk, shifâ'an lâ yughâdiru saqamâ.",
+          fr: "Ô Allah, Seigneur des hommes, fais partir le mal, guéris — Tu es le Guérisseur, il n'y a de guérison que la Tienne — d'une guérison qui ne laisse aucune maladie.",
+          source: "Al-Bukhari & Muslim",
+        },
+        {
+          titre: "La roqya de Jibrîl sur le Prophète ﷺ",
+          arabe: "بِسْمِ اللَّهِ أَرْقِيكَ، مِنْ كُلِّ شَيْءٍ يُؤْذِيكَ، مِنْ شَرِّ كُلِّ نَفْسٍ أَوْ عَيْنِ حَاسِدٍ، اللَّهُ يَشْفِيكَ، بِسْمِ اللَّهِ أَرْقِيكَ",
+          translit:
+            "Bismi-llâhi arqîk, min kulli shay'in yu'dhîk, min sharri kulli nafsin aw 'aynin hâsid, Allâhu yashfîk, bismi-llâhi arqîk.",
+          fr: "Au nom d'Allah je te fais la roqya, contre toute chose qui te nuit, contre le mal de toute âme ou de tout œil envieux. Qu'Allah te guérisse. Au nom d'Allah je te fais la roqya.",
+          source: "Muslim",
+        },
+        {
+          titre: "Pour celui qui rend visite à un malade (7 fois)",
+          arabe: "أَسْأَلُ اللَّهَ الْعَظِيمَ، رَبَّ الْعَرْشِ الْعَظِيمِ، أَنْ يَشْفِيَكَ",
+          translit: "As'alu-llâha-l-'Azîm, Rabba-l-'arshi-l-'azîm, an yashfiyak.",
+          fr: "Je demande à Allah l'Immense, Seigneur du Trône immense, de te guérir. — « Celui qui la dit sept fois auprès d'un malade dont l'heure n'est pas venue, Allah le guérit. »",
+          source: "Abu Dawud & At-Tirmidhi",
+        },
+        {
+          titre: "Protection contre tout ce qu'Il a créé (3 fois le soir)",
+          arabe: "أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ",
+          translit: "A'ûdhu bikalimâti-llâhi-t-tâmmâti min sharri mâ khalaq.",
+          fr: "Je cherche refuge dans les paroles parfaites d'Allah contre le mal de ce qu'Il a créé. — « Celui qui la dit trois fois le soir, aucune piqûre venimeuse ne lui nuira cette nuit-là. »",
+          source: "Muslim",
+        },
+        {
+          titre: "Rien ne nuit avec Son nom (3 fois matin et soir)",
+          arabe: "بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ",
+          translit:
+            "Bismi-llâhi-lladhî lâ yadurru ma'a-smihi shay'un fi-l-ardi wa lâ fi-s-samâ'i wa huwa-s-Samî'u-l-'Alîm.",
+          fr: "Au nom d'Allah : avec Son nom, rien ne peut nuire, ni sur terre ni dans le ciel, et Il est l'Audient, l'Omniscient. — « Celui qui la dit trois fois, rien ne lui nuira. »",
+          source: "Abu Dawud & At-Tirmidhi",
+        },
+      ],
+    },
+    {
+      titre: "Contre le mauvais œil ('ayn)",
+      resume: "Le reconnaître, s'en prémunir, et le traitement de la Sunna.",
+      illustration: "oeil",
+      points: [
+        "« Le mauvais œil est une réalité ; et s'il y avait une chose capable de devancer le destin, ce serait le mauvais œil » (Muslim). Il part d'un regard d'admiration ou d'envie, parfois sans mauvaise intention — on peut même se l'infliger à soi-même ou à ses propres enfants.",
+        "Prévention — invoquer la bénédiction : quand 'Âmir ibn Rabî'a admira le corps de Sahl ibn Hunayf qui se baignait, Sahl tomba aussitôt malade. Le Prophète ﷺ dit à 'Âmir : « Pourquoi n'as-tu pas invoqué la bénédiction (dit : Allâhumma bârik) ? » (Mâlik, An-Nasa'i & Ibn Mâjah). Chaque fois que quelque chose te plaît, dis « Allâhumma bârik » ou « bâraka-llâhu fîk ». Les savants recommandent aussi « mâ shâ' Allâh, lâ quwwata illâ billâh » (18:39).",
+        "Prévention — les adhkâr du matin et du soir, les trois Qul, et l'invocation de protection pour les enfants (ci-dessous) sont le bouclier quotidien.",
+        "Traitement n° 1 — la roqya : réciter sur l'atteint les versets et les invocations des étapes précédentes. Jibrîl l'a faite sur le Prophète ﷺ en nommant précisément « le mal de tout œil envieux » (Muslim).",
+        "Traitement n° 2 — le lavage (ghusl) de celui qu'on soupçonne : le Prophète ﷺ ordonna à 'Âmir de se laver pour Sahl. Il lava dans un récipient son visage, ses mains jusqu'aux coudes, ses genoux, ses pieds et l'intérieur de son pagne ; on versa cette eau sur Sahl, qui repartit avec les gens comme s'il n'avait rien eu (Mâlik, An-Nasa'i & Ibn Mâjah). Le Prophète ﷺ a dit : « Si l'on vous demande de vous laver, lavez-vous » (Muslim).",
+        "Ce lavage suppose que l'on sache qui a jeté l'œil, et que la personne accepte : on le lui demande avec douceur, sans accusation. Si l'on ne sait pas, on s'en tient à la roqya et aux invocations : elles suffisent avec la permission d'Allah.",
+      ],
+      dhikrs: [
+        {
+          titre: "Protection des enfants (ce que disait le Prophète ﷺ pour Hasan et Husayn)",
+          arabe: "أُعِيذُكُمَا بِكَلِمَاتِ اللَّهِ التَّامَّةِ، مِنْ كُلِّ شَيْطَانٍ وَهَامَّةٍ، وَمِنْ كُلِّ عَيْنٍ لَامَّةٍ",
+          translit: "U'îdhukumâ bikalimâti-llâhi-t-tâmma, min kulli shaytânin wa hâmma, wa min kulli 'aynin lâmma.",
+          fr: "Je vous place tous deux sous la protection des paroles parfaites d'Allah, contre tout diable et toute bête venimeuse, et contre tout œil malfaisant. — Pour un seul enfant, on dit « u'îdhuka » (garçon) ou « u'îdhuki » (fille).",
+          source: "Al-Bukhari",
+        },
+        {
+          titre: "Quand quelque chose te plaît",
+          arabe: "اللَّهُمَّ بَارِكْ فِيهِ",
+          translit: "Allâhumma bârik fîh.",
+          fr: "Ô Allah, bénis-le (ou « fîhâ » : bénis-la). Le Prophète ﷺ a dit : « Quand l'un de vous voit chez son frère, chez lui-même ou dans ses biens quelque chose qui lui plaît, qu'il invoque la bénédiction : car le mauvais œil est une réalité. »",
+          source: "Ahmad & Al-Hâkim (authentifié)",
+        },
+      ],
+      astuce:
+        "Signes qui font penser au mauvais œil, d'après l'expérience des savants : un mal qui survient brusquement après une admiration, sans cause médicale trouvée. Mais ne pose jamais de diagnostic sur quelqu'un d'autre, et consulte toujours un médecin en parallèle : la roqya ne remplace pas les soins.",
+    },
+    {
+      titre: "Contre la sorcellerie (sihr)",
+      resume: "Ce que le Prophète ﷺ a vécu, et comment s'en défaire licitement.",
+      illustration: "noeud",
+      points: [
+        "Le Prophète ﷺ lui-même a été atteint par la sorcellerie d'un homme des Banû Zurayq, Labîd ibn al-A'sam : il lui semblait avoir fait une chose qu'il n'avait pas faite. Allah l'informa par deux anges de l'endroit du sortilège (un peigne, des cheveux et des nœuds, cachés dans un puits), qu'on retira, et il fut guéri (Al-Bukhari & Muslim). Les savants du tafsîr rapportent que les sourates Al-Falaq et An-Nâs furent révélées à cette occasion : à chaque verset récité, un nœud se défaisait.",
+        "La sorcellerie est réelle, mais elle n'agit que par la permission d'Allah : « Ils ne pouvaient nuire à personne par cela, sauf avec la permission d'Allah » (2:102). Elle ne peut rien contre celui qu'Allah protège.",
+        "Prévention établie par la Sunna : « Celui qui mange sept dattes 'ajwa (de Médine) le matin, ni poison ni sorcellerie ne lui nuiront ce jour-là » (Al-Bukhari & Muslim). Et les adhkâr du matin et du soir, Âyat al-Kursî au coucher, les trois Qul.",
+        "Traitement n° 1 — la roqya avec les versets de l'étape 2, en insistant sur Al-Falaq et An-Nâs (révélées pour cela), Âyat al-Kursî et les derniers versets d'Al-Baqara.",
+        "Traitement n° 2 — les versets « de la sorcellerie » : les savants (Ibn al-Qayyim, Ibn Bâz…) recommandent d'y ajouter les passages où Allah annule la magie des sorciers de Pharaon. Ce n'est pas un texte du hadith, mais une pratique recommandée fondée sur le sens de ces versets.",
+        "Traitement n° 3 — lire sur de l'eau : réciter ces versets sur de l'eau puis en boire et s'en laver est une pratique rapportée des pieux prédécesseurs et jugée licite par les savants (Ibn al-Qayyim l'a vue chez son maître Ibn Taymiyya). Elle complète la roqya, elle ne la remplace pas.",
+        "Si l'on retrouve l'objet du sortilège (nœuds, écrits…), on le défait et on le détruit en récitant Al-Falaq et An-Nâs, comme pour le Prophète ﷺ. Mais on ne va JAMAIS demander à un sorcier de « défaire » un sort : interrogé sur la nushra (défaire un sort par un autre), le Prophète ﷺ a répondu : « C'est l'œuvre du diable » (Abu Dawud, authentifié).",
+      ],
+      versets: [
+        { titre: "Moïse face aux magiciens de Pharaon", s: 7, de: 117, a: 122, note: "« Ainsi la vérité se manifesta et ce qu'ils faisaient fut réduit à néant » — lus par les savants pour annuler la sorcellerie." },
+        { titre: "« Ce que vous avez apporté est de la magie »", s: 10, de: 81, a: 82 },
+        { titre: "« Le magicien ne réussit pas, où qu'il soit »", s: 20, de: 69, a: 69 },
+      ],
+      astuce:
+        "Sois patient : le Prophète ﷺ est resté atteint un certain temps avant d'être guéri. Répète la roqya chaque jour, garde les adhkâr, et multiplie les bonnes œuvres et l'istighfâr — « la sorcellerie n'a pas de prise sur un cœur rempli du rappel d'Allah ».",
+    },
+    {
+      titre: "Contre les waswâs et les jinns",
+      resume: "Suggestions obsédantes, peurs, présence : la réponse du Prophète ﷺ.",
+      illustration: "vent",
+      points: [
+        "Les waswâs (suggestions insistantes) viennent du diable : doutes sur la foi, sur la pureté, sur la prière, pensées effrayantes qui tournent en boucle. Le Prophète ﷺ a donné un traitement en deux temps : « Qu'il cherche refuge auprès d'Allah, et qu'il s'arrête » (Al-Bukhari & Muslim). Dis « a'ûdhu billâhi mina-sh-shaytâni-r-rajîm » et détourne-toi de la pensée, sans discuter avec elle.",
+        "Avoir de telles pensées et les détester est un signe de foi, pas de faiblesse : des Compagnons s'en sont plaints et le Prophète ﷺ a répondu : « C'est cela la pureté de la foi » (Muslim).",
+        "Pendant la prière : 'Uthmân ibn Abî-l-'Âs se plaignit qu'un diable s'interposait entre lui et sa prière. Le Prophète ﷺ dit : « C'est un diable nommé Khinzab. Quand tu le sens, cherche refuge auprès d'Allah contre lui et crache légèrement (souffle) trois fois vers ta gauche. » 'Uthmân dit : « Je l'ai fait et Allah l'a éloigné de moi » (Muslim).",
+        "Contre une présence ou une peur dans un lieu : l'adhân fait fuir le diable (« quand l'appel à la prière est lancé, le diable s'enfuit en lâchant des vents », Al-Bukhari & Muslim) ; Âyat al-Kursî et la sourate Al-Baqara le chassent de la maison (étape suivante).",
+        "En cas d'atteinte réelle par un jinn (perte de conscience, voix, comportement étranger), la roqya se fait avec les versets de l'étape 2, en particulier Âyat al-Kursî, les derniers versets d'Al-Baqara et les trois Qul, et avec la roqya du Prophète ﷺ. Le Prophète ﷺ a dit à un jinn qui gênait un enfant : « Sors, ennemi d'Allah, je suis le Messager d'Allah » (Ahmad, authentifié). Ne va pas chercher plus loin que le Coran et la Sunna : ni « contrats » avec les jinns, ni objets, ni fumigations rituelles.",
+        "N'oublie pas la cause médicale : beaucoup de troubles ressemblant à une « possession » sont des maladies connues (épilepsie, anxiété, troubles du sommeil). On fait la roqya ET on consulte.",
+      ],
+      dhikrs: [
+        {
+          titre: "La formule de refuge",
+          arabe: "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ",
+          translit: "A'ûdhu billâhi mina-sh-shaytâni-r-rajîm.",
+          fr: "Je cherche refuge auprès d'Allah contre le diable maudit. — À dire dès que la pensée arrive, puis cesser d'y penser (Al-Bukhari & Muslim). En cas de colère aussi : « Je connais une parole qui, s'il la disait, ferait partir ce qu'il ressent » (Al-Bukhari & Muslim).",
+          source: "Al-Bukhari & Muslim",
+        },
+        {
+          titre: "Contre la peur et l'insomnie",
+          arabe: "أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ غَضَبِهِ وَعِقَابِهِ، وَشَرِّ عِبَادِهِ، وَمِنْ هَمَزَاتِ الشَّيَاطِينِ وَأَنْ يَحْضُرُونِ",
+          translit:
+            "A'ûdhu bikalimâti-llâhi-t-tâmmâti min ghadabihi wa 'iqâbih, wa sharri 'ibâdih, wa min hamazâti-sh-shayâtîni wa an yahdurûn.",
+          fr: "Je cherche refuge dans les paroles parfaites d'Allah contre Sa colère et Son châtiment, contre le mal de Ses serviteurs, contre les incitations des diables et contre leur présence auprès de moi. — Le Prophète ﷺ l'enseignait contre les frayeurs nocturnes et l'insomnie.",
+          source: "Abu Dawud & At-Tirmidhi",
+        },
+      ],
+      astuce:
+        "Les waswâs se nourrissent de l'attention qu'on leur donne. Le remède du hadith tient en un mot : s'arrêter. Pas de vérification en boucle des ablutions, pas de prière refaite dix fois — tu agis sur ce dont tu es certain, et tu ignores le reste.",
+    },
+    {
+      titre: "Douleur et maladie",
+      resume: "La main sur l'endroit qui fait mal : la roqya du quotidien.",
+      illustration: "main",
+      points: [
+        "'Uthmân ibn Abî-l-'Âs se plaignit au Prophète ﷺ d'une douleur qu'il ressentait dans son corps. Le Prophète ﷺ lui dit : « Pose ta main à l'endroit de ton corps qui te fait mal, et dis : “Bismillâh” trois fois, puis dis sept fois : “A'ûdhu bi'izzati-llâhi wa qudratihi min sharri mâ ajidu wa uhâdhir” » (Muslim). C'est la roqya la plus simple, valable pour toute douleur : tête, ventre, dos, fièvre…",
+        "Pour une petite blessure ou plaie, le Prophète ﷺ mettait un peu de sa salive sur son doigt, le posait sur la terre et passait le mélange sur l'endroit en disant la formule « turbatu ardinâ » (Al-Bukhari & Muslim).",
+        "Au chevet d'un malade : pose ta main droite sur lui, et dis la roqya du Prophète ﷺ (« Allâhumma rabba-n-nâs… ») puis sept fois « As'alu-llâha-l-'Azîm… » (étape 3).",
+        "La roqya et la médecine vont ensemble : « Soignez-vous, car Allah n'a pas fait descendre de maladie sans faire descendre son remède » (Abu Dawud & At-Tirmidhi). Le Prophète ﷺ recommandait aussi le miel, la graine de nigelle, la hijâma (ventouses), et l'eau de Zamzam.",
+        "Pour un malade qui ne peut pas réciter lui-même, un proche récite sur lui et souffle légèrement ; on peut aussi lire sur de l'eau ou de l'huile d'olive qu'on lui donne ou qu'on lui applique (pratique des Salaf, jugée licite par les savants).",
+      ],
+      dhikrs: [
+        {
+          titre: "La main sur la douleur : « Bismillâh » ×3, puis ×7 :",
+          arabe: "أَعُوذُ بِعِزَّةِ اللَّهِ وَقُدْرَتِهِ مِنْ شَرِّ مَا أَجِدُ وَأُحَاذِرُ",
+          translit: "A'ûdhu bi'izzati-llâhi wa qudratihi min sharri mâ ajidu wa uhâdhir.",
+          fr: "Je cherche refuge dans la puissance d'Allah et Sa capacité contre le mal que je ressens et que je redoute. — 'Uthmân dit : « Je l'ai fait, et Allah a fait partir ce que j'avais. »",
+          source: "Muslim",
+        },
+        {
+          titre: "Pour une plaie ou une petite blessure",
+          arabe: "بِسْمِ اللَّهِ، تُرْبَةُ أَرْضِنَا، بِرِيقَةِ بَعْضِنَا، يُشْفَى سَقِيمُنَا، بِإِذْنِ رَبِّنَا",
+          translit: "Bismi-llâh, turbatu ardinâ, birîqati ba'dinâ, yushfâ saqîmunâ, bi'idhni Rabbinâ.",
+          fr: "Au nom d'Allah. La terre de notre sol, avec la salive de l'un de nous : notre malade est guéri, par la permission de notre Seigneur.",
+          source: "Al-Bukhari & Muslim",
+        },
+      ],
+      astuce:
+        "Fais-en une habitude : dès qu'une douleur apparaît, main dessus, Bismillâh ×3, la formule ×7. C'est le réflexe que le Prophète ﷺ a enseigné — avant même d'ouvrir l'armoire à pharmacie, et sans jamais la fermer.",
+    },
+    {
+      titre: "Protéger sa maison et sa famille",
+      resume: "Les habitudes qui ferment la porte au mal, jour après jour.",
+      illustration: "maison",
+      lien: { href: "/sourate/2", libelle: "Lire la sourate Al-Baqara" },
+      points: [
+        "La sourate Al-Baqara : « Ne faites pas de vos maisons des tombes. Le diable fuit la maison dans laquelle on récite la sourate Al-Baqara » (Muslim). Et : « Récitez Al-Baqara, car s'en saisir est une bénédiction, la délaisser est un regret, et les sorciers (ou : les faux) ne peuvent rien contre elle » (Muslim). Lis-la chez toi régulièrement — en entier si tu peux, sinon par parties, ou fais-la jouer à voix audible.",
+        "En entrant chez soi : dire « Bismillâh » en entrant et en mangeant. Sinon le diable dit à ses compagnons : « Vous avez trouvé un logis et un dîner » (Muslim). Et saluer (« as-salâmu 'alaykum ») même si la maison est vide.",
+        "Au coucher : Âyat al-Kursî (gardien jusqu'au matin, Al-Bukhari), les trois Qul soufflées dans les mains et passées sur le corps (Al-Bukhari & Muslim), les deux derniers versets d'Al-Baqara (Al-Bukhari & Muslim). Fais-le aussi pour tes enfants dans leur lit.",
+        "Les enfants : chaque jour, l'invocation « u'îdhukum bikalimâti-llâhi-t-tâmma… » (étape 4). Le Prophète ﷺ la disait pour ses petits-enfants, et rappelait qu'Ibrâhîm la disait pour Ismâ'îl et Ishâq (Al-Bukhari).",
+        "Les adhkâr du matin et du soir sont la forteresse quotidienne : « a'ûdhu bikalimâti-llâhi-t-tâmmât… » ×3, « bismi-llâhi-lladhî lâ yadurru… » ×3, les trois Qul ×3, Âyat al-Kursî. Retrouve-les dans la rubrique Invocations, catégories « Matin » et « Soir ».",
+        "Ne pas laisser d'images d'êtres vivants exposées ni de chien dans la maison : « Les anges n'entrent pas dans une maison où il y a un chien ou des images » (Al-Bukhari & Muslim). Et surtout : garder la prière, le Coran et le rappel d'Allah vivants chez soi — c'est ce qui rend une maison inhabitable pour le diable.",
+      ],
+      astuce:
+        "Un rituel du soir en 3 minutes pour toute la famille : Âyat al-Kursî → les trois Qul dans les mains → l'invocation de protection des enfants. Les enfants adorent le faire eux-mêmes une fois qu'ils le connaissent.",
+    },
+  ],
+  aEviter: [
+    "Porter des amulettes, talismans, « mains de Fatma », œils bleus, ou des écrits roulés : « Celui qui porte une amulette (tamîma) a commis du shirk » (Ahmad, authentifié). Même un verset du Coran porté en pendentif « contre le mal » est déconseillé par la majorité des savants : la protection vient de la récitation, pas de l'objet.",
+    "Aller voir un voyant, un marabout ou un sorcier, même « pour défaire » un sort : « Celui qui va voir un devin et l'interroge, sa prière n'est pas acceptée pendant quarante jours » (Muslim), et « celui qui le croit a renié ce qui a été révélé à Muhammad ﷺ » (Abu Dawud & At-Tirmidhi).",
+    "Accepter une roqya avec des formules incompréhensibles, des symboles, des chiffres, des « noms » inconnus, des sacrifices d'animaux, ou dans laquelle le raqi prétend « parler aux jinns » et connaître l'invisible.",
+    "Un raqi qui frappe le malade, l'étrangle, le brûle « pour faire sortir le jinn », ou qui s'isole avec une femme et la touche : tout cela est interdit. Une femme se fait la roqya elle-même ou par un proche ; si elle consulte un raqi, c'est en présence d'un mahram, sans contact.",
+    "Accuser untel ou untel de mauvais œil ou de sorcellerie sans preuve : c'est de la suspicion, et souvent une calomnie. « Évitez trop de suspicion : certaines suspicions sont un péché » (49:12).",
+    "Abandonner les soins médicaux au profit de la seule roqya, ou l'inverse. Les deux sont des causes voulues par Allah ; on les réunit.",
+    "Voir le mauvais œil et les jinns partout : la plupart des épreuves sont des maladies ordinaires ou des épreuves du destin. L'obsession de la sorcellerie est elle-même une porte ouverte aux waswâs.",
+    "Croire que la roqya agit par elle-même, ou qu'une certaine personne « a le don » : c'est Allah seul qui guérit ; le raqi n'est qu'un moyen, et toi aussi tu peux réciter.",
+  ],
+  fin: {
+    titre: "Allah est Ash-Shâfî, le Guérisseur",
+    texte:
+      "Tu connais maintenant les roqyas du Prophète ﷺ pour chaque situation : le mauvais œil, la sorcellerie, les waswâs, la douleur, la protection du foyer. Garde l'essentiel : le Coran récité avec certitude, les adhkâr chaque jour, la confiance en Allah — et un médecin quand il le faut. « Et quand je suis malade, c'est Lui qui me guérit » (26:80).",
   },
 };

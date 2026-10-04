@@ -1,4 +1,4 @@
-/* Illustrations des guides pas à pas (prière de la nuit, istikhâra, omra).
+/* Illustrations des guides pas à pas (prière de la nuit, istikhâra, omra, roqya).
    SVG maison, trait = couleur du texte (currentColor), aplats = var(--accent). */
 
 const A = "var(--accent)";
@@ -266,6 +266,72 @@ const ILLUSTRATIONS: Record<string, () => JSX.Element> = {
       <circle cx="56" cy="74" r="10" />
       <path d="M34 62L76 14M50 66L30 20" strokeWidth="3" />
       <path d="M70 60c6-2 10 2 14-2M74 70c5 0 8 4 12 2M66 50c4-4 10-2 12-6" stroke={A} strokeWidth="3" />
+    </Cadre>
+  ),
+  /* ---- Roqya ---- */
+  bouclier: () => (
+    <Cadre>
+      <path d="M48 8l32 10v26c0 20-14 34-32 44C30 78 16 64 16 44V18z" fill={DOUX} />
+      <path d="M48 8v80C30 78 16 64 16 44V18z" fill={A} stroke="none" opacity="0.9" />
+      <path d="M48 8l32 10v26c0 20-14 34-32 44C30 78 16 64 16 44V18z" />
+      <path d="M36 48l8 8 16-18" stroke="var(--sur-accent)" strokeWidth="4" />
+      <Scintille x={84} y={14} r={4} />
+    </Cadre>
+  ),
+  livre: () => (
+    <Cadre>
+      <path d="M48 26c-8-8-20-10-36-8v58c16-2 28 0 36 8 8-8 20-10 36-8V18c-16-2-28 0-36 8z" fill={DOUX} />
+      <path d="M48 26v58" />
+      <path d="M20 34c8-1 16 0 22 4M20 46c8-1 16 0 22 4M20 58c8-1 16 0 22 4M54 38c6-4 14-5 22-4M54 50c6-4 14-5 22-4M54 62c6-4 14-5 22-4" stroke={A} strokeWidth="3" />
+      <Scintille x={48} y={12} r={5} />
+    </Cadre>
+  ),
+  oeil: () => (
+    <Cadre>
+      <path d="M8 48c12-18 26-26 40-26s28 8 40 26c-12 18-26 26-40 26S20 66 8 48z" fill={DOUX} />
+      <circle cx="48" cy="48" r="14" fill={A} stroke="none" />
+      <circle cx="48" cy="48" r="6" fill="#26221f" stroke="none" />
+      <circle cx="53" cy="43" r="2.5" fill="var(--sur-accent)" stroke="none" />
+      <path d="M16 20l10 8M80 20l-10 8M48 10v10" strokeWidth="3" />
+      <path d="M14 70l68-44" strokeWidth="4" />
+    </Cadre>
+  ),
+  noeud: () => (
+    <Cadre>
+      <path d="M8 48c14-18 26-18 40 0s26 18 40 0" />
+      <path d="M8 48c14 18 26 18 40 0s26-18 40 0" />
+      <circle cx="48" cy="48" r="9" fill={A} stroke="none" />
+      <path d="M72 16l6 6M78 16l-6 6M20 74l6 6M26 74l-6 6" strokeWidth="3" />
+    </Cadre>
+  ),
+  vent: () => (
+    <Cadre>
+      <path d="M10 36h40a9 9 0 1 0-9-9" />
+      <path d="M10 52h58a10 10 0 1 1-10 10" />
+      <path d="M10 68h26a7 7 0 1 1-7 7" />
+      <path d="M72 20a12 12 0 1 1 0 .1" fill={A} stroke="none" />
+      <Scintille x={86} y={46} r={4} />
+    </Cadre>
+  ),
+  main: () => (
+    <Cadre>
+      <path d="M30 88V46a6 6 0 0 1 12 0v14V30a6 6 0 0 1 12 0v30V36a6 6 0 0 1 12 0v24V44a6 6 0 0 1 12 0v22c0 14-10 22-24 22S30 88 30 88z" fill={DOUX} />
+      <path d="M30 70l-10-14a6 6 0 0 1 10-7l6 9" fill={DOUX} />
+      <circle cx="54" cy="18" r="6" fill={A} stroke="none" />
+      <Scintille x={80} y={24} r={4} />
+      <Scintille x={18} y={28} r={3} />
+    </Cadre>
+  ),
+  maison: () => (
+    <Cadre>
+      <path d="M14 46L48 16l34 30" />
+      <path d="M22 42v44h52V42" fill={DOUX} />
+      <path d="M40 86V62h16v24" fill={A} stroke="none" />
+      <path d="M40 86V62h16v24" />
+      <path d="M60 24V14h8v18" />
+      <path d="M30 52h8v8h-8zM58 52h8v8h-8z" stroke={A} strokeWidth="3" />
+      <Scintille x={14} y={20} r={4} />
+      <Scintille x={86} y={64} r={3} />
     </Cadre>
   ),
   fin: () => (

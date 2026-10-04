@@ -21,6 +21,7 @@ import GuideInstallation from "@/components/GuideInstallation";
 import Illustration from "@/components/IllustrationsGuides";
 import {
   Boussole,
+  Bouclier,
   Calendrier as IconeCalendrier,
   Citation,
   Cloche,
@@ -67,6 +68,7 @@ const GUIDES = [
   { href: "/invocations/nuit", nom: "Prière de la nuit", icone: LuneEtoile, dessin: "lune" },
   { href: "/invocations/istikhara", nom: "Istikhâra", icone: Boussole, dessin: "carrefour" },
   { href: "/invocations/tawba", nom: "Le repentir", icone: Repeter, dessin: "porte" },
+  { href: "/invocations/roqya", nom: "La roqya", icone: Bouclier, dessin: "bouclier" },
 ];
 
 const NOMS_PRIERES: Record<string, string> = {

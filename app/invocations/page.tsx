@@ -7,6 +7,7 @@ import { usePrefs } from "@/lib/prefs";
 import Entete from "@/components/Entete";
 import {
   Ampoule,
+  Bouclier,
   Boussole,
   Coeur,
   ICONES_CATEGORIES,
@@ -34,6 +35,12 @@ const GUIDES = [
     icone: Repeter,
     nom: "Le repentir (tawba)",
     description: "Revenir vers Allah : conditions, prière et formules",
+  },
+  {
+    href: "/invocations/roqya",
+    icone: Bouclier,
+    nom: "La roqya",
+    description: "Mauvais œil, sorcellerie, waswâs, douleur : les roqyas du Prophète ﷺ",
   },
   {
     href: "/omra",
