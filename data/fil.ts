@@ -7,6 +7,8 @@ import { CATEGORIES_INVOCATIONS } from "@/data/invocations";
 import { SOURATES } from "@/data/sourates";
 import { NOMS_ALLAH, type NomAllah } from "@/data/noms-allah";
 
+import { PHOTOS_FIL, type PhotoFil } from "./photos-fil";
+
 export type SceneId = "aube" | "mer" | "desert" | "nuit" | "foret" | "montagnes";
 export const SCENES: SceneId[] = ["aube", "mer", "desert", "nuit", "foret", "montagnes"];
 
@@ -135,6 +137,25 @@ export function videoDe(id: string): string | null {
   const nb = VIDEOS_PAR_SCENE[scene];
   if (!nb) return null;
   return `/fonds/${scene}-${(Math.floor(hacher(id) / SCENES.length) % nb) + 1}`;
+}
+
+/** Fond d'une carte : on alterne vidéos locales et photos Unsplash de la même
+ *  scène pour varier les images (≈ 2 cartes sur 3 en photo, car il y a bien
+ *  plus de photos que de vidéos). Résultat stable pour un identifiant donné. */
+export type FondCarte =
+  | { type: "video"; src: string }
+  | { type: "photo"; photo: PhotoFil };
+
+export function fondDe(id: string): FondCarte {
+  const scene = sceneDe(id);
+  const h = hacher(id + "|fond");
+  const photos = PHOTOS_FIL.filter((p) => p.scene === scene);
+  const video = videoDe(id);
+  if (photos.length && (h % 3 !== 0 || !video)) {
+    return { type: "photo", photo: photos[Math.floor(h / 3) % photos.length] };
+  }
+  if (video) return { type: "video", src: video };
+  return { type: "photo", photo: photos[0] };
 }
 
 function melanger<T>(t: T[]): T[] {

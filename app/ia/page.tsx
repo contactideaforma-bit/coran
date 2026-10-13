@@ -24,6 +24,8 @@ interface Etat {
   actif?: boolean;
   restant?: number;
   quota?: number;
+  gratuitRestant?: number; // sans abonnement : questions offertes restantes
+  gratuitTotal?: number;
 }
 
 interface Echange {
@@ -34,6 +36,9 @@ interface Echange {
 
 export default function PageIa() {
   const [etat, setEtat] = useState<Etat | null>(null);
+  // Mode « questions offertes » figé au chargement : on reste dans la
+  // conversation même quand la dernière question offerte vient d'être posée.
+  const [essai, setEssai] = useState(false);
   const [message, setMessage] = useState<{ type: "ok" | "erreur"; texte: string } | null>(null);
 
   useEffect(() => {
@@ -44,7 +49,10 @@ export default function PageIa() {
     if (p.toString()) window.history.replaceState({}, "", "/ia");
     fetch("/api/ia/etat", { cache: "no-store" })
       .then((r) => r.json())
-      .then(setEtat)
+      .then((e: Etat) => {
+        setEssai(!e.connecte && (e.gratuitRestant ?? 0) > 0);
+        setEtat(e);
+      })
       .catch(() => setEtat({ connecte: false }));
   }, []);
 
@@ -67,7 +75,8 @@ export default function PageIa() {
           Chargement…
         </p>
       )}
-      {etat && !etat.connecte && <Presentation />}
+      {etat && !etat.connecte && !essai && <Presentation epuise />}
+      {etat && !etat.connecte && essai && <Conversation etat={etat} setEtat={setEtat} gratuit />}
       {etat && etat.connecte && !etat.actif && <AbonnementInactif email={etat.email ?? ""} />}
       {etat && etat.connecte && etat.actif && <Conversation etat={etat} setEtat={setEtat} />}
     </div>
@@ -76,9 +85,14 @@ export default function PageIa() {
 
 /* ===== Non connecté ===== */
 
-function Presentation() {
+function Presentation({ epuise = false, compacte = false }: { epuise?: boolean; compacte?: boolean }) {
   return (
     <>
+      {epuise && (
+        <p className="mt-4 text-center text-sm font-bold" style={{ color: "var(--accent-fort)" }}>
+          Tes questions offertes ont été utilisées. Pour continuer, abonne-toi : sans engagement.
+        </p>
+      )}
       <section
         className="card mt-6 rounded-3xl p-5 shadow-soft"
         style={{ background: "linear-gradient(160deg, color-mix(in srgb, var(--accent) 14%, var(--card)), var(--card) 70%)" }}
@@ -90,13 +104,15 @@ function Presentation() {
           <Etincelles taille={26} />
         </span>
         <h1 className="mt-4 text-2xl font-extrabold" style={{ fontFamily: "Marcellus, serif" }}>
-          Assistant My Easy Coran
+          {compacte ? "Continuer avec l'abonnement" : "Assistant My Easy Coran"}
         </h1>
-        <p className="mt-2 text-sm leading-relaxed">
-          Pose tes questions sur l&apos;islam et reçois une réponse construite à partir du Coran, de la
-          Sunna authentique (hadiths sahîh et hasan) et des avis de savants reconnus — chaque réponse
-          cite ses sources, et les versets s&apos;affichent en arabe et en français.
-        </p>
+        {!compacte && (
+          <p className="mt-2 text-sm leading-relaxed">
+            Pose tes questions sur l&apos;islam et reçois une réponse construite à partir du Coran, de la
+            Sunna authentique (hadiths sahîh et hasan) et des avis de savants reconnus — chaque réponse
+            cite ses sources, et les versets s&apos;affichent en arabe et en français.
+          </p>
+        )}
         <ul className="mt-4 space-y-2 text-sm">
           {[
             "Versets cités avec leur référence exacte, affichés depuis le texte coranique",
@@ -124,7 +140,7 @@ function Presentation() {
         </p>
       </section>
 
-      <Avertissement />
+      {!compacte && <Avertissement />}
 
       <FormulaireConnexion />
     </>
@@ -255,7 +271,17 @@ function BoutonsCompte() {
 
 /* ===== Conversation ===== */
 
-function Conversation({ etat, setEtat }: { etat: Etat; setEtat: (e: Etat) => void }) {
+function Conversation({
+  etat,
+  setEtat,
+  gratuit = false,
+}: {
+  etat: Etat;
+  setEtat: (e: Etat) => void;
+  gratuit?: boolean;
+}) {
+  const restant = gratuit ? (etat.gratuitRestant ?? 0) : (etat.restant ?? 0);
+  const epuise = gratuit && restant === 0;
   const [echanges, setEchanges] = useState<Echange[]>([]);
   const [question, setQuestion] = useState("");
   const [enCours, setEnCours] = useState(false);
@@ -297,16 +323,19 @@ function Conversation({ etat, setEtat }: { etat: Etat; setEtat: (e: Etat) => voi
       const j = await r.json();
       if (j.ok) {
         setEchanges((l) => l.map((e, i) => (i === l.length - 1 ? { ...e, reponse: j.reponse } : e)));
-        setEtat({ ...etat, restant: j.restant });
+        setEtat(j.gratuit ? { ...etat, gratuitRestant: j.restant } : { ...etat, restant: j.restant });
       } else {
         const msg =
           j.code === "quota"
             ? `Tu as atteint les ${j.quota} questions du jour. À demain, in shâ Allah !`
             : j.code === "inactif"
               ? "Ton abonnement n'est plus actif."
-              : "Réponse impossible pour le moment, réessaie dans un instant.";
+              : j.code === "gratuit_epuise"
+                ? "Tes questions offertes ont été utilisées."
+                : "Réponse impossible pour le moment, réessaie dans un instant.";
         setEchanges((l) => l.map((e, i) => (i === l.length - 1 ? { ...e, erreur: msg } : e)));
         if (j.code === "inactif") setEtat({ ...etat, actif: false });
+        if (j.code === "gratuit_epuise") setEtat({ ...etat, gratuitRestant: 0 });
       }
     } catch {
       setEchanges((l) =>
@@ -328,7 +357,9 @@ function Conversation({ etat, setEtat }: { etat: Etat; setEtat: (e: Etat) => voi
     <>
       <div className="mt-4 flex items-center justify-between gap-2 text-xs" style={{ color: "var(--muted)" }}>
         <span>
-          {etat.restant} question{(etat.restant ?? 0) > 1 ? "s" : ""} restante{(etat.restant ?? 0) > 1 ? "s" : ""} aujourd&apos;hui
+          {gratuit
+            ? `${restant} question${restant > 1 ? "s" : ""} offerte${restant > 1 ? "s" : ""} restante${restant > 1 ? "s" : ""}`
+            : `${restant} question${restant > 1 ? "s" : ""} restante${restant > 1 ? "s" : ""} aujourd'hui`}
         </span>
         {echanges.length > 0 && (
           <button onClick={effacer} className="underline">
@@ -342,6 +373,11 @@ function Conversation({ etat, setEtat }: { etat: Etat; setEtat: (e: Etat) => voi
           <h1 className="text-xl font-extrabold" style={{ fontFamily: "Marcellus, serif" }}>
             Que veux-tu comprendre aujourd&apos;hui ?
           </h1>
+          {gratuit && (
+            <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
+              {etat.gratuitTotal ?? 3} questions offertes pour découvrir l&apos;assistant, puis 2,99 €/mois sans engagement.
+            </p>
+          )}
           <div className="mt-3 flex flex-wrap gap-2">
             {QUESTIONS_SUGGEREES.map((q) => (
               <button
@@ -384,8 +420,11 @@ function Conversation({ etat, setEtat }: { etat: Etat; setEtat: (e: Etat) => voi
         <div ref={finRef} />
       </div>
 
-      <BoutonsCompte />
+      {!gratuit && <BoutonsCompte />}
 
+      {epuise && <Presentation epuise compacte />}
+
+      {!epuise && (
       <form
         onSubmit={(ev) => {
           ev.preventDefault();
@@ -419,6 +458,7 @@ function Conversation({ etat, setEtat }: { etat: Etat; setEtat: (e: Etat) => voi
           </button>
         </div>
       </form>
+      )}
       <div className="h-20" />
     </>
   );

@@ -7,9 +7,9 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  fondDe,
   sceneDe,
   tirerSerie,
-  videoDe,
   trouverCarte,
   type Carte,
   type Filtre,
@@ -331,6 +331,7 @@ export default function ScrollHalal() {
 
             const fav = favoris.has(el.id);
             const lien = lienDe(el);
+            const fond = fondDe(el.id);
             return (
               <section
                 key={`${el.id}-${i}`}
@@ -341,7 +342,8 @@ export default function ScrollHalal() {
                 <SceneNature
                   scene={sceneDe(el.id)}
                   anime={anime && !enPause}
-                  video={videoDe(el.id)}
+                  video={fond.type === "video" ? fond.src : null}
+                  photo={fond.type === "photo" ? fond.photo : null}
                   charger={anime}
                   lire={i === actif && !enPause}
                 />

@@ -9,6 +9,7 @@
  *   ia:lien:<token>            → email                           (15 min)
  *   ia:statut:<abonnement>     → "actif" | "inactif"             (6 h)
  *   ia:quota:<email>:<jour>    → nombre de questions du jour     (2 jours)
+ *   ia:gratuit:<anonyme>       → questions gratuites consommées   (1 an)
  *
  * Variables d'environnement (Vercel → Settings → Environment Variables) :
  *   STRIPE_SECRET_KEY        clé secrète Stripe (sk_live_…)
@@ -27,8 +28,11 @@ import { cookies } from "next/headers";
 import { PROMPT_SYSTEME } from "@/data/ia";
 
 export const QUOTA_PAR_JOUR = 30;
+export const QUESTIONS_GRATUITES = 3;
 export const COOKIE_SESSION = "ia_session";
+const COOKIE_ANONYME = "ia_anon";
 const DUREE_SESSION = 180 * 24 * 3600;
+const DUREE_ANONYME = 365 * 24 * 3600;
 
 /* ===== Redis (REST Upstash) ===== */
 
@@ -197,6 +201,36 @@ export async function consommerLien(token: string): Promise<string | null> {
   const email = await redis<string | null>("GET", `ia:lien:${token}`);
   if (email) await redis("DEL", `ia:lien:${token}`);
   return email;
+}
+
+/* ===== Questions gratuites (sans abonnement, par appareil) ===== */
+
+/** Identifiant anonyme de l'appareil (cookie), créé au premier passage. */
+export function identifiantAnonyme(creer = true): string | null {
+  const existant = cookies().get(COOKIE_ANONYME)?.value;
+  if (existant && /^[a-f0-9]{32}$/.test(existant)) return existant;
+  if (!creer) return null;
+  const id = randomBytes(16).toString("hex");
+  cookies().set(COOKIE_ANONYME, id, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    path: "/",
+    maxAge: DUREE_ANONYME,
+  });
+  return id;
+}
+
+export async function gratuitesConsommees(anonyme: string) {
+  const n = await redis<string | null>("GET", `ia:gratuit:${anonyme}`);
+  return Number(n ?? 0);
+}
+
+export async function consommerGratuite(anonyme: string) {
+  const cle = `ia:gratuit:${anonyme}`;
+  const n = await redis<number>("INCR", cle);
+  if (n === 1) await redis("EXPIRE", cle, DUREE_ANONYME);
+  return n;
 }
 
 /* ===== Quota ===== */

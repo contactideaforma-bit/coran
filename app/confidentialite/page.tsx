@@ -70,7 +70,8 @@ export default function PageConfidentialite() {
           calculés par AlAdhan à partir de la ville que tu as saisie (jamais ta
           position GPS). Ces services reçoivent uniquement les informations
           techniques nécessaires à la requête (adresse IP, ville pour les
-          horaires).
+          horaires). Les photos de fond du Scroll halal sont affichées depuis Unsplash
+          (images.unsplash.com), qui reçoit de même ton adresse IP lors du chargement.
         </p>
         <p>
           Des statistiques d&apos;audience anonymes (pages vues, type
@@ -108,8 +109,9 @@ export default function PageConfidentialite() {
           modèle et ne sont pas associées à ton identité. Nous ne conservons pas le contenu des
           questions sur nos serveurs : seul un compteur quotidien (nombre de questions) est tenu
           pour appliquer la limite d&apos;usage. L&apos;historique affiché dans l&apos;appli reste
-          sur ton appareil. Les réponses sont générées automatiquement et ne constituent pas une
-          fatwa.
+          sur ton appareil. Pour les questions offertes sans abonnement, un identifiant anonyme
+          (cookie technique, sans donnée personnelle) compte les questions posées depuis cet
+          appareil. Les réponses sont générées automatiquement et ne constituent pas une fatwa.
         </p>
       </Section>
 

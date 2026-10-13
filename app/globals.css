@@ -306,3 +306,13 @@ main {
   border-top: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border));
   box-shadow: 0 -6px 24px -12px rgba(40, 30, 10, 0.18);
 }
+
+/* Photos du Scroll halal : lent zoom (effet Ken Burns) */
+@keyframes fil-kenburns {
+  from { transform: scale(1) translateY(0); }
+  to { transform: scale(1.12) translateY(-2%); }
+}
+.fil-kenburns {
+  animation: fil-kenburns 24s ease-in-out infinite alternate;
+  will-change: transform;
+}

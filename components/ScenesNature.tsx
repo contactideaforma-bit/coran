@@ -4,6 +4,7 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import type { SceneId } from "@/data/fil";
+import { urlPhoto, type PhotoFil } from "@/data/photos-fil";
 
 /** Générateur pseudo-aléatoire déterministe (mêmes étoiles à chaque rendu). */
 function aleatoire(graine: number) {
@@ -219,12 +220,14 @@ export default function SceneNature({
   scene,
   anime,
   video,
+  photo,
   charger = false,
   lire = false,
 }: {
   scene: SceneId;
   anime: boolean; // animer le dessin de secours
   video?: string | null; // chemin sans extension, ex. /fonds/mer-1
+  photo?: PhotoFil | null; // photo Unsplash (prioritaire sur la vidéo)
   charger?: boolean; // télécharger la vidéo (carte visible ou voisine)
   lire?: boolean; // lire la vidéo (carte visible et pas en pause)
 }) {
@@ -233,7 +236,8 @@ export default function SceneNature({
   const ref = useRef<HTMLVideoElement>(null);
   const [erreur, setErreur] = useState(false);
   const [prete, setPrete] = useState(false);
-  const avecVideo = !!video && !erreur;
+  const avecPhoto = !!photo && !erreur;
+  const avecVideo = !avecPhoto && !!video && !erreur;
 
   useEffect(() => {
     const v = ref.current;
@@ -252,6 +256,33 @@ export default function SceneNature({
       >
         <Dessin u={u} />
       </svg>
+      {avecPhoto && (
+        <>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={charger ? urlPhoto(photo) : undefined}
+            alt=""
+            className={`absolute inset-0 h-full w-full object-cover ${lire && charger ? "fil-kenburns" : ""}`}
+            style={{ opacity: prete ? 1 : 0, transition: "opacity 600ms ease" }}
+            loading="lazy"
+            decoding="async"
+            onLoad={() => setPrete(true)}
+            onError={() => setErreur(true)}
+            aria-hidden="true"
+          />
+          {prete && (
+            <a
+              href={`https://unsplash.com/@${photo.pseudo}?utm_source=my_easy_coran&utm_medium=referral`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="absolute bottom-2 right-3 z-10 text-[10px] text-white/60"
+            >
+              Photo : {photo.auteur} / Unsplash
+            </a>
+          )}
+        </>
+      )}
       {avecVideo && (
         <video
           ref={ref}

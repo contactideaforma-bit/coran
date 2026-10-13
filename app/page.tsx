@@ -273,6 +273,32 @@ export default function Accueil() {
         </Link>
       </section>
 
+      {/* ===== Assistant IA (mis en avant) ===== */}
+      <Link
+        href="/ia"
+        className="relative mt-3 flex items-center gap-4 overflow-hidden rounded-3xl p-4 shadow-soft transition hover:-translate-y-0.5 active:scale-[0.98]"
+        style={{
+          background: "linear-gradient(135deg, var(--accent-fort), color-mix(in srgb, var(--accent-fort) 70%, #1f3a5f))",
+          color: "var(--sur-accent)",
+        }}
+      >
+        <span
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl"
+          style={{ background: "rgba(255,255,255,0.18)" }}
+        >
+          <Etincelles taille={26} />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-base font-extrabold leading-tight">Pose ta question à l&apos;assistant</span>
+          <span className="mt-0.5 block text-xs opacity-90">
+            Réponses d&apos;après le Coran, la Sunna authentique et les savants · 3 questions offertes
+          </span>
+        </span>
+        <span className="shrink-0 rounded-full px-3 py-1 text-xs font-extrabold" style={{ background: "rgba(255,255,255,0.18)" }}>
+          Nouveau
+        </span>
+      </Link>
+
       {/* ===== Rappel du jour ===== */}
       {hadith && (
         <Link
@@ -327,29 +353,6 @@ export default function Accueil() {
 
       <TitreSection>Aller plus loin</TitreSection>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <Link
-          href="/ia"
-          className="card flex items-center gap-4 rounded-3xl p-4 shadow-soft transition active:scale-[0.98]"
-          style={{
-            background: "linear-gradient(160deg, color-mix(in srgb, var(--accent) 14%, var(--card)), var(--card) 70%)",
-          }}
-        >
-          <span
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl"
-            style={{ background: "color-mix(in srgb, var(--accent) 18%, var(--card))", color: "var(--accent-fort)" }}
-          >
-            <Etincelles taille={26} />
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="block font-extrabold">Assistant IA</span>
-            <span className="block text-xs" style={{ color: "var(--muted)" }}>
-              Tes questions, répondues d&apos;après le Coran et la Sunna authentique
-            </span>
-          </span>
-          <span className="font-bold" style={{ color: "var(--accent-fort)" }}>
-            →
-          </span>
-        </Link>
         <Link
           href="/soutien"
           className="card flex items-center gap-4 rounded-3xl p-4 shadow-soft transition active:scale-[0.98]"
