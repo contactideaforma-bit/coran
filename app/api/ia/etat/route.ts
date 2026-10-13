@@ -35,7 +35,13 @@ export async function GET() {
       gratuitRestant: Math.max(0, QUESTIONS_GRATUITES - consommees),
       gratuitTotal: QUESTIONS_GRATUITES,
     });
-  } catch {
-    return NextResponse.json({ connecte: false, gratuitRestant: 0, gratuitTotal: QUESTIONS_GRATUITES });
+  } catch (e) {
+    console.error("[ia/etat]", e);
+    return NextResponse.json({
+      connecte: false,
+      gratuitRestant: 0,
+      gratuitTotal: QUESTIONS_GRATUITES,
+      erreur: e instanceof Error ? e.message : String(e),
+    });
   }
 }
