@@ -251,7 +251,7 @@ const ETAPES: Record<
     {
       titre: "Touche « Ajouter »",
       texte:
-        "L'icône My Easy Muslim apparaît sur ton écran d'accueil, comme une vraie appli — et elle fonctionne même hors connexion.",
+        "L'icône My Easy Coran apparaît sur ton écran d'accueil, comme une vraie appli — et elle fonctionne même hors connexion.",
       illus: IllusAccueil,
     },
   ],
@@ -271,7 +271,7 @@ const ETAPES: Record<
     {
       titre: "C'est installé !",
       texte:
-        "L'icône My Easy Muslim apparaît sur ton écran d'accueil, comme une vraie appli — et elle fonctionne même hors connexion.",
+        "L'icône My Easy Coran apparaît sur ton écran d'accueil, comme une vraie appli — et elle fonctionne même hors connexion.",
       illus: IllusAccueil,
     },
   ],

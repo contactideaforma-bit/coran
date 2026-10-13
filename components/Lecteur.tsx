@@ -27,7 +27,7 @@ import {
   reconnaitre,
   type IndexVocabulaire,
 } from "@/lib/vocabulaire";
-import { packDuMot } from "@/data/vocabulaire";
+import { VOCABULAIRE_MASQUE, packDuMot } from "@/data/vocabulaire";
 import Entete from "@/components/Entete";
 import {
   Alerte,
@@ -445,7 +445,7 @@ export default function Lecteur({ n }: { n: number }) {
           </button>
         )}
 
-        {data && (
+        {data && !VOCABULAIRE_MASQUE && (
           <button
             onClick={() => maj({ vocabulaire: !prefs.vocabulaire })}
             role="switch"
@@ -831,6 +831,7 @@ export default function Lecteur({ n }: { n: number }) {
 
             {/* Mot déjà mémorisé dans l'onglet vocabulaire */}
             {prefs.vocabulaire &&
+              !VOCABULAIRE_MASQUE &&
               (() => {
                 const connu = reconnaitre(formeDuMot(motActif.word), vocab);
                 if (!connu) return null;

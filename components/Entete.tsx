@@ -41,13 +41,13 @@ export default function Entete() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/logo.png"
-            alt="My Easy Muslim"
+            alt="My Easy Coran"
             className="h-10 w-10 rounded-xl border"
             style={{ borderColor: "color-mix(in srgb, var(--accent) 25%, transparent)" }}
           />
           <span>
             <span className="block text-lg font-extrabold leading-tight">
-              My Easy Muslim
+              My Easy Coran
             </span>
             <span className="block text-xs" style={{ color: "var(--muted)" }}>
               Ton compagnon du quotidien

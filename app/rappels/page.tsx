@@ -152,7 +152,7 @@ export default function Rappels() {
   const tester = async () => {
     await montrerNotification(
       "Test réussi ✅",
-      "Les notifications de My Easy Muslim fonctionnent sur cet appareil.",
+      "Les notifications de My Easy Coran fonctionnent sur cet appareil.",
       "/rappels"
     );
     setTestEnvoye(true);

@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "My Easy Muslim",
-    short_name: "Easy Muslim",
+    name: "My Easy Coran",
+    short_name: "Easy Coran",
     description:
       "Coran avec tajwid en couleur, hadith du jour, horaires de prière, invocations, Nourania et calendrier religieux — en français.",
     start_url: "/",

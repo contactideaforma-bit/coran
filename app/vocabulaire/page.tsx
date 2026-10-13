@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { PACKS } from "@/data/vocabulaire";
+import { PACKS, VOCABULAIRE_MASQUE } from "@/data/vocabulaire";
 import {
   lireProgression,
   statsGlobales,
@@ -14,6 +14,31 @@ import Entete from "@/components/Entete";
 import { Cube, Etincelles, Repeter, Trophee, Verifie } from "@/components/Icones";
 
 export default function Vocabulaire() {
+  if (VOCABULAIRE_MASQUE) return <VocabulaireIndisponible />;
+  return <VocabulaireActif />;
+}
+
+function VocabulaireIndisponible() {
+  return (
+    <div className="mx-auto max-w-2xl px-4 pb-16 pt-4">
+      <Entete />
+      <section className="card mt-6 rounded-3xl p-6 text-center shadow-soft">
+        <p className="flex justify-center" style={{ color: "var(--accent-fort)" }}>
+          <Cube taille={32} />
+        </p>
+        <h1 className="mt-3 text-xl font-extrabold">Vocabulaire en pause</h1>
+        <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
+          Ce module est temporairement indisponible, le temps de corriger la prononciation des mots.
+        </p>
+        <Link href="/" className="mt-4 inline-block text-sm font-bold underline">
+          Retour à l&apos;accueil
+        </Link>
+      </section>
+    </div>
+  );
+}
+
+function VocabulaireActif() {
   const { prefs, maj } = usePrefs();
   const [progression, setProgression] = useState<Progression | null>(null);
 

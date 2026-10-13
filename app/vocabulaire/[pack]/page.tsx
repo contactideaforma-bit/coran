@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { PACKS, type Mot } from "@/data/vocabulaire";
+import { PACKS, VOCABULAIRE_MASQUE, type Mot } from "@/data/vocabulaire";
 import {
   apresReponse,
   ecrireProgression,
@@ -66,6 +66,22 @@ function construireEtapes(mots: Mot[], progression: Progression): Etape[] {
 }
 
 export default function SessionVocabulaire({ params }: { params: { pack: string } }) {
+  if (VOCABULAIRE_MASQUE) return <ModuleEnPause />;
+  return <SessionVocabulaireActive params={params} />;
+}
+
+function ModuleEnPause() {
+  return (
+    <div className="mx-auto max-w-2xl px-4 pb-16 pt-10 text-center text-sm">
+      <p>Le module vocabulaire est temporairement en pause.</p>
+      <Link href="/" className="mt-3 inline-block font-bold underline">
+        Retour à l&apos;accueil
+      </Link>
+    </div>
+  );
+}
+
+function SessionVocabulaireActive({ params }: { params: { pack: string } }) {
   const revision = params.pack === "revision";
   const pack = useMemo(() => PACKS.find((p) => p.id === params.pack), [params.pack]);
 

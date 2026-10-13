@@ -200,7 +200,7 @@ export default function ScrollHalal() {
             : c.theme;
     try {
       if (navigator.share) {
-        await navigator.share({ title: "My Easy Muslim", text: texte, url });
+        await navigator.share({ title: "My Easy Coran", text: texte, url });
         return;
       }
       await navigator.clipboard.writeText(`${texte}\n${url}`);

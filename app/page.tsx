@@ -26,8 +26,9 @@ import {
   Citation,
   Cloche,
   Coeur,
-  Cube,
+  CoeurPlein,
   Defiler,
+  Etincelles,
   Horloge,
   KaabaIcone,
   Lettres,
@@ -53,7 +54,6 @@ const LIRE: Tuile[] = [
   { href: "/coran", icone: LivreOuvert, nom: "Coran", sous: "Lire et écouter, tajwid en couleur", teinte: "#2e7d5b" },
   { href: "/apprentissage", icone: Repeter, nom: "Mémoriser", sous: "Répéter verset par verset", teinte: "#3b6ea5" },
   { href: "/nourania", icone: Lettres, nom: "Apprendre à lire", sous: "L'arabe pas à pas (Nourania)", teinte: "#7c5cad" },
-  { href: "/vocabulaire", icone: Cube, nom: "Vocabulaire", sous: "Les mots du Coran", teinte: "#1f7a80" },
 ];
 
 const QUOTIDIEN: Tuile[] = [
@@ -325,6 +325,56 @@ export default function Accueil() {
         ))}
       </div>
 
+      <TitreSection>Aller plus loin</TitreSection>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <Link
+          href="/ia"
+          className="card flex items-center gap-4 rounded-3xl p-4 shadow-soft transition active:scale-[0.98]"
+          style={{
+            background: "linear-gradient(160deg, color-mix(in srgb, var(--accent) 14%, var(--card)), var(--card) 70%)",
+          }}
+        >
+          <span
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl"
+            style={{ background: "color-mix(in srgb, var(--accent) 18%, var(--card))", color: "var(--accent-fort)" }}
+          >
+            <Etincelles taille={26} />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block font-extrabold">Assistant IA</span>
+            <span className="block text-xs" style={{ color: "var(--muted)" }}>
+              Tes questions, répondues d&apos;après le Coran et la Sunna authentique
+            </span>
+          </span>
+          <span className="font-bold" style={{ color: "var(--accent-fort)" }}>
+            →
+          </span>
+        </Link>
+        <Link
+          href="/soutien"
+          className="card flex items-center gap-4 rounded-3xl p-4 shadow-soft transition active:scale-[0.98]"
+          style={{
+            background: "linear-gradient(160deg, color-mix(in srgb, #b04a6f 12%, var(--card)), var(--card) 70%)",
+          }}
+        >
+          <span
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl"
+            style={{ background: "color-mix(in srgb, #b04a6f 18%, var(--card))", color: "color-mix(in srgb, #b04a6f 85%, var(--text))" }}
+          >
+            <CoeurPlein taille={26} />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block font-extrabold">Soutenir l&apos;appli</span>
+            <span className="block text-xs" style={{ color: "var(--muted)" }}>
+              Gratuite et sans pub — un coup de pouce, montant libre
+            </span>
+          </span>
+          <span className="font-bold" style={{ color: "var(--accent-fort)" }}>
+            →
+          </span>
+        </Link>
+      </div>
+
       <TitreSection>Se détendre</TitreSection>
       <Link
         href="/jeux"
@@ -355,6 +405,11 @@ export default function Accueil() {
         style={{ color: "var(--muted)" }}
       >
         <Pinceau taille={14} /> Personnalise ton appli (thème, couleurs, récitateur) avec le pinceau en haut.
+      </p>
+      <p className="mt-3 text-center text-xs" style={{ color: "var(--muted)" }}>
+        <Link href="/confidentialite" className="underline">
+          Politique de confidentialité
+        </Link>
       </p>
     </div>
   );

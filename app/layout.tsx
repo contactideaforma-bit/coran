@@ -8,12 +8,12 @@ import BarreOnglets from "@/components/BarreOnglets";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "My Easy Muslim — Ton compagnon du quotidien",
+  title: "My Easy Coran — Ton compagnon du quotidien",
   description:
     "Coran avec tajwid en couleur, hadith du jour, horaires de prière, invocations, apprentissage Nourania et calendrier des événements religieux — en français.",
   manifest: "/manifest.webmanifest",
   openGraph: {
-    title: "My Easy Muslim — Ton compagnon du quotidien",
+    title: "My Easy Coran — Ton compagnon du quotidien",
     description:
       "Coran avec tajwid en couleur, hadith du jour, horaires de prière, invocations et apprentissage de la lecture — gratuit, en français.",
     type: "website",
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "My Easy Muslim",
+    title: "My Easy Coran",
   },
 };
 

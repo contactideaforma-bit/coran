@@ -681,6 +681,11 @@ const VERBES_RECIT: PackVocabulaire = {
   ],
 };
 
+/** Module masqué dans l'appli (prononciation vocale défectueuse) : la tuile
+ *  d'accueil, l'option du lecteur et la page /vocabulaire sont désactivées.
+ *  Repasser à false pour le réactiver. */
+export const VOCABULAIRE_MASQUE = true;
+
 export const PACKS: PackVocabulaire[] = [
   FATIHA,
   NOMS_DIVINS,
