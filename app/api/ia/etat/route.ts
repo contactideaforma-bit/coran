@@ -42,6 +42,14 @@ export async function GET() {
       gratuitRestant: 0,
       gratuitTotal: QUESTIONS_GRATUITES,
       erreur: e instanceof Error ? e.message : String(e),
+      cause: e instanceof Error && e.cause ? String((e.cause as { code?: string }).code ?? e.cause) : null,
+      hote: (() => {
+        try {
+          return new URL((process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL) ?? "").host;
+        } catch {
+          return `URL invalide (${((process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL) ?? "").length} caractères)`;
+        }
+      })(),
     });
   }
 }
