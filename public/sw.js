@@ -3,13 +3,14 @@
  * restent disponibles sans connexion après une première visite.
  * (L'audio n'est pas mis en cache pour préserver l'espace de stockage.)
  */
-const CACHE = "my-easy-muslim-v4";
+const CACHE = "my-easy-muslim-v5";
 
 const HOTES_DONNEES = [
   "api.quran.com",
   "static.quranwbw.com",
   "fonts.googleapis.com",
   "fonts.gstatic.com",
+  "images.pexels.com", // vignettes de l'accueil (cache pour l'affichage hors ligne)
 ];
 
 self.addEventListener("install", () => {
@@ -45,7 +46,8 @@ self.addEventListener("fetch", (event) => {
         const enCache = await cache.match(req);
         if (enCache) return enCache;
         const res = await fetch(req);
-        if (res.ok) cache.put(req, res.clone());
+        // Les images <img> d'un autre domaine arrivent en réponse « opaque » (ok = false) : on les garde aussi
+        if (res.ok || res.type === "opaque") cache.put(req, res.clone());
         return res;
       })()
     );

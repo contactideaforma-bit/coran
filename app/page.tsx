@@ -26,16 +26,12 @@ import {
   Citation,
   Cloche,
   Coeur,
-  CoeurPlein,
   Defiler,
-  Etincelles,
   Horloge,
   KaabaIcone,
   Lettres,
   LivreOuvert,
   LuneEtoile,
-  Manette,
-  MarquePageIcone,
   Pinceau,
   Repeter,
 } from "@/components/Icones";
@@ -45,30 +41,37 @@ type Icone = (p: { taille?: number; className?: string }) => JSX.Element;
 interface Tuile {
   href: string;
   icone: Icone;
+  /** Illustration 3D (public/icones/*.webp) — remplace l'icône dessinée. */
+  image?: string;
   nom: string;
   sous: string;
   teinte: string; // couleur propre à la rubrique
 }
 
+/** Photo Pexels recadrée en carré (licence Pexels : usage libre, hotlink autorisé).
+ *  En attendant les illustrations 3D : voir public/icones/. */
+const pexels = (id: number) =>
+  `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=320&h=320&fit=crop`;
+
 const LIRE: Tuile[] = [
-  { href: "/coran", icone: LivreOuvert, nom: "Coran", sous: "Lire et écouter, tajwid en couleur", teinte: "#2e7d5b" },
-  { href: "/apprentissage", icone: Repeter, nom: "Mémoriser", sous: "Répéter verset par verset", teinte: "#3b6ea5" },
-  { href: "/nourania", icone: Lettres, nom: "Apprendre à lire", sous: "L'arabe pas à pas (Nourania)", teinte: "#7c5cad" },
+  { href: "/coran", icone: LivreOuvert, image: "/icones/coran.webp", nom: "Coran", sous: "Lire et écouter, tajwid en couleur", teinte: "#2e7d5b" },
+  { href: "/apprentissage", icone: Repeter, image: "/icones/memoriser.webp", nom: "Mémoriser", sous: "Répéter verset par verset", teinte: "#3b6ea5" },
+  { href: "/nourania", icone: Lettres, image: "/icones/nourania.webp", nom: "Apprendre à lire", sous: "L'arabe pas à pas (Nourania)", teinte: "#7c5cad" },
 ];
 
 const QUOTIDIEN: Tuile[] = [
-  { href: "/prieres", icone: Horloge, nom: "Prières", sous: "Horaires de ta ville", teinte: "#a07b26" },
-  { href: "/invocations", icone: Coeur, nom: "Invocations", sous: "100 douas authentiques", teinte: "#b04a6f" },
-  { href: "/rappels", icone: Cloche, nom: "Rappels", sous: "Notifications de prière", teinte: "#c0603f" },
-  { href: "/calendrier", icone: IconeCalendrier, nom: "Calendrier", sous: "Dates importantes", teinte: "#4b55a8" },
+  { href: "/prieres", icone: Horloge, image: "/icones/prieres.webp", nom: "Prières", sous: "Horaires de ta ville", teinte: "#a07b26" },
+  { href: "/invocations", icone: Coeur, image: "/icones/invocations.webp", nom: "Invocations", sous: "100 douas authentiques", teinte: "#b04a6f" },
+  { href: "/rappels", icone: Cloche, image: pexels(20069741), nom: "Rappels", sous: "Notifications de prière", teinte: "#c0603f" },
+  { href: "/calendrier", icone: IconeCalendrier, image: pexels(25181345), nom: "Calendrier", sous: "Dates importantes", teinte: "#4b55a8" },
 ];
 
 const GUIDES = [
-  { href: "/omra", nom: "La Omra", icone: KaabaIcone, dessin: "tawaf" },
-  { href: "/invocations/nuit", nom: "Prière de la nuit", icone: LuneEtoile, dessin: "lune" },
-  { href: "/invocations/istikhara", nom: "Istikhâra", icone: Boussole, dessin: "carrefour" },
-  { href: "/invocations/tawba", nom: "Le repentir", icone: Repeter, dessin: "porte" },
-  { href: "/invocations/roqya", nom: "La roqya", icone: Bouclier, dessin: "bouclier" },
+  { href: "/omra", nom: "La Omra", icone: KaabaIcone, dessin: "tawaf", image: pexels(38789865) },
+  { href: "/invocations/nuit", nom: "Prière de la nuit", icone: LuneEtoile, dessin: "lune", image: pexels(39567592) },
+  { href: "/invocations/istikhara", nom: "Istikhâra", icone: Boussole, dessin: "carrefour", image: pexels(6593988) },
+  { href: "/invocations/tawba", nom: "Le repentir", icone: Repeter, dessin: "porte", image: pexels(31907685) },
+  { href: "/invocations/roqya", nom: "La roqya", icone: Bouclier, dessin: "bouclier", image: pexels(36516084) },
 ];
 
 const NOMS_PRIERES: Record<string, string> = {
@@ -95,6 +98,24 @@ function dansCombien(hhmm: string, maintenant: Date, demain = false) {
   return `dans ${Math.floor(min / 60)} h ${String(min % 60).padStart(2, "0")}`;
 }
 
+/** Illustration 3D posée sur une plaque blanche arrondie (lisible en mode sombre aussi). */
+function Vignette({ src, taille = 64 }: { src: string; taille?: number }) {
+  return (
+    <span
+      className="block shrink-0 overflow-hidden rounded-2xl"
+      style={{
+        width: taille,
+        height: taille,
+        background: "#fff",
+        boxShadow: "0 6px 16px rgba(0,0,0,0.10), inset 0 0 0 1px rgba(0,0,0,0.05)",
+      }}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} alt="" width={taille} height={taille} className="h-full w-full object-cover" draggable={false} />
+    </span>
+  );
+}
+
 function TuileRubrique({ t }: { t: Tuile }) {
   return (
     <Link
@@ -105,15 +126,19 @@ function TuileRubrique({ t }: { t: Tuile }) {
         borderColor: `color-mix(in srgb, ${t.teinte} 28%, var(--border))`,
       }}
     >
-      <span
-        className="flex h-12 w-12 items-center justify-center rounded-2xl"
-        style={{
-          background: `color-mix(in srgb, ${t.teinte} 18%, var(--card))`,
-          color: `color-mix(in srgb, ${t.teinte} 85%, var(--text))`,
-        }}
-      >
-        <t.icone taille={26} />
-      </span>
+      {t.image ? (
+        <Vignette src={t.image} />
+      ) : (
+        <span
+          className="flex h-12 w-12 items-center justify-center rounded-2xl"
+          style={{
+            background: `color-mix(in srgb, ${t.teinte} 18%, var(--card))`,
+            color: `color-mix(in srgb, ${t.teinte} 85%, var(--text))`,
+          }}
+        >
+          <t.icone taille={26} />
+        </span>
+      )}
       <span className="mt-3 block">
         <span className="block text-base font-extrabold leading-tight">{t.nom}</span>
         <span className="mt-0.5 block text-xs leading-snug" style={{ color: "var(--muted)" }}>
@@ -243,7 +268,7 @@ export default function Accueil() {
           className="flex flex-col justify-between rounded-3xl p-4 shadow-soft transition hover:-translate-y-0.5 active:scale-[0.97]"
           style={{ background: "var(--accent-fort)", color: "var(--sur-accent)", minHeight: "8rem" }}
         >
-          <MarquePageIcone taille={26} rempli />
+          <Vignette src={pexels(8522577)} taille={56} />
           <span className="mt-3 block">
             <span className="block text-base font-extrabold leading-tight">
               {sourateMarquee ? "Reprendre ma lecture" : "Lire le Coran"}
@@ -282,12 +307,7 @@ export default function Accueil() {
           color: "var(--sur-accent)",
         }}
       >
-        <span
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl"
-          style={{ background: "rgba(255,255,255,0.18)" }}
-        >
-          <Etincelles taille={26} />
-        </span>
+        <Vignette src={pexels(10695255)} taille={56} />
         <span className="min-w-0 flex-1">
           <span className="block text-base font-extrabold leading-tight">Pose ta question à l&apos;assistant</span>
           <span className="mt-0.5 block text-xs opacity-90">
@@ -340,12 +360,16 @@ export default function Accueil() {
             href={g.href}
             className="card flex w-36 shrink-0 flex-col items-center rounded-3xl p-4 text-center shadow-soft transition active:scale-[0.97]"
           >
-            <span
-              className="h-20 w-20 rounded-2xl p-2"
-              style={{ background: "color-mix(in srgb, var(--accent) 12%, transparent)" }}
-            >
-              <Illustration nom={g.dessin} />
-            </span>
+            {g.image ? (
+              <Vignette src={g.image} taille={80} />
+            ) : (
+              <span
+                className="h-20 w-20 rounded-2xl p-2"
+                style={{ background: "color-mix(in srgb, var(--accent) 12%, transparent)" }}
+              >
+                <Illustration nom={g.dessin} />
+              </span>
+            )}
             <span className="mt-2 text-sm font-extrabold leading-tight">{g.nom}</span>
           </Link>
         ))}
@@ -360,12 +384,7 @@ export default function Accueil() {
             background: "linear-gradient(160deg, color-mix(in srgb, #b04a6f 12%, var(--card)), var(--card) 70%)",
           }}
         >
-          <span
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl"
-            style={{ background: "color-mix(in srgb, #b04a6f 18%, var(--card))", color: "color-mix(in srgb, #b04a6f 85%, var(--text))" }}
-          >
-            <CoeurPlein taille={26} />
-          </span>
+          <Vignette src={pexels(5872362)} taille={56} />
           <span className="min-w-0 flex-1">
             <span className="block font-extrabold">Soutenir l&apos;appli</span>
             <span className="block text-xs" style={{ color: "var(--muted)" }}>
@@ -386,12 +405,7 @@ export default function Accueil() {
           background: "linear-gradient(160deg, color-mix(in srgb, #2e7d5b 12%, var(--card)), var(--card) 70%)",
         }}
       >
-        <span
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl"
-          style={{ background: "color-mix(in srgb, #2e7d5b 18%, var(--card))", color: "color-mix(in srgb, #2e7d5b 85%, var(--text))" }}
-        >
-          <Manette taille={26} />
-        </span>
+        <Vignette src={pexels(7296664)} taille={56} />
         <span className="min-w-0 flex-1">
           <span className="block font-extrabold">Jeux</span>
           <span className="block text-xs" style={{ color: "var(--muted)" }}>
@@ -412,7 +426,8 @@ export default function Accueil() {
       <p className="mt-3 text-center text-xs" style={{ color: "var(--muted)" }}>
         <Link href="/confidentialite" className="underline">
           Politique de confidentialité
-        </Link>
+        </Link>{" "}
+        · Photos : Pexels
       </p>
     </div>
   );
