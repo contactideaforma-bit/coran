@@ -50,10 +50,16 @@ export default function BoussoleQibla({ ville, pays }: Props) {
   const [position, setPosition] = useState<{ lat: number; lon: number } | null>(null);
   const [origine, setOrigine] = useState<"gps" | "ville" | null>(null);
   const [erreur, setErreur] = useState<string | null>(null);
-  const [cap, setCap] = useState<number | null>(null); // orientation du téléphone
+  // Orientation du téléphone, arrondie au degré (mise à jour seulement
+  // quand elle change : pas de re-rendu à 60 images/seconde)
+  const [cap, setCap] = useState<number | null>(null);
   const [capteur, setCapteur] = useState<EtatCapteur>("inconnu");
   const [chargement, setChargement] = useState(false);
   const capLisse = useRef<number | null>(null);
+  const cadranRef = useRef<SVGSVGElement | null>(null);
+  const kaabaRef = useRef<HTMLDivElement | null>(null);
+  const qiblaRef = useRef<number | null>(null);
+  const imageRef = useRef<number | null>(null);
 
   /* ---- Position ---- */
   const localiserParVille = useCallback(async () => {
@@ -103,16 +109,28 @@ export default function BoussoleQibla({ ville, pays }: Props) {
       return;
     }
     let recu = false;
+    const appliquer = () => {
+      imageRef.current = null;
+      const c = capLisse.current;
+      if (c === null) return;
+      const q = qiblaRef.current ?? 0;
+      // Rotation appliquée directement au DOM (fluide, sans re-rendu React)
+      if (cadranRef.current) cadranRef.current.style.transform = `rotate(${-c}deg)`;
+      if (kaabaRef.current) kaabaRef.current.style.transform = `rotate(${q - c}deg)`;
+      setCap((prev) => (prev !== null && Math.round(prev) === Math.round(c) ? prev : c));
+    };
     const surOrientation = (e: DeviceOrientationEvent) => {
       // iOS fournit directement le cap boussole ; Android donne alpha (absolu)
       const ios = (e as DeviceOrientationEvent & { webkitCompassHeading?: number })
         .webkitCompassHeading;
       let valeur: number | null = null;
       if (typeof ios === "number" && !Number.isNaN(ios)) valeur = ios;
-      else if (e.absolute && typeof e.alpha === "number") valeur = (360 - e.alpha) % 360;
       else if (typeof e.alpha === "number") valeur = (360 - e.alpha) % 360;
       if (valeur === null) return;
-      recu = true;
+      if (!recu) {
+        recu = true;
+        setCapteur("actif");
+      }
       // Lissage circulaire pour éviter les tremblements
       const precedent = capLisse.current;
       if (precedent === null) capLisse.current = valeur;
@@ -122,8 +140,7 @@ export default function BoussoleQibla({ ville, pays }: Props) {
         if (delta < -180) delta += 360;
         capLisse.current = (precedent + delta * 0.25 + 360) % 360;
       }
-      setCap(capLisse.current);
-      setCapteur("actif");
+      if (imageRef.current === null) imageRef.current = requestAnimationFrame(appliquer);
     };
     const abs = "ondeviceorientationabsolute" in window;
     const nom = abs ? "deviceorientationabsolute" : "deviceorientation";
@@ -134,6 +151,8 @@ export default function BoussoleQibla({ ville, pays }: Props) {
     return () => {
       window.removeEventListener(nom, surOrientation as EventListener, true);
       window.clearTimeout(verif);
+      if (imageRef.current !== null) cancelAnimationFrame(imageRef.current);
+      imageRef.current = null;
     };
   }, [position]);
 
@@ -154,6 +173,7 @@ export default function BoussoleQibla({ ville, pays }: Props) {
   };
 
   const qibla = position ? azimutQibla(position.lat, position.lon) : null;
+  qiblaRef.current = qibla;
   const distance = position ? distanceKaaba(position.lat, position.lon) : null;
   // Rotation du cadran : on tourne tout le cadran de -cap pour que le nord
   // réel reste en haut de l'écran ; l'aiguille Qibla est fixée sur le cadran.
@@ -204,7 +224,15 @@ export default function BoussoleQibla({ ville, pays }: Props) {
       ) : (
         <div className="mt-5 flex flex-col items-center">
           {/* Cadran */}
-          <div className="relative" style={{ width: 240, height: 240 }}>
+          <div
+            className="relative rounded-full"
+            style={{
+              width: 240,
+              height: 240,
+              boxShadow: aligne ? "0 0 0 6px rgba(47,143,91,0.25), 0 0 32px rgba(47,143,91,0.45)" : "none",
+              transition: "box-shadow 0.3s",
+            }}
+          >
             {/* Repère fixe en haut : direction où pointe le téléphone */}
             <div
               className="absolute left-1/2 top-0 z-10 -translate-x-1/2 -translate-y-1"
@@ -218,15 +246,14 @@ export default function BoussoleQibla({ ville, pays }: Props) {
               }}
             />
             <svg
+              ref={cadranRef}
               viewBox="0 0 200 200"
               width={240}
               height={240}
               style={{
                 transform: `rotate(${rotationCadran}deg)`,
-                transition: "transform 0.15s linear",
-                filter: aligne
-                  ? "drop-shadow(0 0 18px rgba(47,143,91,0.45))"
-                  : "drop-shadow(0 8px 20px rgba(60,45,15,0.18))",
+                willChange: "transform",
+                filter: "drop-shadow(0 8px 20px rgba(60,45,15,0.18))",
               }}
             >
               {/* Disque */}
@@ -326,10 +353,11 @@ export default function BoussoleQibla({ ville, pays }: Props) {
             </svg>
             {/* Kaaba sur l'aiguille, au-dessus du cadran */}
             <div
+              ref={kaabaRef}
               className="pointer-events-none absolute inset-0 flex items-start justify-center"
               style={{
                 transform: `rotate(${rotationCadran + (qibla ?? 0)}deg)`,
-                transition: "transform 0.15s linear",
+                willChange: "transform",
               }}
             >
               <span
@@ -342,11 +370,11 @@ export default function BoussoleQibla({ ville, pays }: Props) {
           </div>
 
           {/* Lecture */}
-          <div className="mt-4 text-center">
+          <div className="mt-4 text-center" style={{ minHeight: "6.5rem" }}>
             {capteur === "actif" && ecart !== null ? (
               <p
-                className="text-lg font-extrabold"
-                style={{ color: aligne ? "#2f8f5b" : "var(--text)" }}
+                className="text-lg font-extrabold tabular-nums"
+                style={{ color: aligne ? "#2f8f5b" : "var(--text)", minHeight: "1.75rem" }}
               >
                 {aligne
                   ? "Tu es face à la Qibla"

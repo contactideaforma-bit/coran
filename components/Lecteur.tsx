@@ -20,6 +20,7 @@ import {
 } from "@/lib/marquePage";
 import { TAJWID_RULES, RULE_BY_ID, type TajwidRule } from "@/lib/tajwid";
 import { urlMot, urlVerset } from "@/lib/audio";
+import { LectureContinue, lectureContinueDisponible } from "@/lib/lecture-continue";
 import { RECITATEURS, TAILLES, usePrefs } from "@/lib/prefs";
 import {
   indexMemorises,
@@ -80,8 +81,10 @@ export default function Lecteur({ n }: { n: number }) {
   const [motsFrPrets, setMotsFrPrets] = useState(false);
   const [vocab, setVocab] = useState<IndexVocabulaire | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  // Verset suivant déjà téléchargé pendant la lecture de la sourate
+  // Verset suivant déjà téléchargé pendant la lecture de la sourate (secours <audio>)
   const prechargeRef = useRef<{ url: string; audio: HTMLAudioElement } | null>(null);
+  // Lecture continue sans coupure (Web Audio)
+  const continueRef = useRef<LectureContinue | null>(null);
   const dataRef = useRef<SourateData | null>(null);
   const conteneurRef = useRef<HTMLDivElement | null>(null);
   const bulleRef = useRef<HTMLDivElement | null>(null);
@@ -114,6 +117,7 @@ export default function Lecteur({ n }: { n: number }) {
     let annule = false;
     audioRef.current?.pause();
     audioRef.current = null;
+    continueRef.current?.arreter();
     setLecture(null);
     setData(null);
     setErreur(false);
@@ -154,6 +158,7 @@ export default function Lecteur({ n }: { n: number }) {
   useEffect(() => {
     return () => {
       audioRef.current?.pause();
+      continueRef.current?.arreter();
     };
   }, []);
 
@@ -226,11 +231,13 @@ export default function Lecteur({ n }: { n: number }) {
     audioRef.current?.pause();
     audioRef.current = null;
     prechargeRef.current = null;
+    continueRef.current?.arreter();
     setLecture(null);
   };
 
   const jouer = (url: string, etat: Lecture) => {
     audioRef.current?.pause();
+    continueRef.current?.arreter();
     const audio = new Audio(url);
     audioRef.current = audio;
     setLecture(etat);
@@ -270,6 +277,7 @@ export default function Lecteur({ n }: { n: number }) {
     const m2 = verse?.words[w + 1];
     if (!m1 || !m2) return;
     audioRef.current?.pause();
+    continueRef.current?.arreter();
     const audio1 = new Audio(urlMot(n, v, m1.audio));
     const audio2 = new Audio(urlMot(n, v, m2.audio));
     audio2.preload = "auto"; // précharger le 2e pour un enchaînement fluide
@@ -350,11 +358,48 @@ export default function Lecteur({ n }: { n: number }) {
     prechargerVerset(idx + 1);
   };
 
+  /** Affiche le verset en cours de récitation (surlignage + défilement). */
+  const montrerVersetLu = (v: number) => {
+    setLecture({ type: "sourate", v });
+    setSection(sectionDuVerset(v));
+    setTimeout(() => {
+      document
+        .getElementById(`v-${v}`)
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 50);
+  };
+
+  /** Lecture continue sans coupure (Web Audio) ; secours <audio> sinon. */
+  const lancerSourate = (idx: number) => {
+    const verses = dataRef.current?.verses;
+    if (!verses || !verses.length) return;
+    if (!lectureContinueDisponible()) {
+      jouerSourateDepuis(idx);
+      return;
+    }
+    audioRef.current?.pause();
+    audioRef.current = null;
+    if (!continueRef.current) {
+      continueRef.current = new LectureContinue({
+        surVerset: (i) => {
+          const v = dataRef.current?.verses[i];
+          if (v) montrerVersetLu(v.n);
+        },
+        surFin: () => setLecture(null),
+        surErreur: () => {},
+      });
+    }
+    const urls = verses.map((v) => urlVerset(n, v.n, prefs.recitateur));
+    // Le premier verset s'affiche tout de suite (le temps du téléchargement)
+    montrerVersetLu(verses[idx].n);
+    continueRef.current.demarrer(urls, idx);
+  };
+
   const clicSourate = () => {
     if (lecture?.type === "sourate") {
       stopAudio();
     } else {
-      jouerSourateDepuis(0);
+      lancerSourate(0);
     }
   };
 
@@ -402,6 +447,14 @@ export default function Lecteur({ n }: { n: number }) {
         <div className="flex items-center justify-between gap-3">
           <Link
             href="/coran"
+            onClick={() => {
+              // Demander à la liste de revenir là où on était
+              try {
+                sessionStorage.setItem("coran-liste-retour", "1");
+              } catch {
+                /* stockage indisponible */
+              }
+            }}
             className="card rounded-full px-4 py-2 text-sm font-bold shadow-soft transition hover:scale-105 active:scale-95"
           >
             ← Sourates
