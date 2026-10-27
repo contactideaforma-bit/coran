@@ -56,6 +56,7 @@ export default function Apprentissage() {
   const [progression, setProgression] = useState("");
   const [etapeCourante, setEtapeCourante] = useState<Etape | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const prechargeRef = useRef<{ url: string; audio: HTMLAudioElement } | null>(null);
   const fileRef = useRef<Etape[]>([]);
   const indexRef = useRef(0);
   const etatRef = useRef<"arret" | "lecture" | "pause">("arret");
@@ -136,6 +137,7 @@ export default function Apprentissage() {
   const stopAudio = () => {
     audioRef.current?.pause();
     audioRef.current = null;
+    prechargeRef.current = null;
     fileRef.current = [];
     indexRef.current = 0;
     changerEtat("arret");
@@ -153,12 +155,29 @@ export default function Apprentissage() {
     indexRef.current = i;
     setProgression(`${file[i].label} • étape ${i + 1}/${file.length}`);
     setEtapeCourante(file[i]);
-    const audio = new Audio(file[i].url);
+    // On réutilise l'audio préchargé pendant l'étape précédente (pas de coupure)
+    const pret = prechargeRef.current;
+    const audio =
+      pret && pret.url === file[i].url ? pret.audio : new Audio(file[i].url);
+    prechargeRef.current = null;
     audioRef.current = audio;
-    const suivant = () => jouerEtape(i + 1);
+    let enchaine = false;
+    const suivant = () => {
+      if (enchaine) return;
+      enchaine = true;
+      jouerEtape(i + 1);
+    };
     audio.onended = suivant;
     audio.onerror = suivant; // un fichier manquant ne bloque pas la session
     audio.play().catch(suivant);
+    // Précharger l'étape suivante dès maintenant
+    const prochaine = file[i + 1];
+    if (prochaine) {
+      const a = new Audio(prochaine.url);
+      a.preload = "auto";
+      a.load();
+      prechargeRef.current = { url: prochaine.url, audio: a };
+    }
   };
 
   const lancerFile = (file: Etape[]) => {

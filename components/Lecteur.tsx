@@ -80,6 +80,8 @@ export default function Lecteur({ n }: { n: number }) {
   const [motsFrPrets, setMotsFrPrets] = useState(false);
   const [vocab, setVocab] = useState<IndexVocabulaire | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  // Verset suivant déjà téléchargé pendant la lecture de la sourate
+  const prechargeRef = useRef<{ url: string; audio: HTMLAudioElement } | null>(null);
   const dataRef = useRef<SourateData | null>(null);
   const conteneurRef = useRef<HTMLDivElement | null>(null);
   const bulleRef = useRef<HTMLDivElement | null>(null);
@@ -223,6 +225,7 @@ export default function Lecteur({ n }: { n: number }) {
   const stopAudio = () => {
     audioRef.current?.pause();
     audioRef.current = null;
+    prechargeRef.current = null;
     setLecture(null);
   };
 
@@ -294,16 +297,37 @@ export default function Lecteur({ n }: { n: number }) {
     }
   };
 
-  // Lecture de la sourate entière (enchaînement des versets)
+  /** Précharge l'audio du verset d'index idx (pour enchaîner sans coupure). */
+  const prechargerVerset = (idx: number) => {
+    const verses = dataRef.current?.verses;
+    if (!verses || idx >= verses.length) {
+      prechargeRef.current = null;
+      return;
+    }
+    const url = urlVerset(n, verses[idx].n, prefs.recitateur);
+    if (prechargeRef.current?.url === url) return;
+    const audio = new Audio(url);
+    audio.preload = "auto";
+    audio.load();
+    prechargeRef.current = { url, audio };
+  };
+
+  // Lecture de la sourate entière (enchaînement des versets sans coupure :
+  // le verset suivant est téléchargé pendant la lecture du verset en cours,
+  // et démarre dès la fin du précédent sans attendre le réseau)
   const jouerSourateDepuis = (idx: number) => {
     const verses = dataRef.current?.verses;
     if (!verses || idx >= verses.length) {
+      prechargeRef.current = null;
       setLecture(null);
       return;
     }
     const v = verses[idx];
     audioRef.current?.pause();
-    const audio = new Audio(urlVerset(n, v.n, prefs.recitateur));
+    const url = urlVerset(n, v.n, prefs.recitateur);
+    const pret = prechargeRef.current;
+    const audio = pret && pret.url === url ? pret.audio : new Audio(url);
+    prechargeRef.current = null;
     audioRef.current = audio;
     setLecture({ type: "sourate", v: v.n });
     setSection(sectionDuVerset(v.n));
@@ -312,9 +336,18 @@ export default function Lecteur({ n }: { n: number }) {
         .getElementById(`v-${v.n}`)
         ?.scrollIntoView({ behavior: "smooth", block: "center" });
     }, 50);
-    audio.onended = () => jouerSourateDepuis(idx + 1);
+    let enchaine = false;
+    const suivant = () => {
+      if (enchaine) return;
+      enchaine = true;
+      jouerSourateDepuis(idx + 1);
+    };
+    audio.onended = suivant;
     audio.onerror = () => setLecture(null);
+    // Dès que la lecture démarre, on précharge le verset suivant
+    audio.onplaying = () => prechargerVerset(idx + 1);
     audio.play().catch(() => setLecture(null));
+    prechargerVerset(idx + 1);
   };
 
   const clicSourate = () => {
@@ -742,7 +775,7 @@ export default function Lecteur({ n }: { n: number }) {
         className="fixed right-6 z-30 flex items-center gap-2 rounded-full px-5 py-3 font-bold text-white shadow-lg transition-all duration-300 hover:scale-105 active:scale-95"
         style={{
           backgroundColor: "var(--accent-fort)",
-          bottom: "calc(1.5rem + env(safe-area-inset-bottom))",
+          bottom: "calc(1rem + var(--hauteur-onglets))",
           opacity: bulleReglesVisible ? 1 : 0,
           transform: bulleReglesVisible
             ? "translateY(0)"

@@ -55,11 +55,11 @@ export default function BarreOnglets() {
               <Link
                 href={o.href}
                 aria-current={actif ? "page" : undefined}
-                className="flex flex-col items-center gap-0.5 py-2 transition active:scale-90"
+                className="flex flex-col items-center gap-1 pb-1.5 pt-2 transition active:scale-90"
                 style={{ color: actif ? "var(--accent-fort)" : "var(--muted)" }}
               >
                 <span
-                  className="flex h-8 w-14 items-center justify-center rounded-full transition-colors"
+                  className={`flex h-8 w-14 items-center justify-center rounded-full transition-colors ${actif ? "onglet-actif" : ""}`}
                   style={{
                     background: actif
                       ? "color-mix(in srgb, var(--accent) 18%, transparent)"

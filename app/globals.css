@@ -77,15 +77,38 @@ h3 {
   font-weight: 500;
 }
 
-/* ===== Cartes : profondeur douce, léger relief ===== */
+/* ===== Cartes : relief lumineux (liseré clair en haut, ombre douce) ===== */
+:root {
+  /* Reflet de lumière posé sur le bord haut des blocs + fine ombre interne en bas */
+  --relief:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -1px 0 color-mix(in srgb, var(--accent) 12%, transparent),
+    inset 1px 0 0 rgba(255, 255, 255, 0.35);
+  --reflet-haut: rgba(255, 255, 255, 0.75);
+}
+.dark {
+  --relief:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+    inset 1px 0 0 rgba(255, 255, 255, 0.04);
+  --reflet-haut: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
 .card {
   background:
+    /* Reflet lumineux qui descend du coin haut-gauche */
+    linear-gradient(
+      160deg,
+      var(--reflet-haut) 0%,
+      transparent 42%
+    ),
     linear-gradient(
       180deg,
-      color-mix(in srgb, var(--accent) 3%, var(--card)),
-      var(--card) 45%
+      color-mix(in srgb, var(--accent) 4%, var(--card)),
+      var(--card) 55%
     );
-  border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border));
+  border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--border));
+  box-shadow: var(--relief);
   transition:
     background-color 0.3s ease,
     border-color 0.3s ease,
@@ -95,16 +118,27 @@ h3 {
 
 .shadow-soft {
   box-shadow:
+    var(--relief),
     0 1px 2px rgba(40, 30, 10, 0.05),
     0 10px 30px -12px color-mix(in srgb, var(--accent) 30%, rgba(60, 45, 15, 0.18));
 }
 
-/* Les cartes cliquables se soulèvent légèrement */
+/* Les cartes cliquables se soulèvent légèrement et s'éclairent */
 a.card:hover,
 button.card:hover {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
   box-shadow:
+    var(--relief),
     0 2px 4px rgba(40, 30, 10, 0.06),
     0 16px 38px -12px color-mix(in srgb, var(--accent) 40%, rgba(60, 45, 15, 0.22));
+}
+
+/* Relief plus marqué pour les blocs mis en avant */
+.relief {
+  box-shadow:
+    var(--relief),
+    0 1px 2px rgba(40, 30, 10, 0.05),
+    0 18px 40px -16px color-mix(in srgb, var(--accent) 45%, rgba(60, 45, 15, 0.25));
 }
 
 /* ===== En-tête effet verre ===== */
@@ -296,15 +330,31 @@ main {
 
 /* ===== Barre d'onglets du bas ===== */
 :root { --hauteur-onglets: 0px; }
-.avec-onglets { --hauteur-onglets: calc(4rem + env(safe-area-inset-bottom)); }
-.avec-onglets body { padding-bottom: var(--hauteur-onglets); }
+/* Un peu plus haute, avec une marge sous les icônes pour qu'elles ne
+   collent pas au bord de l'écran */
+.avec-onglets { --hauteur-onglets: calc(4.75rem + env(safe-area-inset-bottom, 0px)); }
+.avec-onglets body { padding-bottom: calc(var(--hauteur-onglets) + 0.75rem); }
 .barre-onglets {
-  padding-bottom: env(safe-area-inset-bottom);
+  padding-top: 0.25rem;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.5rem);
   background: color-mix(in srgb, var(--card) 88%, transparent);
   -webkit-backdrop-filter: blur(16px) saturate(1.4);
   backdrop-filter: blur(16px) saturate(1.4);
   border-top: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border));
-  box-shadow: 0 -6px 24px -12px rgba(40, 30, 10, 0.18);
+  box-shadow:
+    inset 0 1px 0 var(--reflet-haut),
+    0 -6px 24px -12px rgba(40, 30, 10, 0.18);
+}
+/* Pastille active : petit relief lumineux */
+.barre-onglets .onglet-actif {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 2px 6px -2px color-mix(in srgb, var(--accent) 50%, transparent);
+}
+.dark .barre-onglets .onglet-actif {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 2px 6px -2px rgba(0, 0, 0, 0.5);
 }
 
 /* Photos du Scroll halal : lent zoom (effet Ken Burns) */

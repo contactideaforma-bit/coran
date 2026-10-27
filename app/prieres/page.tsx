@@ -19,6 +19,7 @@ import {
   synchroniserAbonnement,
 } from "@/lib/notifications";
 import Entete from "@/components/Entete";
+import BoussoleQibla from "@/components/BoussoleQibla";
 import {
   Alerte,
   Aube,
@@ -557,6 +558,8 @@ export default function Prieres() {
               )}
             </div>
           )}
+
+          <BoussoleQibla ville={config.ville} pays={config.pays} />
 
           <CarteRappels />
 
