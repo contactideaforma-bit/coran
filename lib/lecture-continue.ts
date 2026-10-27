@@ -4,8 +4,9 @@
  * fichiers (démarrage du décodeur, réseau). Ici, chaque verset est
  * téléchargé puis décodé en mémoire, et le suivant est programmé sur
  * l'horloge audio exactement à la fin du précédent : l'enchaînement est
- * parfaitement continu. On rogne en plus le silence au début et à la fin
- * de chaque fichier. Deux versets d'avance sont toujours téléchargés.
+ * parfaitement continu. Le silence enregistré au début/fin de chaque
+ * fichier est conservé (c'est la respiration naturelle du récitateur).
+ * Deux versets d'avance sont toujours téléchargés.
  */
 
 interface Morceau {
@@ -24,6 +25,7 @@ export interface RappelsLecture {
 }
 
 const AVANCE = 2; // nombre de versets téléchargés d'avance
+const ROGNER_SILENCE = false; // true = couper les blancs (transitions pressées)
 const SEUIL_SILENCE = 0.012; // amplitude en dessous de laquelle c'est du silence
 const MARGE_DEBUT = 0.06; // on garde un petit souffle avant le premier son
 const MARGE_FIN = 0.1;
@@ -115,6 +117,7 @@ export class LectureContinue {
 
   /** Rogne le silence de début et de fin. */
   private bornes(buffer: AudioBuffer): { debut: number; fin: number } {
+    if (!ROGNER_SILENCE) return { debut: 0, fin: buffer.duration };
     const d = buffer.getChannelData(0);
     const taux = buffer.sampleRate;
     let premier = 0;

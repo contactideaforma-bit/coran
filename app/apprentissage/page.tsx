@@ -12,6 +12,7 @@ import { SOURATES } from "@/data/sourates";
 import { sectionsJuz } from "@/data/juz";
 import { RULE_BY_ID, type TajwidRule } from "@/lib/tajwid";
 import { urlMot, urlVerset } from "@/lib/audio";
+import { LecteurPlage, chargerAudioSourate, type AudioSourate } from "@/lib/audio-sourate";
 import { RECITATEURS, TAILLES, usePrefs } from "@/lib/prefs";
 import Entete from "@/components/Entete";
 import {
@@ -29,6 +30,9 @@ interface Etape {
   label: string; // ex. « Verset 5 — répétition 2/3 »
   v: number; // verset joué (pour le surlignage)
   w?: number; // index du mot joué (mode passage)
+  /** Plage de versets consécutifs lue dans le fichier complet de la sourate
+   *  (récitation d'origine, transitions naturelles) — url ignorée */
+  plage?: { de: number; a: number };
 }
 
 const REPETITIONS = [1, 2, 3, 5, 7, 10];
@@ -57,6 +61,8 @@ export default function Apprentissage() {
   const [etapeCourante, setEtapeCourante] = useState<Etape | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const prechargeRef = useRef<{ url: string; audio: HTMLAudioElement } | null>(null);
+  const plageRef = useRef<LecteurPlage | null>(null);
+  const audioSourateRef = useRef<AudioSourate | null>(null);
   const fileRef = useRef<Etape[]>([]);
   const indexRef = useRef(0);
   const etatRef = useRef<"arret" | "lecture" | "pause">("arret");
@@ -73,6 +79,18 @@ export default function Apprentissage() {
     const s = Number(m[1]);
     if (s >= 1 && s <= 114) setN(s);
   }, []);
+
+  // Fichier complet de la sourate (récitation d'origine) + minutages
+  useEffect(() => {
+    let annule = false;
+    audioSourateRef.current = null;
+    chargerAudioSourate(prefs.recitateur, n).then((a) => {
+      if (!annule) audioSourateRef.current = a;
+    });
+    return () => {
+      annule = true;
+    };
+  }, [n, prefs.recitateur]);
 
   // Charger la sourate choisie (et tout réinitialiser)
   useEffect(() => {
@@ -138,6 +156,7 @@ export default function Apprentissage() {
     audioRef.current?.pause();
     audioRef.current = null;
     prechargeRef.current = null;
+    plageRef.current?.arreter();
     fileRef.current = [];
     indexRef.current = 0;
     changerEtat("arret");
@@ -155,6 +174,27 @@ export default function Apprentissage() {
     indexRef.current = i;
     setProgression(`${file[i].label} • étape ${i + 1}/${file.length}`);
     setEtapeCourante(file[i]);
+    const plage = file[i].plage;
+    const complet = audioSourateRef.current;
+    if (plage && complet) {
+      // Récitation d'origine : la plage est lue d'un trait dans le fichier complet
+      audioRef.current?.pause();
+      audioRef.current = null;
+      if (!plageRef.current) plageRef.current = new LecteurPlage();
+      let enchaine = false;
+      const suivant = () => {
+        if (enchaine) return;
+        enchaine = true;
+        jouerEtape(i + 1);
+      };
+      plageRef.current.jouer(complet, plage.de, plage.a, {
+        surVerset: (v) => setEtapeCourante((e) => (e && e.v !== v ? { ...e, v } : e)),
+        surFin: suivant,
+        surErreur: suivant,
+      });
+      return;
+    }
+    plageRef.current?.arreter();
     // On réutilise l'audio préchargé pendant l'étape précédente (pas de coupure)
     const pret = prechargeRef.current;
     const audio =
@@ -188,17 +228,40 @@ export default function Apprentissage() {
     jouerEtape(0);
   };
 
-  /** File du mode « versets » : chaque verset coché, répété N fois. */
+  /** File du mode « versets » : les versets cochés, répétés N fois.
+   *  Des versets consécutifs forment une plage lue d'un trait dans la
+   *  récitation d'origine (transition naturelle entre les versets). */
   const lancerVersets = () => {
     const liste = Array.from(coches).sort((a, b) => a - b);
     const file: Etape[] = [];
-    for (const v of liste) {
-      for (let r = 1; r <= reps; r++) {
-        file.push({
-          url: urlVerset(n, v, prefs.recitateur),
-          label: `Verset ${v} — répétition ${r}/${reps}`,
-          v,
-        });
+    if (audioSourateRef.current) {
+      // Regrouper les versets consécutifs
+      const plages: { de: number; a: number }[] = [];
+      for (const v of liste) {
+        const derniere = plages[plages.length - 1];
+        if (derniere && v === derniere.a + 1) derniere.a = v;
+        else plages.push({ de: v, a: v });
+      }
+      for (const p of plages) {
+        const nom = p.de === p.a ? `Verset ${p.de}` : `Versets ${p.de} à ${p.a}`;
+        for (let r = 1; r <= reps; r++) {
+          file.push({
+            url: "",
+            label: `${nom} — répétition ${r}/${reps}`,
+            v: p.de,
+            plage: p,
+          });
+        }
+      }
+    } else {
+      for (const v of liste) {
+        for (let r = 1; r <= reps; r++) {
+          file.push({
+            url: urlVerset(n, v, prefs.recitateur),
+            label: `Verset ${v} — répétition ${r}/${reps}`,
+            v,
+          });
+        }
       }
     }
     lancerFile(file);
@@ -224,12 +287,24 @@ export default function Apprentissage() {
   };
 
   const basculerPause = () => {
+    const etape = fileRef.current[indexRef.current];
+    const complet = audioSourateRef.current;
     if (etat === "lecture") {
       audioRef.current?.pause();
+      plageRef.current?.pause();
       changerEtat("pause");
     } else if (etat === "pause") {
       changerEtat("lecture");
-      audioRef.current?.play().catch(() => jouerEtape(indexRef.current + 1));
+      if (etape?.plage && complet && plageRef.current) {
+        const i = indexRef.current;
+        plageRef.current.reprendre(complet, etape.plage.a, {
+          surVerset: (v) => setEtapeCourante((e) => (e && e.v !== v ? { ...e, v } : e)),
+          surFin: () => jouerEtape(i + 1),
+          surErreur: () => jouerEtape(i + 1),
+        });
+      } else {
+        audioRef.current?.play().catch(() => jouerEtape(indexRef.current + 1));
+      }
     }
   };
 

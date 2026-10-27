@@ -21,6 +21,7 @@ import {
 import { TAJWID_RULES, RULE_BY_ID, type TajwidRule } from "@/lib/tajwid";
 import { urlMot, urlVerset } from "@/lib/audio";
 import { LectureContinue, lectureContinueDisponible } from "@/lib/lecture-continue";
+import { LecteurPlage, chargerAudioSourate, type AudioSourate } from "@/lib/audio-sourate";
 import { RECITATEURS, TAILLES, usePrefs } from "@/lib/prefs";
 import {
   indexMemorises,
@@ -83,8 +84,11 @@ export default function Lecteur({ n }: { n: number }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   // Verset suivant déjà téléchargé pendant la lecture de la sourate (secours <audio>)
   const prechargeRef = useRef<{ url: string; audio: HTMLAudioElement } | null>(null);
-  // Lecture continue sans coupure (Web Audio)
+  // Lecture continue sans coupure (Web Audio, secours)
   const continueRef = useRef<LectureContinue | null>(null);
+  // Fichier complet de la sourate (récitation d'origine) + minutages
+  const plageRef = useRef<LecteurPlage | null>(null);
+  const audioSourateRef = useRef<AudioSourate | null>(null);
   const dataRef = useRef<SourateData | null>(null);
   const conteneurRef = useRef<HTMLDivElement | null>(null);
   const bulleRef = useRef<HTMLDivElement | null>(null);
@@ -118,6 +122,7 @@ export default function Lecteur({ n }: { n: number }) {
     audioRef.current?.pause();
     audioRef.current = null;
     continueRef.current?.arreter();
+    plageRef.current?.arreter();
     setLecture(null);
     setData(null);
     setErreur(false);
@@ -139,6 +144,18 @@ export default function Lecteur({ n }: { n: number }) {
     };
   }, [n]);
 
+  // Préparer le fichier complet de la sourate (récitation d'origine)
+  useEffect(() => {
+    let annule = false;
+    audioSourateRef.current = null;
+    chargerAudioSourate(prefs.recitateur, n).then((a) => {
+      if (!annule) audioSourateRef.current = a;
+    });
+    return () => {
+      annule = true;
+    };
+  }, [n, prefs.recitateur]);
+
   // Aller au verset indiqué dans l'URL (#v-12) après chargement
   useEffect(() => {
     if (!data) return;
@@ -159,6 +176,7 @@ export default function Lecteur({ n }: { n: number }) {
     return () => {
       audioRef.current?.pause();
       continueRef.current?.arreter();
+    plageRef.current?.arreter();
     };
   }, []);
 
@@ -232,12 +250,14 @@ export default function Lecteur({ n }: { n: number }) {
     audioRef.current = null;
     prechargeRef.current = null;
     continueRef.current?.arreter();
+    plageRef.current?.arreter();
     setLecture(null);
   };
 
   const jouer = (url: string, etat: Lecture) => {
     audioRef.current?.pause();
     continueRef.current?.arreter();
+    plageRef.current?.arreter();
     const audio = new Audio(url);
     audioRef.current = audio;
     setLecture(etat);
@@ -278,6 +298,7 @@ export default function Lecteur({ n }: { n: number }) {
     if (!m1 || !m2) return;
     audioRef.current?.pause();
     continueRef.current?.arreter();
+    plageRef.current?.arreter();
     const audio1 = new Audio(urlMot(n, v, m1.audio));
     const audio2 = new Audio(urlMot(n, v, m2.audio));
     audio2.preload = "auto"; // précharger le 2e pour un enchaînement fluide
@@ -360,7 +381,9 @@ export default function Lecteur({ n }: { n: number }) {
 
   /** Affiche le verset en cours de récitation (surlignage + défilement). */
   const montrerVersetLu = (v: number) => {
-    setLecture({ type: "sourate", v });
+    setLecture((prev) =>
+      prev?.type === "sourate" && prev.v === v ? prev : { type: "sourate", v }
+    );
     setSection(sectionDuVerset(v));
     setTimeout(() => {
       document
@@ -369,8 +392,29 @@ export default function Lecteur({ n }: { n: number }) {
     }, 50);
   };
 
-  /** Lecture continue sans coupure (Web Audio) ; secours <audio> sinon. */
+  /** Lecture de la sourate : fichier complet d'origine si le récitateur est
+   *  disponible, sinon enchaînement sans coupure (Web Audio), sinon <audio>. */
   const lancerSourate = (idx: number) => {
+    const verses = dataRef.current?.verses;
+    if (!verses || !verses.length) return;
+    audioRef.current?.pause();
+    audioRef.current = null;
+    continueRef.current?.arreter();
+    const complet = audioSourateRef.current;
+    if (complet) {
+      if (!plageRef.current) plageRef.current = new LecteurPlage();
+      montrerVersetLu(verses[idx].n);
+      plageRef.current.jouer(complet, verses[idx].n, verses[verses.length - 1].n, {
+        surVerset: (v) => montrerVersetLu(v),
+        surFin: () => setLecture(null),
+        surErreur: () => lancerSourateParVersets(idx),
+      });
+      return;
+    }
+    lancerSourateParVersets(idx);
+  };
+
+  const lancerSourateParVersets = (idx: number) => {
     const verses = dataRef.current?.verses;
     if (!verses || !verses.length) return;
     if (!lectureContinueDisponible()) {
