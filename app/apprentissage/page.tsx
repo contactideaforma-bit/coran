@@ -13,6 +13,7 @@ import { sectionsJuz } from "@/data/juz";
 import { RULE_BY_ID, type TajwidRule } from "@/lib/tajwid";
 import { urlMot, urlVerset } from "@/lib/audio";
 import { LecteurPlage, chargerAudioSourate, type AudioSourate } from "@/lib/audio-sourate";
+import { declarerMediaSession, effacerMediaSession, etatMediaSession } from "@/lib/media-session";
 import { RECITATEURS, TAILLES, usePrefs } from "@/lib/prefs";
 import Entete from "@/components/Entete";
 import {
@@ -174,6 +175,17 @@ export default function Apprentissage() {
     indexRef.current = i;
     setProgression(`${file[i].label} • étape ${i + 1}/${file.length}`);
     setEtapeCourante(file[i]);
+    declarerMediaSession({
+      titre: `${meta.nom} — ${file[i].label}`,
+      artiste: nomRecitateur,
+      surLecture: () => {
+        if (etatRef.current === "pause") basculerPause();
+      },
+      surPause: () => {
+        if (etatRef.current === "lecture") basculerPause();
+      },
+      surArret: () => stopAudio(),
+    });
     const plage = file[i].plage;
     const complet = audioSourateRef.current;
     if (plage && complet) {
@@ -289,19 +301,17 @@ export default function Apprentissage() {
   const basculerPause = () => {
     const etape = fileRef.current[indexRef.current];
     const complet = audioSourateRef.current;
-    if (etat === "lecture") {
+    const etatActuel = etatRef.current; // (les contrôles de l'écran verrouillé appellent une version figée)
+    if (etatActuel === "lecture") {
       audioRef.current?.pause();
       plageRef.current?.pause();
+      etatMediaSession("paused");
       changerEtat("pause");
-    } else if (etat === "pause") {
+    } else if (etatActuel === "pause") {
       changerEtat("lecture");
+      etatMediaSession("playing");
       if (etape?.plage && complet && plageRef.current) {
-        const i = indexRef.current;
-        plageRef.current.reprendre(complet, etape.plage.a, {
-          surVerset: (v) => setEtapeCourante((e) => (e && e.v !== v ? { ...e, v } : e)),
-          surFin: () => jouerEtape(i + 1),
-          surErreur: () => jouerEtape(i + 1),
-        });
+        plageRef.current.reprendre();
       } else {
         audioRef.current?.play().catch(() => jouerEtape(indexRef.current + 1));
       }

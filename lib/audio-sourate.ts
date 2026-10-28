@@ -82,10 +82,18 @@ export class LecteurPlage {
   readonly element: HTMLAudioElement;
   private session = 0;
   private boucle: number | null = null;
+  private rappelsCourants: RappelsPlage | null = null;
 
   constructor() {
     this.element = new Audio();
     this.element.preload = "auto";
+    // Dans le document (caché) : iOS maintient mieux la lecture en
+    // arrière-plan pour un élément présent dans la page.
+    if (typeof document !== "undefined") {
+      this.element.setAttribute("aria-hidden", "true");
+      this.element.style.display = "none";
+      document.body.appendChild(this.element);
+    }
   }
 
   /** Lit du verset `de` au verset `a` (inclus). */
@@ -104,10 +112,14 @@ export class LecteurPlage {
 
     const surveiller = () => {
       if (session !== this.session) return;
+      if (this.boucle !== null) {
+        window.clearTimeout(this.boucle);
+        this.boucle = null;
+      }
+      if (el.paused && !el.ended) return; // en pause : on repartira avec reprendre()
       const t = el.currentTime;
       if (t >= tFin - 0.03 || el.ended) {
         el.pause();
-        this.boucle = null;
         rappels.surFin();
         return;
       }
@@ -129,8 +141,12 @@ export class LecteurPlage {
       if (session === this.session) rappels.surErreur();
     };
     el.onended = () => {
-      if (session === this.session && this.boucle === null) rappels.surFin();
+      if (session === this.session) surveiller();
     };
+    el.ontimeupdate = () => {
+      if (session === this.session) surveiller();
+    };
+    this.rappelsCourants = rappels;
 
     if (el.src !== audio.url) {
       el.src = audio.url;
@@ -176,24 +192,12 @@ export class LecteurPlage {
     }
   }
 
-  /** Reprend après une pause (la surveillance repart). */
-  reprendre(audio: AudioSourate, a: number, rappels: RappelsPlage) {
-    const session = this.session;
-    const tFin = (minutageDe(audio, a) ?? audio.minutages[audio.minutages.length - 1]).a;
+  /** Reprend après une pause (depuis le bouton ou l'écran verrouillé). */
+  reprendre() {
     const el = this.element;
-    const surveiller = () => {
-      if (session !== this.session) return;
-      if (el.currentTime >= tFin - 0.03 || el.ended) {
-        el.pause();
-        this.boucle = null;
-        rappels.surFin();
-        return;
-      }
-      const m = audio.minutages.filter((x) => el.currentTime >= x.de).pop();
-      if (m) rappels.surVerset?.(m.v);
-      this.boucle = window.setTimeout(surveiller, 60);
-    };
-    el.play().then(surveiller, () => rappels.surErreur());
+    const rappels = this.rappelsCourants;
+    if (!rappels) return;
+    el.play().catch(() => rappels.surErreur());
   }
 
   arreter() {
@@ -205,6 +209,8 @@ export class LecteurPlage {
     this.element.pause();
     this.element.onended = null;
     this.element.onerror = null;
+    this.element.ontimeupdate = null;
+    this.rappelsCourants = null;
   }
 
   get enLecture() {

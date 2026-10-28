@@ -20,8 +20,8 @@ import {
 } from "@/lib/marquePage";
 import { TAJWID_RULES, RULE_BY_ID, type TajwidRule } from "@/lib/tajwid";
 import { urlMot, urlVerset } from "@/lib/audio";
-import { LectureContinue, lectureContinueDisponible } from "@/lib/lecture-continue";
 import { LecteurPlage, chargerAudioSourate, type AudioSourate } from "@/lib/audio-sourate";
+import { declarerMediaSession, effacerMediaSession, etatMediaSession } from "@/lib/media-session";
 import { RECITATEURS, TAILLES, usePrefs } from "@/lib/prefs";
 import {
   indexMemorises,
@@ -84,8 +84,6 @@ export default function Lecteur({ n }: { n: number }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   // Verset suivant déjà téléchargé pendant la lecture de la sourate (secours <audio>)
   const prechargeRef = useRef<{ url: string; audio: HTMLAudioElement } | null>(null);
-  // Lecture continue sans coupure (Web Audio, secours)
-  const continueRef = useRef<LectureContinue | null>(null);
   // Fichier complet de la sourate (récitation d'origine) + minutages
   const plageRef = useRef<LecteurPlage | null>(null);
   const audioSourateRef = useRef<AudioSourate | null>(null);
@@ -121,7 +119,6 @@ export default function Lecteur({ n }: { n: number }) {
     let annule = false;
     audioRef.current?.pause();
     audioRef.current = null;
-    continueRef.current?.arreter();
     plageRef.current?.arreter();
     setLecture(null);
     setData(null);
@@ -175,8 +172,7 @@ export default function Lecteur({ n }: { n: number }) {
   useEffect(() => {
     return () => {
       audioRef.current?.pause();
-      continueRef.current?.arreter();
-    plageRef.current?.arreter();
+      plageRef.current?.arreter();
     };
   }, []);
 
@@ -249,14 +245,13 @@ export default function Lecteur({ n }: { n: number }) {
     audioRef.current?.pause();
     audioRef.current = null;
     prechargeRef.current = null;
-    continueRef.current?.arreter();
     plageRef.current?.arreter();
+    effacerMediaSession();
     setLecture(null);
   };
 
   const jouer = (url: string, etat: Lecture) => {
     audioRef.current?.pause();
-    continueRef.current?.arreter();
     plageRef.current?.arreter();
     const audio = new Audio(url);
     audioRef.current = audio;
@@ -297,7 +292,6 @@ export default function Lecteur({ n }: { n: number }) {
     const m2 = verse?.words[w + 1];
     if (!m1 || !m2) return;
     audioRef.current?.pause();
-    continueRef.current?.arreter();
     plageRef.current?.arreter();
     const audio1 = new Audio(urlMot(n, v, m1.audio));
     const audio2 = new Audio(urlMot(n, v, m2.audio));
@@ -360,6 +354,7 @@ export default function Lecteur({ n }: { n: number }) {
     audioRef.current = audio;
     setLecture({ type: "sourate", v: v.n });
     setSection(sectionDuVerset(v.n));
+    declarerSession(v.n);
     setTimeout(() => {
       document
         .getElementById(`v-${v.n}`)
@@ -399,14 +394,20 @@ export default function Lecteur({ n }: { n: number }) {
     if (!verses || !verses.length) return;
     audioRef.current?.pause();
     audioRef.current = null;
-    continueRef.current?.arreter();
     const complet = audioSourateRef.current;
     if (complet) {
       if (!plageRef.current) plageRef.current = new LecteurPlage();
       montrerVersetLu(verses[idx].n);
+      declarerSession(verses[idx].n);
       plageRef.current.jouer(complet, verses[idx].n, verses[verses.length - 1].n, {
-        surVerset: (v) => montrerVersetLu(v),
-        surFin: () => setLecture(null),
+        surVerset: (v) => {
+          montrerVersetLu(v);
+          declarerSession(v);
+        },
+        surFin: () => {
+          effacerMediaSession();
+          setLecture(null);
+        },
         surErreur: () => lancerSourateParVersets(idx),
       });
       return;
@@ -414,29 +415,28 @@ export default function Lecteur({ n }: { n: number }) {
     lancerSourateParVersets(idx);
   };
 
+  /** Secours : enchaînement verset par verset (<audio> préchargé). */
   const lancerSourateParVersets = (idx: number) => {
-    const verses = dataRef.current?.verses;
-    if (!verses || !verses.length) return;
-    if (!lectureContinueDisponible()) {
-      jouerSourateDepuis(idx);
-      return;
-    }
-    audioRef.current?.pause();
-    audioRef.current = null;
-    if (!continueRef.current) {
-      continueRef.current = new LectureContinue({
-        surVerset: (i) => {
-          const v = dataRef.current?.verses[i];
-          if (v) montrerVersetLu(v.n);
-        },
-        surFin: () => setLecture(null),
-        surErreur: () => {},
-      });
-    }
-    const urls = verses.map((v) => urlVerset(n, v.n, prefs.recitateur));
-    // Le premier verset s'affiche tout de suite (le temps du téléchargement)
-    montrerVersetLu(verses[idx].n);
-    continueRef.current.demarrer(urls, idx);
+    jouerSourateDepuis(idx);
+  };
+
+  /** Contrôles de l'écran verrouillé + maintien de la lecture en arrière-plan. */
+  const declarerSession = (v: number) => {
+    declarerMediaSession({
+      titre: `${meta.nom} — verset ${v}`,
+      artiste: RECITATEURS.find((r) => r.id === prefs.recitateur)?.nom,
+      surLecture: () => {
+        plageRef.current?.reprendre();
+        audioRef.current?.play().catch(() => {});
+        etatMediaSession("playing");
+      },
+      surPause: () => {
+        plageRef.current?.pause();
+        audioRef.current?.pause();
+        etatMediaSession("paused");
+      },
+      surArret: () => stopAudio(),
+    });
   };
 
   const clicSourate = () => {
