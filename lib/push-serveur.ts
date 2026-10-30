@@ -20,6 +20,7 @@ import {
   enMinutes,
   type Abonne,
   type PriereNotifiable,
+  NOTIF_KAHF,
 } from "./rappels";
 
 /* ===== Redis (REST Upstash) ===== */
@@ -264,6 +265,15 @@ export async function envoyerRappels() {
           url: "/coran",
           tag: `rappel-${r.id}`,
         });
+      }
+
+      // 3. Sourate Al-Kahf chaque vendredi
+      const kahf = a.notifs?.kahf ?? { actif: true, heure: "09:00" };
+      if (kahf.actif && jourSemaine === 5) {
+        const ecart = minutes - enMinutes(kahf.heure);
+        if (ecart >= 0 && ecart <= TOLERANCE && (await premiereFois(`${a.id}:${date}:kahf`))) {
+          messages.push({ ...NOTIF_KAHF, tag: "kahf" });
+        }
       }
 
       for (const m of messages) {

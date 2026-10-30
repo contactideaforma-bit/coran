@@ -7,8 +7,8 @@ import { JUZ_DEBUTS } from "@/data/juz";
 import { usePrefs } from "@/lib/prefs";
 import { lireMarquePage, type MarquePage } from "@/lib/marquePage";
 import Entete from "@/components/Entete";
+import EnTeteRubrique from "@/components/EnTeteRubrique";
 import {
-  LivreOuvert,
   MarquePageIcone,
   Recherche,
 } from "@/components/Icones";
@@ -132,17 +132,14 @@ export default function Coran() {
     <div className="mx-auto max-w-3xl px-4 pb-16 pt-4">
       <Entete />
 
-      <section className="mt-6 flex items-center justify-between gap-3">
-        <Link
-          href="/"
-          className="card rounded-full px-4 py-2 text-sm font-bold shadow-soft transition hover:scale-105 active:scale-95"
-        >
-          ← Accueil
-        </Link>
-        <h2 className="flex items-center gap-2 text-xl font-extrabold">
-          <LivreOuvert taille={22} /> Le Coran
-        </h2>
-      </section>
+      <EnTeteRubrique
+        surtitre="Lire & apprendre"
+        titre="Le Coran"
+        teinte="#2e7d5b"
+        filigrane="القرآن"
+        image="/icones/coran.webp"
+        texte="114 sourates, tajwid en couleur, mot à mot et récitation continue."
+      />
 
       {/* Reprendre la lecture (marque-page) */}
       {marque && sourateMarquee && (

@@ -12,6 +12,7 @@ import {
   PRIERES_NOTIFIABLES,
   enMinutes,
   lireConfigNotifs,
+  NOTIF_KAHF,
 } from "@/lib/rappels";
 
 interface Echeance {
@@ -83,6 +84,20 @@ export default function RappelPriere() {
               corps: r.message,
               url: "/coran",
             });
+            break;
+          }
+        }
+      }
+
+      // Al-Kahf le vendredi
+      if (notifs.kahf?.actif) {
+        for (let j = 0; j <= 7; j++) {
+          const d = new Date(maintenant);
+          d.setDate(d.getDate() + j);
+          if (d.getDay() !== 5) continue;
+          const quand = aDate(notifs.kahf.heure, j);
+          if (quand > maintenant.getTime()) {
+            candidats.push({ quand, ...NOTIF_KAHF });
             break;
           }
         }

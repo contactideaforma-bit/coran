@@ -26,7 +26,8 @@ import {
   type RappelCoran,
 } from "@/lib/rappels";
 import Entete from "@/components/Entete";
-import { Cloche, Horloge, LivreOuvert, Verifie } from "@/components/Icones";
+import EnTeteRubrique from "@/components/EnTeteRubrique";
+import { Horloge, LivreOuvert, Verifie } from "@/components/Icones";
 
 /** Interrupteur rond (même style que la page prières). */
 function Interrupteur({
@@ -167,17 +168,14 @@ export default function Rappels() {
     <div className="mx-auto max-w-3xl px-4 pb-16 pt-4">
       <Entete />
 
-      <section className="mt-6 flex items-center gap-3">
-        <span className="tuile-icone">
-          <Cloche taille={24} />
-        </span>
-        <div>
-          <h1 className="text-2xl font-extrabold">Rappels</h1>
-          <p className="text-sm" style={{ color: "var(--muted)" }}>
-            Notifications pour les prières et ta lecture du Coran
-          </p>
-        </div>
-      </section>
+      <EnTeteRubrique
+        surtitre="Au quotidien"
+        titre="Rappels"
+        teinte="#c0603f"
+        filigrane="تذكير"
+        image="https://images.pexels.com/photos/20069741/pexels-photo-20069741.jpeg?auto=compress&cs=tinysrgb&w=320&h=320&fit=crop"
+        texte="Prières, lecture du Coran et sourate Al-Kahf du vendredi : des notifications aux moments que tu choisis."
+      />
 
       {/* ===== Interrupteur général ===== */}
       <div className="card mt-5 rounded-2xl p-4 shadow-soft">
@@ -295,6 +293,43 @@ export default function Rappels() {
               })}
             </div>
           </div>
+        )}
+      </section>
+
+      {/* ===== Al-Kahf le vendredi ===== */}
+      <section className="card mt-6 rounded-2xl p-4 shadow-soft">
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <h2 className="text-lg font-extrabold">Sourate Al-Kahf le vendredi 🌟</h2>
+            <p className="text-sm" style={{ color: "var(--muted)" }}>
+              Un rappel chaque vendredi, avec un lien direct pour lire ou écouter la sourate.
+            </p>
+          </div>
+          <button
+            onClick={() => enregistrer({ ...config, kahf: { ...config.kahf, actif: !config.kahf.actif } })}
+            role="switch"
+            aria-checked={config.kahf.actif}
+            aria-label="Activer le rappel Al-Kahf"
+            className="relative h-6 w-11 shrink-0 rounded-full transition"
+            style={{ backgroundColor: config.kahf.actif ? "var(--accent-fort)" : "var(--border)" }}
+          >
+            <span
+              className="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all"
+              style={{ left: config.kahf.actif ? "1.375rem" : "0.125rem" }}
+            />
+          </button>
+        </div>
+        {config.kahf.actif && (
+          <label className="mt-3 flex items-center gap-3 text-sm font-bold">
+            Heure du rappel
+            <input
+              type="time"
+              value={config.kahf.heure}
+              onChange={(e) => enregistrer({ ...config, kahf: { ...config.kahf, heure: e.target.value } })}
+              className="rounded-xl border px-3 py-1.5 text-base font-bold"
+              style={{ borderColor: "var(--border)", background: "var(--card)", color: "var(--text)" }}
+            />
+          </label>
         )}
       </section>
 

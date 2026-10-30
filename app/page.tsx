@@ -149,13 +149,16 @@ function TuileRubrique({ t }: { t: Tuile }) {
   );
 }
 
-function TitreSection({ children }: { children: React.ReactNode }) {
+const ROMAINS = ["I", "II", "III", "IV", "V", "VI", "VII"];
+function TitreSection({ children, numero }: { children: React.ReactNode; numero: number }) {
   return (
-    <h3 className="mb-3 mt-8 px-1 text-lg font-extrabold" style={{ fontFamily: "Marcellus, serif" }}>
-      {children}
-    </h3>
+    <div className="titre-edito px-1">
+      <small>{ROMAINS[numero - 1] ?? numero}</small>
+      <h3>{children}</h3>
+    </div>
   );
 }
+
 
 export default function Accueil() {
   const [hadith, setHadith] = useState<Hadith | null>(null);
@@ -262,7 +265,7 @@ export default function Accueil() {
       </section>
 
       {/* ===== Les deux actions principales ===== */}
-      <section className="mt-4 grid grid-cols-2 gap-3">
+      <section className="cascade mt-4 grid grid-cols-2 gap-3">
         <Link
           href={marque && sourateMarquee ? `/sourate/${marque.s}#v-${marque.v}` : "/coran"}
           className="flex flex-col justify-between rounded-3xl p-4 shadow-soft transition hover:-translate-y-0.5 active:scale-[0.97]"
@@ -319,6 +322,27 @@ export default function Accueil() {
         </span>
       </Link>
 
+      {/* ===== Vendredi : Al-Kahf ===== */}
+      {maintenant?.getDay() === 5 && (
+        <Link
+          href="/sourate/18?ecouter=1"
+          className="card relief mt-3 flex items-center gap-4 rounded-3xl p-4 transition active:scale-[0.98]"
+          style={{ borderColor: "var(--accent)" }}
+        >
+          <span className="chiffre-edito shrink-0" style={{ fontSize: "2.6rem", color: "var(--accent-fort)" }}>
+            18
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="hero-surtitre">C&apos;est vendredi</span>
+            <span className="mt-1 block text-base font-extrabold leading-tight">Sourate Al-Kahf</span>
+            <span className="mt-0.5 block text-xs" style={{ color: "var(--muted)" }}>
+              « Une lumière l&apos;éclaire jusqu&apos;au vendredi suivant » — lire ou écouter
+            </span>
+          </span>
+          <span className="pilule-pleine shrink-0 text-xs">▶ Écouter</span>
+        </Link>
+      )}
+
       {/* ===== Rappel du jour ===== */}
       {hadith && (
         <Link
@@ -338,21 +362,21 @@ export default function Accueil() {
       <GuideInstallation />
 
       {/* ===== Rubriques ===== */}
-      <TitreSection>Lire & apprendre</TitreSection>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <TitreSection numero={1}>Lire & apprendre</TitreSection>
+      <div className="cascade grid grid-cols-2 gap-3 sm:grid-cols-4">
         {LIRE.map((t) => (
           <TuileRubrique key={t.href} t={t} />
         ))}
       </div>
 
-      <TitreSection>Au quotidien</TitreSection>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <TitreSection numero={2}>Au quotidien</TitreSection>
+      <div className="cascade grid grid-cols-2 gap-3 sm:grid-cols-4">
         {QUOTIDIEN.map((t) => (
           <TuileRubrique key={t.href} t={t} />
         ))}
       </div>
 
-      <TitreSection>Guides pas à pas</TitreSection>
+      <TitreSection numero={3}>Guides pas à pas</TitreSection>
       <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2" style={{ scrollbarWidth: "none" }}>
         {GUIDES.map((g) => (
           <Link
@@ -375,7 +399,7 @@ export default function Accueil() {
         ))}
       </div>
 
-      <TitreSection>Aller plus loin</TitreSection>
+      <TitreSection numero={4}>Aller plus loin</TitreSection>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <Link
           href="/soutien"
@@ -397,7 +421,7 @@ export default function Accueil() {
         </Link>
       </div>
 
-      <TitreSection>Se détendre</TitreSection>
+      <TitreSection numero={5}>Se détendre</TitreSection>
       <Link
         href="/jeux"
         className="card flex items-center gap-4 rounded-3xl p-4 shadow-soft transition active:scale-[0.98]"

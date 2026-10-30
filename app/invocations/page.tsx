@@ -5,6 +5,9 @@ import { useMemo, useState } from "react";
 import { CATEGORIES_INVOCATIONS } from "@/data/invocations";
 import { usePrefs } from "@/lib/prefs";
 import Entete from "@/components/Entete";
+import EnTeteRubrique from "@/components/EnTeteRubrique";
+import EcouteInvocation, { useCorrespondanceAudio } from "@/components/EcouteInvocation";
+import { cleInvocation } from "@/lib/invocations-audio";
 import {
   Ampoule,
   Bouclier,
@@ -60,15 +63,22 @@ const normaliser = (t: string) =>
 export default function Invocations() {
   const { prefs } = usePrefs();
   const [q, setQ] = useState("");
+  const audios = useCorrespondanceAudio();
 
   const categories = useMemo(() => {
     const n = normaliser(q.trim());
-    if (!n) return CATEGORIES_INVOCATIONS;
+    if (!n)
+      return CATEGORIES_INVOCATIONS.map((c) => ({
+        ...c,
+        invocations: c.invocations.map((inv, idx) => ({ ...inv, idx })),
+      }));
     return CATEGORIES_INVOCATIONS.map((c) => ({
       ...c,
-      invocations: c.invocations.filter((inv) =>
-        normaliser(`${inv.titre} ${inv.fr} ${inv.translit} ${inv.note ?? ""} ${c.nom}`).includes(n)
-      ),
+      invocations: c.invocations
+        .map((inv, idx) => ({ ...inv, idx }))
+        .filter((inv) =>
+          normaliser(`${inv.titre} ${inv.fr} ${inv.translit} ${inv.note ?? ""} ${c.nom}`).includes(n)
+        ),
     })).filter((c) => c.invocations.length > 0);
   }, [q]);
 
@@ -79,17 +89,14 @@ export default function Invocations() {
     <div className="mx-auto max-w-3xl px-4 pb-16 pt-4">
       <Entete />
 
-      <section className="mt-6 flex items-center justify-between gap-3">
-        <Link
-          href="/"
-          className="card rounded-full px-4 py-2 text-sm font-bold shadow-soft transition hover:scale-105 active:scale-95"
-        >
-          ← Accueil
-        </Link>
-        <h2 className="flex items-center gap-2 text-xl font-extrabold">
-          <Coeur taille={22} /> Invocations
-        </h2>
-      </section>
+      <EnTeteRubrique
+        surtitre="Au quotidien"
+        titre="Invocations"
+        teinte="#b04a6f"
+        filigrane="الدعاء"
+        image="/icones/invocations.webp"
+        texte={`${total} invocations authentiques de la Citadelle du musulman, avec l'audio pour bien prononcer, et des guides pas à pas.`}
+      />
 
       <section className="mt-5">
         <h3 className="mb-2 text-lg font-extrabold">Guides pas à pas</h3>
@@ -218,6 +225,12 @@ export default function Invocations() {
                         <p className="text-xs font-bold" style={{ color: "var(--muted)" }}>
                           — {inv.source}
                         </p>
+                        {audios?.[cleInvocation(cat.id, inv.idx)] !== undefined && (
+                          <EcouteInvocation
+                            cle={cleInvocation(cat.id, inv.idx)}
+                            idAudio={audios[cleInvocation(cat.id, inv.idx)]}
+                          />
+                        )}
                         {inv.lien && (
                           <Link
                             href={inv.lien.href}

@@ -44,6 +44,8 @@ export interface ConfigNotifs {
   prieres: Record<PriereNotifiable, boolean>;
   avance: number; // minutes avant l'heure de la prière (0 = à l'heure)
   rappels: RappelCoran[];
+  /** Rappel hebdomadaire de la sourate Al-Kahf, chaque vendredi à l'heure indiquée */
+  kahf: { actif: boolean; heure: string };
 }
 
 /** Ce que le serveur conserve pour chaque appareil abonné. */
@@ -60,6 +62,14 @@ export const CONFIG_NOTIFS_DEFAUT: ConfigNotifs = {
   prieres: { fajr: true, dhuhr: true, asr: true, maghrib: true, isha: true },
   avance: 0,
   rappels: [],
+  kahf: { actif: true, heure: "09:00" },
+};
+
+/** Notification du vendredi : lien direct vers Al-Kahf avec le bouton Écouter mis en avant. */
+export const NOTIF_KAHF = {
+  titre: "C'est vendredi : sourate Al-Kahf 🌟",
+  corps: "« Une lumière l'éclaire jusqu'au vendredi suivant. » Touche pour lire ou écouter.",
+  url: "/sourate/18?ecouter=1",
 };
 
 export const MESSAGE_RAPPEL_DEFAUT = "C'est l'heure de ta lecture du Coran 📖";
@@ -75,6 +85,10 @@ export function lireConfigNotifs(): ConfigNotifs {
       prieres: { ...CONFIG_NOTIFS_DEFAUT.prieres, ...(c.prieres ?? {}) },
       avance: typeof c.avance === "number" ? c.avance : 0,
       rappels: Array.isArray(c.rappels) ? c.rappels : [],
+      kahf: {
+        actif: typeof c.kahf?.actif === "boolean" ? c.kahf.actif : true,
+        heure: typeof c.kahf?.heure === "string" ? c.kahf.heure : "09:00",
+      },
     };
   } catch {
     return CONFIG_NOTIFS_DEFAUT;

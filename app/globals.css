@@ -366,3 +366,226 @@ main {
   animation: fil-kenburns 24s ease-in-out infinite alternate;
   will-change: transform;
 }
+
+/* =====================================================================
+   Système « éditorial & relief » (refonte 10/2026)
+   ===================================================================== */
+
+/* Chiffres et dates en caractère de titre (Cormorant Garamond) */
+.chiffre-edito {
+  font-family: "Cormorant Garamond", "Marcellus", serif;
+  font-weight: 600;
+  font-variant-numeric: lining-nums;
+  letter-spacing: -0.01em;
+  line-height: 0.9;
+}
+
+/* En-tête de rubrique : bandeau teinté pleine largeur, grand titre,
+   calligraphie décorative en filigrane, illustration qui déborde */
+.hero {
+  --teinte: var(--accent);
+  position: relative;
+  overflow: hidden;
+  margin: 1.25rem 0 0;
+  padding: 1.5rem 1.25rem 1.4rem;
+  border-radius: 2rem;
+  background:
+    radial-gradient(120% 140% at 100% 0%, color-mix(in srgb, var(--teinte) 26%, transparent), transparent 60%),
+    linear-gradient(165deg, color-mix(in srgb, var(--teinte) 14%, var(--card)), var(--card) 70%);
+  border: 1px solid color-mix(in srgb, var(--teinte) 30%, var(--border));
+  box-shadow:
+    var(--relief),
+    0 24px 48px -28px color-mix(in srgb, var(--teinte) 55%, rgba(60, 45, 15, 0.3));
+}
+.hero-filigrane {
+  position: absolute;
+  right: -0.25rem;
+  top: -1.1rem;
+  font-size: 7.5rem;
+  line-height: 1;
+  color: color-mix(in srgb, var(--teinte) 14%, transparent);
+  pointer-events: none;
+  user-select: none;
+  direction: rtl;
+}
+.dark .hero-filigrane { color: color-mix(in srgb, var(--teinte) 22%, transparent); }
+.hero-surtitre {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--teinte) 75%, var(--text));
+}
+.hero-surtitre::before {
+  content: "";
+  width: 1.5rem;
+  height: 2px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--teinte) 80%, var(--text));
+}
+.hero-titre {
+  font-family: "Marcellus", serif;
+  font-size: clamp(1.9rem, 7.5vw, 2.6rem);
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  margin-top: 0.4rem;
+}
+.hero-texte {
+  margin-top: 0.6rem;
+  max-width: 30rem;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+.hero-image {
+  position: absolute;
+  right: 0.9rem;
+  bottom: -0.6rem;
+  width: 6.25rem;
+  height: 6.25rem;
+  object-fit: cover;
+  border-radius: 1.4rem;
+  background: #fff;
+  box-shadow: 0 16px 28px -12px rgba(40, 30, 10, 0.4), inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+  transform: rotate(-6deg);
+  pointer-events: none;
+}
+
+/* Titre de section éditorial : numéro romain discret + filet */
+.titre-edito {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin: 2rem 0 0.9rem;
+}
+.titre-edito > h3,
+.titre-edito > h2 {
+  font-family: "Marcellus", serif;
+  font-size: 1.35rem;
+  line-height: 1.1;
+}
+.titre-edito > small {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: color-mix(in srgb, var(--accent) 70%, var(--text));
+}
+.titre-edito::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  margin-left: 0.25rem;
+  background: linear-gradient(to right, color-mix(in srgb, var(--accent) 45%, transparent), transparent);
+}
+
+/* Frise verticale (calendrier) */
+.frise {
+  position: relative;
+  padding-left: 3.6rem;
+}
+.frise::before {
+  content: "";
+  position: absolute;
+  left: 1.05rem;
+  top: 0.75rem;
+  bottom: 0.75rem;
+  width: 2px;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--accent) 60%, transparent),
+    color-mix(in srgb, var(--accent) 15%, transparent)
+  );
+}
+.frise-point {
+  position: absolute;
+  left: 0;
+  top: 1.1rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: var(--card);
+  color: var(--accent-fort);
+  border: 1.5px solid color-mix(in srgb, var(--accent) 55%, var(--border));
+  box-shadow: var(--relief), 0 6px 14px -8px rgba(40, 30, 10, 0.3);
+}
+.frise-point.en-cours {
+  background: #2e7d5b;
+  color: #fff;
+  border-color: #2e7d5b;
+  box-shadow: 0 0 0 6px rgba(46, 125, 91, 0.18);
+}
+
+/* Apparition en cascade des listes */
+.cascade > * { animation: apparition 0.5s ease-out both; }
+.cascade > :nth-child(1) { animation-delay: 0.03s; }
+.cascade > :nth-child(2) { animation-delay: 0.08s; }
+.cascade > :nth-child(3) { animation-delay: 0.13s; }
+.cascade > :nth-child(4) { animation-delay: 0.18s; }
+.cascade > :nth-child(5) { animation-delay: 0.23s; }
+.cascade > :nth-child(6) { animation-delay: 0.28s; }
+.cascade > :nth-child(7) { animation-delay: 0.33s; }
+.cascade > :nth-child(8) { animation-delay: 0.38s; }
+.cascade > :nth-child(n + 9) { animation-delay: 0.42s; }
+@media (prefers-reduced-motion: reduce) {
+  .cascade > * { animation: none; }
+}
+
+/* Bouton pilule plein (accent) et pilule claire */
+.pilule-pleine {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 9999px;
+  padding: 0.55rem 1rem;
+  font-weight: 800;
+  font-size: 0.85rem;
+  background: var(--accent-fort);
+  color: var(--sur-accent);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    0 8px 18px -10px color-mix(in srgb, var(--accent) 80%, transparent);
+  transition: transform 0.15s ease;
+}
+.pilule-pleine:active { transform: scale(0.96); }
+.pilule-claire {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 9999px;
+  padding: 0.5rem 0.95rem;
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: var(--accent-fort);
+  background: color-mix(in srgb, var(--accent) 12%, var(--card));
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  box-shadow: var(--relief);
+  transition: transform 0.15s ease;
+}
+.pilule-claire:active { transform: scale(0.96); }
+
+/* Étiquette d'échéance (« Dans 24 jours ») */
+.etiquette {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  color: var(--accent-fort);
+  background: color-mix(in srgb, var(--accent) 14%, var(--card));
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+}
+.etiquette.en-cours {
+  color: #fff;
+  background: #2e7d5b;
+  border-color: #2e7d5b;
+}

@@ -42,6 +42,15 @@ export const RECITATEURS = [
   { id: "Abdurrahmaan_As-Sudais_192kbps", nom: "Abdurrahman As-Sudais", detail: "Imam de la Mecque" },
   { id: "Saood_ash-Shuraym_128kbps", nom: "Saoud Ash-Shuraym", detail: "Imam de la Mecque" },
   { id: "Ghamadi_40kbps", nom: "Saad Al-Ghamdi", detail: "Voix douce très appréciée" },
+  { id: "khalefa_al_tunaiji_64kbps", nom: "Khalifa Al-Tunaiji", detail: "Récitation posée et mélodieuse, très utilisée pour réviser" },
+  { id: "Alafasy_128kbps", nom: "Mishary Rashid Alafasy", detail: "Voix chaleureuse, récitateur le plus écouté au monde" },
+  { id: "MaherAlMuaiqly128kbps", nom: "Maher Al-Muaiqly", detail: "Imam de la Mecque, récitation limpide" },
+  { id: "Hudhaify_128kbps", nom: "Ali Al-Hudhaify", detail: "Imam de Médine, débit régulier idéal pour mémoriser" },
+  { id: "Abu_Bakr_Ash-Shaatree_128kbps", nom: "Abu Bakr Ash-Shatri", detail: "Voix douce et émouvante" },
+  { id: "ahmed_ibn_ali_al_ajamy_128kbps", nom: "Ahmed Al-Ajamy", detail: "Récitation claire et rythmée" },
+  { id: "Hani_Rifai_192kbps", nom: "Hani Ar-Rifai", detail: "Voix profonde, très expressive" },
+  { id: "Muhammad_Jibreel_128kbps", nom: "Muhammad Jibreel", detail: "Imam égyptien, récitation vivante" },
+  { id: "Abdullah_Basfar_192kbps", nom: "Abdullah Basfar", detail: "Articulation nette, recommandé pour l'apprentissage" },
 ];
 
 export const POLICES = [

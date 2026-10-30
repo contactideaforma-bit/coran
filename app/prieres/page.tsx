@@ -19,6 +19,7 @@ import {
   synchroniserAbonnement,
 } from "@/lib/notifications";
 import Entete from "@/components/Entete";
+import EnTeteRubrique from "@/components/EnTeteRubrique";
 import BoussoleQibla from "@/components/BoussoleQibla";
 import {
   Alerte,
@@ -187,17 +188,40 @@ export default function Prieres() {
     <div className="mx-auto max-w-3xl px-4 pb-16 pt-4">
       <Entete />
 
-      <section className="mt-6 flex items-center justify-between gap-3">
-        <Link
-          href="/"
-          className="card rounded-full px-4 py-2 text-sm font-bold shadow-soft transition hover:scale-105 active:scale-95"
-        >
-          ← Accueil
-        </Link>
-        <h2 className="flex items-center gap-2 text-xl font-extrabold">
-          <Horloge taille={22} /> Horaires de prière
-        </h2>
-      </section>
+      <EnTeteRubrique
+        surtitre="Au quotidien"
+        titre="Horaires de prière"
+        teinte="#a07b26"
+        filigrane="الصلاة"
+        image="/icones/prieres.webp"
+        texte={
+          config && !montrerFormulaire
+            ? `${config.ville}${horaires ? ` — ${horaires.hijri} H` : ""}`
+            : "Choisis ta ville : les horaires et la boussole suivent."
+        }
+        actions={
+          config && !montrerFormulaire ? (
+            <button onClick={() => setFormulaire(true)} className="pilule-claire text-xs">
+              <Epingle taille={14} /> Modifier
+            </button>
+          ) : null
+        }
+        enfants={
+          config && !montrerFormulaire && horaires && suivante && maintenant ? (
+            <div className="mt-4 flex items-end gap-3">
+              <span className="chiffre-edito" style={{ fontSize: "3.4rem", color: "var(--accent-fort)" }}>
+                {horaires[suivante]}
+              </span>
+              <span className="pb-1 text-sm leading-tight">
+                <span className="block font-extrabold">{LIGNES.find((l) => l.id === suivante)?.nom}</span>
+                <span className="block" style={{ color: "var(--muted)" }}>
+                  {tempsRestant(horaires[suivante], maintenant)}
+                </span>
+              </span>
+            </div>
+          ) : null
+        }
+      />
 
       {/* Choix ville + méthode */}
       {montrerFormulaire && (
@@ -295,29 +319,6 @@ export default function Prieres() {
       {/* Horaires du jour */}
       {config && !montrerFormulaire && (
         <div className="mt-6 space-y-4">
-          <div className="card flex items-center justify-between rounded-2xl p-4 shadow-soft">
-            <div>
-              <p className="flex items-center gap-1.5 font-bold">
-                <Epingle taille={16} className="shrink-0" /> {config.ville}
-              </p>
-              <p className="text-sm" style={{ color: "var(--muted)" }}>
-                {horaires
-                  ? `${new Date().toLocaleDateString("fr-FR", {
-                      weekday: "long",
-                      day: "numeric",
-                      month: "long",
-                    })} • ${horaires.hijri} H`
-                  : "…"}
-              </p>
-            </div>
-            <button
-              onClick={() => setFormulaire(true)}
-              className="card rounded-full px-4 py-2 text-sm font-bold transition hover:scale-105 active:scale-95"
-            >
-              Modifier
-            </button>
-          </div>
-
           {/* Vue : aujourd'hui ou mois entier */}
           <div className="flex gap-2">
             {(
@@ -374,19 +375,19 @@ export default function Prieres() {
           )}
 
           {vue === "jour" && horaires && (
-            <ul className="space-y-2">
+            <ul className="cascade space-y-2">
               {LIGNES.map((l) => {
                 const estSuivante = suivante === l.id;
                 return (
                   <li
                     key={l.id}
-                    className="card flex items-center justify-between rounded-2xl px-5 py-4 shadow-soft"
+                    className="card flex items-center justify-between rounded-3xl px-5 py-3.5 shadow-soft"
                     style={
                       estSuivante
                         ? {
-                            boxShadow: "0 0 0 2px var(--accent)",
+                            borderColor: "var(--accent)",
                             backgroundColor:
-                              "color-mix(in srgb, var(--accent) 10%, var(--card))",
+                              "color-mix(in srgb, var(--accent) 12%, var(--card))",
                           }
                         : undefined
                     }
@@ -407,7 +408,7 @@ export default function Prieres() {
                         </span>
                       )}
                     </span>
-                    <span className="text-lg font-extrabold tabular-nums">
+                    <span className="chiffre-edito tabular-nums" style={{ fontSize: "1.9rem" }}>
                       {horaires[l.id]}
                     </span>
                   </li>

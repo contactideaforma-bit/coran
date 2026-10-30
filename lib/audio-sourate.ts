@@ -12,6 +12,9 @@ export const RECITATIONS_QURAN_COM: Record<string, number> = {
   Minshawy_Murattal_128kbps: 9,
   "Abdurrahmaan_As-Sudais_192kbps": 3,
   "Saood_ash-Shuraym_128kbps": 10,
+  Alafasy_128kbps: 7,
+  "Abu_Bakr_Ash-Shaatree_128kbps": 4,
+  Hani_Rifai_192kbps: 5,
 };
 
 export interface MinutageVerset {

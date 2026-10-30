@@ -21,6 +21,7 @@ import {
 import { TAJWID_RULES, RULE_BY_ID, type TajwidRule } from "@/lib/tajwid";
 import { urlMot, urlVerset } from "@/lib/audio";
 import { LecteurPlage, chargerAudioSourate, type AudioSourate } from "@/lib/audio-sourate";
+import { pagesDeSourate } from "@/lib/coran";
 import { declarerMediaSession, effacerMediaSession, etatMediaSession } from "@/lib/media-session";
 import { RECITATEURS, TAILLES, usePrefs } from "@/lib/prefs";
 import {
@@ -472,6 +473,23 @@ export default function Lecteur({ n }: { n: number }) {
   const nomRecitateur =
     RECITATEURS.find((r) => r.id === prefs.recitateur)?.nom ?? "";
 
+  const pagesMushaf = data ? pagesDeSourate(data) : [];
+  const [saisieVerset, setSaisieVerset] = useState("");
+  // Arrivée depuis le rappel du vendredi (/sourate/18?ecouter=1) : proposer l'écoute
+  const [invitationEcoute, setInvitationEcoute] = useState(false);
+  useEffect(() => {
+    setInvitationEcoute(/[?&]ecouter=1/.test(window.location.search));
+  }, [n]);
+
+  /** Aller à un verset : bonne section de juz', puis défilement. */
+  const allerAuVerset = (v: number) => {
+    if (!data || v < 1 || v > meta.versets) return;
+    setSection(sectionDuVerset(v));
+    setTimeout(() => {
+      document.getElementById(`v-${v}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 80);
+  };
+
   const sec = sections[Math.min(section, sections.length - 1)];
   const versetsAffiches = data
     ? sections.length > 1
@@ -485,6 +503,34 @@ export default function Lecteur({ n }: { n: number }) {
   return (
     <div ref={conteneurRef} className="relative mx-auto max-w-3xl px-4 pb-36 pt-4">
       <Entete />
+
+      {invitationEcoute && (
+        <section
+          className="card relief pop mt-5 flex items-center gap-3 rounded-3xl p-4"
+          style={{ borderColor: "var(--accent)" }}
+        >
+          <span className="text-3xl" aria-hidden>🌟</span>
+          <div className="min-w-0 flex-1">
+            <p className="font-extrabold leading-tight">
+              {n === 18 ? "Vendredi : sourate Al-Kahf" : `Sourate ${meta.nom}`}
+            </p>
+            <p className="text-xs" style={{ color: "var(--muted)" }}>
+              Lis-la ci-dessous, ou lance la récitation complète.
+            </p>
+          </div>
+          <button
+            onClick={() => {
+              setInvitationEcoute(false);
+              if (lecture?.type !== "sourate") lancerSourate(0);
+            }}
+            disabled={!data}
+            className="shrink-0 rounded-full px-4 py-2 text-sm font-bold shadow-soft transition active:scale-95 disabled:opacity-60"
+            style={{ background: "var(--accent-fort)", color: "var(--sur-accent)" }}
+          >
+            {data ? "▶ Écouter" : "Chargement…"}
+          </button>
+        </section>
+      )}
 
       {/* ===== Titre + actions sourate ===== */}
       <section className="mt-5 space-y-3">
@@ -503,17 +549,33 @@ export default function Lecteur({ n }: { n: number }) {
           >
             ← Sourates
           </Link>
-          <div
-            className="card inline-block rounded-full px-5 py-2 shadow-soft"
-            style={{ borderColor: "var(--accent)" }}
+          <div className="text-right">
+            <p className="hero-surtitre justify-end">Sourate {meta.n}</p>
+          </div>
+        </div>
+
+        {/* Titre éditorial : nom arabe en grand, nom français, infos */}
+        <div className="card relief relative overflow-hidden rounded-3xl px-5 py-4">
+          <span
+            className={`hero-filigrane ${police}`}
+            style={{ fontSize: "5.5rem", top: "-0.6rem", right: "0.25rem" }}
+            aria-hidden
           >
-            <span className={`arabic text-xl font-bold ${police}`}>
+            {meta.n}
+          </span>
+          <div className="relative flex items-center justify-between gap-4">
+            <div className="min-w-0">
+              <h1 className="hero-titre" style={{ fontSize: "clamp(1.6rem, 6.5vw, 2.2rem)" }}>
+                {meta.nom}
+              </h1>
+              <p className="mt-1 text-xs font-bold" style={{ color: "var(--muted)" }}>
+                {meta.versets} versets
+                {pagesMushaf.length > 0 && ` • pages ${pagesMushaf[0].page}–${pagesMushaf[pagesMushaf.length - 1].page}`}
+              </p>
+            </div>
+            <span className={`arabic shrink-0 text-4xl font-bold ${police}`} dir="rtl" style={{ color: "var(--accent-fort)" }}>
               {meta.arabe}
             </span>
-            <span className="mx-2" style={{ color: "var(--muted)" }}>
-              •
-            </span>
-            <span className="text-sm font-bold">{meta.nom}</span>
           </div>
         </div>
 
@@ -626,6 +688,64 @@ export default function Lecteur({ n }: { n: number }) {
             ))}
           </div>
         )}
+
+        {/* Aller à un verset ou à une page du mushaf */}
+        {data && (
+          <div className="card rounded-2xl p-3 shadow-soft">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold uppercase tracking-wide" style={{ color: "var(--muted)" }}>
+                Aller au verset
+              </span>
+              <form
+                className="flex items-center gap-2"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  allerAuVerset(Number(saisieVerset));
+                }}
+              >
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  min={1}
+                  max={meta.versets}
+                  value={saisieVerset}
+                  onChange={(e) => setSaisieVerset(e.target.value)}
+                  placeholder={`1-${meta.versets}`}
+                  aria-label="Numéro de verset"
+                  className="w-20 rounded-full border px-3 py-1 text-sm outline-none"
+                  style={{ borderColor: "var(--border)", background: "var(--card)", color: "var(--text)" }}
+                />
+                <button
+                  type="submit"
+                  className="rounded-full px-3 py-1 text-sm font-bold"
+                  style={{ background: "var(--accent-fort)", color: "var(--sur-accent)" }}
+                >
+                  OK
+                </button>
+              </form>
+            </div>
+            {pagesMushaf.length > 0 && (
+              <div className="mt-2 flex items-center gap-2">
+                <span className="shrink-0 text-xs font-bold uppercase tracking-wide" style={{ color: "var(--muted)" }}>
+                  Page du mushaf
+                </span>
+                <div className="flex gap-1.5 overflow-x-auto pb-1">
+                  {pagesMushaf.map((p) => (
+                    <button
+                      key={p.page}
+                      onClick={() => allerAuVerset(p.premierVerset)}
+                      className="shrink-0 rounded-full border px-2.5 py-1 text-xs font-bold transition active:scale-95"
+                      style={{ borderColor: "var(--border)", background: "var(--card)" }}
+                      title={`Page ${p.page} — à partir du verset ${p.premierVerset}`}
+                    >
+                      {p.page}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </section>
 
       {/* ===== Basmala décorative (sauf Al-Fâtiha et At-Tawba) ===== */}
@@ -687,11 +807,18 @@ export default function Lecteur({ n }: { n: number }) {
       {/* ===== Versets ===== */}
       {data && (
         <main className="mt-5 space-y-4">
-          {versetsAffiches.map((v) => {
+          {versetsAffiches.map((v, iv) => {
             const estMarque = marque?.s === n && marque?.v === v.n;
+            const nouvellePage =
+              v.page > 0 && (iv === 0 || versetsAffiches[iv - 1].page !== v.page);
             return (
+              <div key={v.n} className="space-y-4">
+              {nouvellePage && (
+                <p className="ornement text-xs font-bold uppercase tracking-widest" aria-label={`Page ${v.page}`}>
+                  Page {v.page}
+                </p>
+              )}
               <article
-                key={v.n}
                 id={`v-${v.n}`}
                 className="card rounded-2xl p-5 shadow-soft transition"
                 style={{
@@ -816,6 +943,7 @@ export default function Lecteur({ n }: { n: number }) {
                   {v.traduction}
                 </p>
               </article>
+              </div>
             );
           })}
 

@@ -18,6 +18,7 @@ export interface Verse {
   n: number;
   words: Word[];
   traduction: string;
+  page: number; // page du mushaf (édition de Médine, 604 pages) ; 0 si inconnue
 }
 
 export interface SourateData {
@@ -259,9 +260,11 @@ export async function chargerSourate(n: number): Promise<SourateData> {
   const enCache = cache.get(n);
   if (enCache) return enCache;
 
-  const [texteRes, tradRes] = await Promise.all([
+  const [texteRes, tradRes, pagesRes] = await Promise.all([
     fetch(`${API}/quran/verses/uthmani_tajweed?chapter_number=${n}`),
     fetch(`${API}/quran/translations/${TRADUCTION_FR}?chapter_number=${n}`),
+    // Numéro de page du mushaf pour chaque verset (facultatif)
+    fetch(`${API}/verses/by_chapter/${n}?fields=page_number&per_page=300`).catch(() => null),
   ]);
   if (!texteRes.ok || !tradRes.ok) {
     throw new Error("Impossible de charger la sourate");
@@ -269,18 +272,45 @@ export async function chargerSourate(n: number): Promise<SourateData> {
 
   const texteJson = await texteRes.json();
   const tradJson = await tradRes.json();
+  const pages = new Map<number, number>();
+  if (pagesRes && pagesRes.ok) {
+    try {
+      const pagesJson = await pagesRes.json();
+      for (const v of pagesJson.verses ?? []) {
+        pages.set(Number(v.verse_number), Number(v.page_number) || 0);
+      }
+    } catch {
+      /* pages inconnues : pas bloquant */
+    }
+  }
 
   const verses: Verse[] = texteJson.verses.map(
-    (v: { verse_key: string; text_uthmani_tajweed: string }, i: number) => ({
-      n: Number(v.verse_key.split(":")[1]),
-      words: segmentsEnMots(parserTajweed(v.text_uthmani_tajweed)),
-      traduction: nettoyerTraduction(tradJson.translations?.[i]?.text ?? ""),
-    })
+    (v: { verse_key: string; text_uthmani_tajweed: string }, i: number) => {
+      const num = Number(v.verse_key.split(":")[1]);
+      return {
+        n: num,
+        words: segmentsEnMots(parserTajweed(v.text_uthmani_tajweed)),
+        traduction: nettoyerTraduction(tradJson.translations?.[i]?.text ?? ""),
+        page: pages.get(num) ?? 0,
+      };
+    }
   );
 
   const data: SourateData = { verses };
   cache.set(n, data);
   return data;
+}
+
+/** Pages du mushaf couvertes par la sourate, avec le premier verset de chaque page. */
+export function pagesDeSourate(data: SourateData): { page: number; premierVerset: number }[] {
+  const liste: { page: number; premierVerset: number }[] = [];
+  for (const v of data.verses) {
+    if (!v.page) continue;
+    if (!liste.length || liste[liste.length - 1].page !== v.page) {
+      liste.push({ page: v.page, premierVerset: v.n });
+    }
+  }
+  return liste;
 }
 
 /* ===== Phonétique (translittération latine, verset par verset) =====

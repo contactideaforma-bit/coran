@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import {
   chargerPhonetique,
@@ -16,12 +15,14 @@ import { LecteurPlage, chargerAudioSourate, type AudioSourate } from "@/lib/audi
 import { declarerMediaSession, effacerMediaSession, etatMediaSession } from "@/lib/media-session";
 import { RECITATEURS, TAILLES, usePrefs } from "@/lib/prefs";
 import Entete from "@/components/Entete";
+import EnTeteRubrique from "@/components/EnTeteRubrique";
+import ChoixSourate from "@/components/ChoixSourate";
+import { pagesDeSourate } from "@/lib/coran";
 import {
   Alerte,
   Lecture as IconeLecture,
   LivreOuvert,
   Pause,
-  Repeter,
 } from "@/components/Icones";
 
 /* ===== File de lecture ===== */
@@ -378,45 +379,25 @@ export default function Apprentissage() {
     <div className="mx-auto max-w-3xl px-4 pb-52 pt-4">
       <Entete />
 
-      <section className="mt-6 flex items-center justify-between gap-3">
-        <Link
-          href="/"
-          className="card rounded-full px-4 py-2 text-sm font-bold shadow-soft transition hover:scale-105 active:scale-95"
-        >
-          ← Accueil
-        </Link>
-        <h2 className="flex items-center gap-2 text-xl font-extrabold">
-          <Repeter taille={22} /> Apprentissage
-        </h2>
-      </section>
+      <EnTeteRubrique
+        surtitre="Lire & apprendre"
+        titre="Mémoriser"
+        teinte="#3b6ea5"
+        filigrane="الحفظ"
+        image="/icones/memoriser.webp"
+        texte="Choisis une sourate, coche des versets ou un passage, et laisse la récitation se répéter."
+      />
 
       {/* ===== Choix de la sourate ===== */}
-      <div className="card mt-5 rounded-2xl p-4 shadow-soft">
-        <label className="mb-1 block text-sm font-bold" htmlFor="sourate">
-          Sourate
-        </label>
-        <div className="flex items-center gap-3">
-          <select
-            id="sourate"
-            value={n}
-            onChange={(e) => setN(Number(e.target.value))}
-            className="w-full rounded-xl border px-3 py-2.5 font-semibold outline-none"
-            style={{
-              borderColor: "var(--border)",
-              backgroundColor: "var(--card)",
-              color: "var(--text)",
-            }}
-          >
-            {SOURATES.map((s) => (
-              <option key={s.n} value={s.n}>
-                {s.n}. {s.nom} ({s.versets} versets)
-              </option>
-            ))}
-          </select>
-          <span className={`arabic shrink-0 text-2xl font-bold ${police}`}>
-            {meta.arabe}
-          </span>
-        </div>
+      <div className="mt-5">
+        <ChoixSourate
+          valeur={n}
+          libelle="Sourate à réviser"
+          surChoix={(num) => {
+            stopAudio();
+            setN(num);
+          }}
+        />
       </div>
 
       {/* ===== Mode ===== */}
@@ -473,6 +454,33 @@ export default function Apprentissage() {
           ? "Coche les versets à mémoriser : chacun sera répété avant de passer au suivant."
           : "Touche un verset pour le choisir, puis touche le premier et le dernier mot à répéter."}
       </p>
+
+      {/* Aller à une page du mushaf */}
+      {data && pagesDeSourate(data).length > 1 && (
+        <div className="mt-3 flex items-center gap-2">
+          <span className="shrink-0 text-xs font-bold uppercase tracking-wide" style={{ color: "var(--muted)" }}>
+            Page
+          </span>
+          <div className="flex gap-1.5 overflow-x-auto pb-1">
+            {pagesDeSourate(data).map((p) => (
+              <button
+                key={p.page}
+                onClick={() => {
+                  setSection(Math.max(0, sections.findIndex((s) => p.premierVerset >= s.debut && p.premierVerset <= s.fin)));
+                  setTimeout(() => {
+                    document.getElementById(`v-${p.premierVerset}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }, 80);
+                }}
+                className="shrink-0 rounded-full border px-2.5 py-1 text-xs font-bold transition active:scale-95"
+                style={{ borderColor: "var(--border)", background: "var(--card)" }}
+                title={`Page ${p.page} — à partir du verset ${p.premierVerset}`}
+              >
+                {p.page}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Pagination par juz' pour les longues sourates */}
       {data && sections.length > 1 && (
@@ -543,6 +551,7 @@ export default function Apprentissage() {
             return (
               <article
                 key={v.n}
+                id={`v-${v.n}`}
                 onClick={() =>
                   mode === "versets" ? basculerVerset(v.n) : setVPassage(v.n)
                 }
