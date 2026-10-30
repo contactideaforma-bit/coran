@@ -39,6 +39,7 @@ import {
   Lecture as IconeLecture,
   LivreOuvert,
   MarquePageIcone,
+  Micro,
   Pause,
   Repeter,
   Verifie,
@@ -600,14 +601,22 @@ export default function Lecteur({ n }: { n: number }) {
         )}
 
         {data && (
-          <Link
-            href={`/apprentissage?s=${n}`}
-            className="card flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-bold shadow-soft transition hover:scale-[1.01] active:scale-[0.99]"
-            style={{ color: "var(--accent-fort)" }}
-          >
-            <Repeter taille={15} /> Mode apprentissage : répéter des versets ou
-            des mots
-          </Link>
+          <div className="grid grid-cols-2 gap-2">
+            <Link
+              href={`/apprentissage?s=${n}`}
+              className="card flex items-center justify-center gap-2 rounded-2xl px-3 py-2.5 text-center text-sm font-bold shadow-soft transition hover:scale-[1.01] active:scale-[0.99]"
+              style={{ color: "var(--accent-fort)" }}
+            >
+              <Repeter taille={15} /> Mémoriser
+            </Link>
+            <Link
+              href={`/recitation?s=${n}`}
+              className="card flex items-center justify-center gap-2 rounded-2xl px-3 py-2.5 text-center text-sm font-bold shadow-soft transition hover:scale-[1.01] active:scale-[0.99]"
+              style={{ color: "var(--accent-fort)" }}
+            >
+              <Micro taille={15} /> Me tester à l&apos;oral
+            </Link>
+          </div>
         )}
 
         {data && (

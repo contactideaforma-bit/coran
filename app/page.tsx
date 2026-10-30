@@ -32,6 +32,7 @@ import {
   Lettres,
   LivreOuvert,
   LuneEtoile,
+  Micro,
   Pinceau,
   Repeter,
 } from "@/components/Icones";
@@ -57,6 +58,7 @@ const LIRE: Tuile[] = [
   { href: "/coran", icone: LivreOuvert, image: "/icones/coran.webp", nom: "Coran", sous: "Lire et écouter, tajwid en couleur", teinte: "#2e7d5b" },
   { href: "/apprentissage", icone: Repeter, image: "/icones/memoriser.webp", nom: "Mémoriser", sous: "Répéter verset par verset", teinte: "#3b6ea5" },
   { href: "/nourania", icone: Lettres, image: "/icones/nourania.webp", nom: "Apprendre à lire", sous: "L'arabe pas à pas (Nourania)", teinte: "#7c5cad" },
+  { href: "/recitation", icone: Micro, nom: "Récitation", sous: "Récite de mémoire, l'IA te corrige", teinte: "#2a7f8f" },
 ];
 
 const QUOTIDIEN: Tuile[] = [

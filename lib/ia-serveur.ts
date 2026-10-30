@@ -36,7 +36,7 @@ const DUREE_ANONYME = 365 * 24 * 3600;
 
 /* ===== Redis (REST Upstash) ===== */
 
-async function redis<T = unknown>(...commande: (string | number)[]): Promise<T> {
+export async function redis<T = unknown>(...commande: (string | number)[]): Promise<T> {
   const url = (process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL);
   const token = (process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN);
   if (!url || !token) throw new Error("Upstash non configuré");
@@ -53,7 +53,7 @@ async function redis<T = unknown>(...commande: (string | number)[]): Promise<T> 
 
 /* ===== Stripe (API REST, sans SDK) ===== */
 
-async function stripe<T = unknown>(
+export async function stripe<T = unknown>(
   chemin: string,
   options: { methode?: "GET" | "POST"; corps?: Record<string, string> } = {}
 ): Promise<T> {
@@ -173,10 +173,18 @@ export async function supprimerSession() {
 
 /* ===== Lien de connexion par e-mail (Resend) ===== */
 
-export async function envoyerLienConnexion(email: string) {
+export async function envoyerLienConnexion(
+  email: string,
+  destination: { route: string; sujet: string; bouton: string; service: string } = {
+    route: "/api/ia/connexion",
+    sujet: "Ton accès à l'assistant My Easy Coran",
+    bouton: "Ouvrir l'assistant",
+    service: "l'assistant IA",
+  }
+) {
   const token = randomBytes(24).toString("hex");
   await redis("SET", `ia:lien:${token}`, email, "EX", 15 * 60);
-  const lien = `${urlSite()}/api/ia/connexion?token=${token}`;
+  const lien = `${urlSite()}${destination.route}?token=${token}`;
   const cle = process.env.RESEND_API_KEY;
   if (!cle) throw new Error("Resend non configuré");
   const res = await fetch("https://api.resend.com/emails", {
@@ -185,10 +193,10 @@ export async function envoyerLienConnexion(email: string) {
     body: JSON.stringify({
       from: process.env.IA_EMAIL_EXPEDITEUR ?? "My Easy Coran <assistant@myeasycoran.fr>",
       to: [email],
-      subject: "Ton accès à l'assistant My Easy Coran",
+      subject: destination.sujet,
       html: `<p>Assalamu alaykum,</p>
-<p>Voici ton lien de connexion à l'assistant IA de My Easy Coran (valable 15 minutes) :</p>
-<p><a href="${lien}" style="display:inline-block;padding:12px 20px;background:#a07b26;color:#fff;border-radius:999px;text-decoration:none;font-weight:bold">Ouvrir l'assistant</a></p>
+<p>Voici ton lien de connexion à ${destination.service} de My Easy Coran (valable 15 minutes) :</p>
+<p><a href="${lien}" style="display:inline-block;padding:12px 20px;background:#a07b26;color:#fff;border-radius:999px;text-decoration:none;font-weight:bold">${destination.bouton}</a></p>
 <p>Si tu n'es pas à l'origine de cette demande, ignore simplement cet e-mail.</p>
 <p>— My Easy Coran</p>`,
     }),
